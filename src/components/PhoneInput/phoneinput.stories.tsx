@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn } from 'storybook/test';
-import { PhoneInput } from './phoneinput';
+import { PhoneInput, type PhoneInputProps } from './phoneinput';
 import type { FlagCountry } from '../Flag';
 import { FormField } from '../FormField';
 
 const meta = {
   component: PhoneInput,
   tags: ['ai-generated'],
+  // Every story overrides rendering via `render` (see `Controlled` below),
+  // so these are just placeholders to satisfy the required prop types.
   args: {
     country: 'mexico' as FlagCountry,
     value: '',
@@ -26,25 +28,50 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+/**
+ * Every story below renders through this stateful wrapper instead of a
+ * static `onChange`/`onCountryChange` mock — a mock that doesn't update
+ * anything makes manual testing in Storybook's UI look broken (the flag
+ * appears to never change when you pick a different country), even though
+ * the component itself is working correctly. Only `disabled` stories are
+ * meant to look unresponsive.
+ */
+function Controlled({
+  initialCountry = 'mexico',
+  initialValue = '',
+  ...rest
+}: Partial<Omit<PhoneInputProps, 'country' | 'value' | 'onCountryChange' | 'onChange'>> & {
+  initialCountry?: FlagCountry;
+  initialValue?: string;
+}) {
+  const [country, setCountry] = useState<FlagCountry>(initialCountry);
+  const [value, setValue] = useState(initialValue);
+  return (
+    <PhoneInput
+      {...rest}
+      country={country}
+      onCountryChange={setCountry}
+      value={value}
+      onChange={setValue}
+    />
+  );
+}
 
-export const WithValue: Story = {
-  args: { value: '5512345678' },
+export const Default: Story = {
+  render: () => <Controlled />,
 };
 
-export const Error: Story = {
-  args: { value: '551234', error: true },
+export const WithValue: Story = {
+  render: () => <Controlled initialValue="5512345678" />,
+};
+
+export const ErrorState: Story = {
+  render: () => <Controlled initialValue="551234" error />,
 };
 
 export const Disabled: Story = {
-  args: { value: '5512345678', disabled: true },
+  render: () => <Controlled initialValue="5512345678" disabled />,
 };
-
-function Controlled() {
-  const [country, setCountry] = useState<FlagCountry>('mexico');
-  const [value, setValue] = useState('');
-  return <PhoneInput country={country} onCountryChange={setCountry} value={value} onChange={setValue} />;
-}
 
 export const OnlyDigitsAllowed: Story = {
   render: () => <Controlled />,
@@ -55,14 +82,20 @@ export const OnlyDigitsAllowed: Story = {
   },
 };
 
-export const OpensCountryDropdownAndSelects: Story = {
+export const FlagUpdatesOnSelection: Story = {
   render: () => <Controlled />,
   play: async ({ canvas, userEvent }) => {
     const countryButton = canvas.getByRole('button', { name: /country: mexico/i });
+    const flagBefore = countryButton.querySelector('img')?.getAttribute('src');
+
     await userEvent.click(countryButton);
     const argentinaOption = await canvas.findByRole('option', { name: 'Argentina' });
     await userEvent.click(argentinaOption);
-    await canvas.findByRole('button', { name: /country: argentina/i });
+
+    const updatedButton = await canvas.findByRole('button', { name: /country: argentina/i });
+    const flagAfter = updatedButton.querySelector('img')?.getAttribute('src');
+    await expect(flagAfter).not.toBe(flagBefore);
+    await expect(flagAfter).toContain('argentina');
     await expect(canvas.queryByRole('option', { name: 'Argentina' })).not.toBeInTheDocument();
   },
 };
@@ -91,9 +124,9 @@ export const CountriesAreAlphabetical: Story = {
 };
 
 export const InsideFormField: Story = {
-  render: (args) => (
+  render: () => (
     <FormField label="Phone number" helpText="Include your country and number">
-      <PhoneInput {...args} />
+      <Controlled />
     </FormField>
   ),
 };

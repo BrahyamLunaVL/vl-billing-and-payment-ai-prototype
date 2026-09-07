@@ -38,8 +38,9 @@ export interface DropdownOptionProps
  * `<button>` (with `role="option"`, matching how it is used inside a
  * listbox-like `Dropdown`) so it is keyboard-operable and clickable, and so
  * `aria-selected` is valid ARIA usage rather than sitting on a plain button.
- * Hover comes from real CSS `:hover`; `selected` is a prop-driven data state
- * that takes priority over hover styling (see dropdownoption.css).
+ * Hover (fucsia text) and focus (purple text) come from real CSS `:hover`/
+ * `:focus-visible` over a black default; `selected` is a prop-driven data
+ * state that takes priority over both (see dropdownoption.css).
  */
 export const DropdownOption = ({
   text,

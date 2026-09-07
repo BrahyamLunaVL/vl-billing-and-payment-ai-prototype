@@ -1,9 +1,11 @@
 .dropdown-option {
   --dropdown-option-color-white: #ffffff;
+  --dropdown-option-color-black: #263238;
   --dropdown-option-color-brand-primary: #c32059;
   --dropdown-option-color-brand-secondary: #6f1d5d;
   --dropdown-option-color-fucsia-50: #fdf6f8;
   --dropdown-option-color-fucsia-200: #f6dee6;
+  --dropdown-option-color-fucsia-600: #aa2059;
   --dropdown-option-color-gray-300: #d5d7dd;
 
   --dropdown-option-font-family: 'Roboto', sans-serif;
@@ -25,7 +27,7 @@
   border: none;
   border-radius: var(--dropdown-option-radius);
   background: var(--dropdown-option-color-white);
-  color: var(--dropdown-option-color-brand-primary);
+  color: var(--dropdown-option-color-black);
   font-family: var(--dropdown-option-font-family);
   text-align: left;
   cursor: pointer;
@@ -35,12 +37,19 @@
     color var(--dropdown-option-transition-duration) ease;
 }
 
-/* Hover is only shown while the row is not the selected item — selected
-   must keep its own look even on hover, per the design (Default/Hover are
-   mouse states, Selected is a data state that outranks them). */
+/* Hover and focus are only shown while the row is not the selected item —
+   selected must keep its own look even while hovered/focused, per the
+   design (Default/Hover/Focus are mouse/keyboard states, Selected is a data
+   state that outranks them). Focus is listed after hover so it wins when
+   both apply at once (e.g. clicking focuses the row while the mouse is
+   still over it). */
 .dropdown-option:hover:not(.dropdown-option--selected) {
   background: var(--dropdown-option-color-fucsia-50);
-  color: var(--dropdown-option-color-brand-primary);
+  color: var(--dropdown-option-color-fucsia-600);
+}
+
+.dropdown-option:focus-visible:not(.dropdown-option--selected) {
+  color: var(--dropdown-option-color-brand-secondary);
 }
 
 .dropdown-option:focus-visible {

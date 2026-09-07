@@ -21,11 +21,38 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvasElement }) => {
+    const button = canvasElement.querySelector('button');
+    if (!button) throw new globalThis.Error('Expected button to render');
+    // Black by default — only hover/focus/selected introduce color.
+    await expect(getComputedStyle(button).color).toBe('rgb(38, 50, 56)');
+  },
+};
 
-// Hover is a real CSS `:hover` pseudo-class (see dropdownoption.css) and
-// cannot be captured as a static arg/story — it is exercised visually by
-// interacting with the Default story in Storybook's UI.
+// Hover is a real CSS `:hover` pseudo-class (fucsia/600 text, see
+// dropdownoption.css) — `userEvent.hover` dispatches pointer events that
+// trigger JS handlers but doesn't reliably register real browser `:hover`
+// state in this test runner, so it's exercised visually in Storybook's UI
+// instead of asserted here (same limitation noted for Button's hover in
+// button.stories.tsx history).
+
+export const FocusColor: Story = {
+  play: async ({ canvasElement }) => {
+    const button = canvasElement.querySelector('button') as HTMLButtonElement | null;
+    if (!button) throw new globalThis.Error('Expected button to render');
+
+    // Color is animated over 0.15s (see dropdownoption.css) — wait for the
+    // transition to finish before reading the settled computed value.
+    button.focus();
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await expect(getComputedStyle(button).color).toBe('rgb(111, 29, 93)'); // brand/secondary purple
+
+    button.blur();
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await expect(getComputedStyle(button).color).toBe('rgb(38, 50, 56)'); // back to black
+  },
+};
 
 export const Selected: Story = {
   args: { selected: true },
