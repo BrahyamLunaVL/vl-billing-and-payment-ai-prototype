@@ -1,0 +1,90 @@
+.textarea {
+  --textarea-color-brand-primary: #c32059;
+  --textarea-color-brand-black: #263238;
+
+  --textarea-color-fucsia-200: #f6dee6;
+
+  --textarea-color-gray-200: #ececef;
+  --textarea-color-gray-300: #d5d7dd;
+  --textarea-color-gray-400: #bbbbbb;
+
+  --textarea-color-red-400: #f5aeae;
+
+  --textarea-radius: 8px;
+  --textarea-padding: 12px;
+  --textarea-gap: 4px;
+
+  --textarea-font-family: 'Roboto', sans-serif;
+  --textarea-font-size: 14px;
+
+  --textarea-transition-duration: 0.2s;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--textarea-gap);
+  height: 200px;
+  padding: var(--textarea-padding);
+  border: 1px solid var(--textarea-color-gray-300);
+  border-radius: var(--textarea-radius);
+  background: #ffffff;
+  color: var(--textarea-color-brand-black);
+  transition:
+    border-color var(--textarea-transition-duration) ease,
+    background-color var(--textarea-transition-duration) ease;
+}
+
+.textarea:hover:not(.textarea--disabled) {
+  border-color: var(--textarea-color-fucsia-200);
+}
+
+.textarea:focus-within:not(.textarea--disabled) {
+  border-color: var(--textarea-color-brand-primary);
+}
+
+.textarea--error:not(.textarea--disabled) {
+  border-color: var(--textarea-color-red-400);
+}
+
+.textarea--disabled {
+  border-color: var(--textarea-color-gray-300);
+  background: var(--textarea-color-gray-200);
+  color: var(--textarea-color-gray-400);
+}
+
+.textarea__field {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  resize: none;
+  padding: 0;
+  color: inherit;
+  font-family: var(--textarea-font-family);
+  font-size: var(--textarea-font-size);
+  font-weight: 400;
+}
+
+.textarea__field::placeholder {
+  color: var(--textarea-color-gray-400);
+}
+
+.textarea__field:disabled {
+  cursor: not-allowed;
+}
+
+.textarea__counter-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--textarea-gap);
+  flex-shrink: 0;
+}
+
+.textarea__counter {
+  font-family: var(--textarea-font-family);
+  font-size: var(--textarea-font-size);
+  font-weight: 400;
+  color: var(--textarea-color-gray-400);
+}

@@ -1,0 +1,88 @@
+.dropdown-option {
+  --dropdown-option-color-white: #ffffff;
+  --dropdown-option-color-brand-primary: #c32059;
+  --dropdown-option-color-brand-secondary: #6f1d5d;
+  --dropdown-option-color-fucsia-50: #fdf6f8;
+  --dropdown-option-color-fucsia-200: #f6dee6;
+  --dropdown-option-color-gray-300: #d5d7dd;
+
+  --dropdown-option-font-family: 'Roboto', sans-serif;
+  --dropdown-option-font-size-md: 16px;
+
+  --dropdown-option-gap: 8px;
+  --dropdown-option-padding-block: 8px;
+  --dropdown-option-padding-inline: 12px;
+  --dropdown-option-radius: 8px;
+
+  --dropdown-option-transition-duration: 0.15s;
+
+  display: flex;
+  align-items: center;
+  gap: var(--dropdown-option-gap);
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--dropdown-option-padding-block) var(--dropdown-option-padding-inline);
+  border: none;
+  border-radius: var(--dropdown-option-radius);
+  background: var(--dropdown-option-color-white);
+  color: var(--dropdown-option-color-brand-primary);
+  font-family: var(--dropdown-option-font-family);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dropdown-option-transition-duration) ease,
+    color var(--dropdown-option-transition-duration) ease;
+}
+
+/* Hover is only shown while the row is not the selected item — selected
+   must keep its own look even on hover, per the design (Default/Hover are
+   mouse states, Selected is a data state that outranks them). */
+.dropdown-option:hover:not(.dropdown-option--selected) {
+  background: var(--dropdown-option-color-fucsia-50);
+  color: var(--dropdown-option-color-brand-primary);
+}
+
+.dropdown-option:focus-visible {
+  outline: 2px solid var(--dropdown-option-color-brand-primary);
+  outline-offset: -2px;
+}
+
+.dropdown-option--selected {
+  background: var(--dropdown-option-color-fucsia-200);
+  color: var(--dropdown-option-color-brand-secondary);
+}
+
+.dropdown-option__left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: var(--dropdown-option-gap);
+}
+
+.dropdown-option__checkbox {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--dropdown-option-color-gray-300);
+  border-radius: 4px;
+  background: var(--dropdown-option-color-white);
+}
+
+.dropdown-option__icon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.dropdown-option__text {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--dropdown-option-font-size-md);
+  font-weight: 400;
+  color: inherit;
+}

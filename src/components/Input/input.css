@@ -1,0 +1,109 @@
+.input {
+  --input-color-brand-primary: #c32059;
+  --input-color-brand-black: #263238;
+
+  --input-color-fucsia-200: #f6dee6;
+
+  --input-color-gray-200: #ececef;
+  --input-color-gray-300: #d5d7dd;
+  --input-color-gray-400: #bbbbbb;
+
+  --input-color-red-400: #f5aeae;
+
+  --input-radius: 8px;
+  --input-padding: 12px;
+  --input-gap: 4px;
+
+  --input-font-family: 'Roboto', sans-serif;
+  --input-font-size: 14px;
+
+  --input-transition-duration: 0.2s;
+
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--input-gap);
+  padding: var(--input-padding);
+  border: 1px solid var(--input-color-gray-300);
+  border-radius: var(--input-radius);
+  background: #ffffff;
+  color: var(--input-color-brand-black);
+  transition:
+    border-color var(--input-transition-duration) ease,
+    background-color var(--input-transition-duration) ease;
+}
+
+.input:hover:not(.input--disabled) {
+  border-color: var(--input-color-fucsia-200);
+}
+
+.input:focus-within:not(.input--disabled) {
+  border-color: var(--input-color-brand-primary);
+}
+
+.input--error:not(.input--disabled) {
+  border-color: var(--input-color-red-400);
+}
+
+.input--disabled {
+  border-color: var(--input-color-gray-300);
+  background: var(--input-color-gray-200);
+  color: var(--input-color-gray-400);
+}
+
+.input__left,
+.input__right {
+  display: flex;
+  align-items: center;
+  gap: var(--input-gap);
+}
+
+.input__left {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.input__right {
+  align-self: stretch;
+}
+
+.input__divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--input-color-gray-300);
+}
+
+.input__flag,
+.input__icon {
+  flex-shrink: 0;
+}
+
+.input__field {
+  flex: 1 1 0;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-family: var(--input-font-family);
+  font-size: var(--input-font-size);
+  font-weight: 400;
+}
+
+.input__field::placeholder {
+  color: var(--input-color-gray-400);
+}
+
+.input__field:disabled {
+  cursor: not-allowed;
+}
+
+.input__right-text {
+  font-family: var(--input-font-family);
+  font-size: var(--input-font-size);
+  font-weight: 700;
+  color: var(--input-color-gray-400);
+  white-space: nowrap;
+}

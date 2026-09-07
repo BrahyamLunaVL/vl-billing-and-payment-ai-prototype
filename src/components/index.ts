@@ -18,3 +18,15 @@ export type { PopUpProps } from './PopUp';
 
 export { FormField } from './FormField';
 export type { FormFieldProps } from './FormField';
+
+export { DropdownOption } from './DropdownOption';
+export type { DropdownOptionProps } from './DropdownOption';
+
+export { Dropdown } from './Dropdown';
+export type { DropdownProps } from './Dropdown';
+
+export { Input } from './Input';
+export type { InputProps } from './Input';
+
+export { TextArea } from './TextArea';
+export type { TextAreaProps } from './TextArea';
