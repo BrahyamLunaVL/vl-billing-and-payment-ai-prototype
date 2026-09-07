@@ -37,22 +37,13 @@ export const Default: Story = {
 // instead of asserted here (same limitation noted for Button's hover in
 // button.stories.tsx history).
 
-export const FocusColor: Story = {
-  play: async ({ canvasElement }) => {
-    const button = canvasElement.querySelector('button') as HTMLButtonElement | null;
-    if (!button) throw new globalThis.Error('Expected button to render');
-
-    // Color is animated over 0.15s (see dropdownoption.css) — wait for the
-    // transition to finish before reading the settled computed value.
-    button.focus();
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    await expect(getComputedStyle(button).color).toBe('rgb(111, 29, 93)'); // brand/secondary purple
-
-    button.blur();
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    await expect(getComputedStyle(button).color).toBe('rgb(38, 50, 56)'); // back to black
-  },
-};
+// Pressing/holding the option down is real CSS `:active` (purple text,
+// fucsia/200 bg — a bit darker than hover's fucsia/50, see
+// dropdownoption.css). Like `:hover` above, neither `userEvent.hover` nor
+// `userEvent.pointer`'s synthetic press reliably register real browser
+// `:active` state in this test runner, so this is exercised visually in
+// Storybook's UI (press and hold the mouse on a row) rather than asserted
+// here.
 
 export const Selected: Story = {
   args: { selected: true },

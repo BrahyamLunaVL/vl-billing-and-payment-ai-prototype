@@ -37,18 +37,23 @@
     color var(--dropdown-option-transition-duration) ease;
 }
 
-/* Hover and focus are only shown while the row is not the selected item —
-   selected must keep its own look even while hovered/focused, per the
-   design (Default/Hover/Focus are mouse/keyboard states, Selected is a data
-   state that outranks them). Focus is listed after hover so it wins when
-   both apply at once (e.g. clicking focuses the row while the mouse is
-   still over it). */
+/* Hover and active are only shown while the row is not the selected item —
+   selected must keep its own look even while hovered/pressed, per the
+   design (Default/Hover/Active are mouse states, Selected is a data state
+   that outranks them). Active is listed after hover so it wins when both
+   apply at once (pressing down always happens while still hovering). */
 .dropdown-option:hover:not(.dropdown-option--selected) {
   background: var(--dropdown-option-color-fucsia-50);
   color: var(--dropdown-option-color-fucsia-600);
 }
 
-.dropdown-option:focus-visible:not(.dropdown-option--selected) {
+/* "Active" here means pressed/held down (real CSS :active), not keyboard
+   focus — :focus-visible only reflects keyboard navigation in most
+   browsers and never fires on a mouse press, so it can't be used for a
+   "while the user holds the option down" state. :focus-visible is kept
+   below purely as an outline for keyboard users, not for this color. */
+.dropdown-option:active:not(.dropdown-option--selected) {
+  background: var(--dropdown-option-color-fucsia-200);
   color: var(--dropdown-option-color-brand-secondary);
 }
 
