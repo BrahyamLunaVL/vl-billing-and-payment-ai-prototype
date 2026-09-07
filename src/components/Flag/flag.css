@@ -1,0 +1,5 @@
+.flag {
+  display: inline-block;
+  border-radius: 2px;
+  object-fit: cover;
+}
