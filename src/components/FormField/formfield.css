@@ -1,0 +1,124 @@
+.form-field {
+  --form-field-color-black: #263238;
+  --form-field-color-gray-400: #bbbbbb;
+  --form-field-color-gray-300: #d5d7dd;
+  --form-field-color-primary: #c32059;
+  --form-field-color-blue: #378fce;
+  --form-field-color-red: #de1515;
+
+  --form-field-font-family: 'Roboto', sans-serif;
+  --form-field-font-size-sm: 14px;
+  --form-field-font-size-xs: 12px;
+
+  --form-field-gap: 4px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--form-field-gap);
+  width: 100%;
+  font-family: var(--form-field-font-family);
+}
+
+.form-field__label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.form-field__label-details {
+  display: flex;
+  align-items: center;
+  gap: var(--form-field-gap);
+}
+
+.form-field__label {
+  font-weight: 700;
+  font-size: var(--form-field-font-size-sm);
+  color: var(--form-field-color-black);
+  white-space: nowrap;
+}
+
+.form-field__badge {
+  font-weight: 400;
+  font-size: var(--form-field-font-size-sm);
+  color: var(--form-field-color-gray-400);
+  white-space: nowrap;
+}
+
+.form-field__link,
+.form-field__action,
+.form-field__info-trigger {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.form-field__link {
+  font-weight: 700;
+  font-size: var(--form-field-font-size-sm);
+  color: var(--form-field-color-blue);
+  white-space: nowrap;
+}
+
+.form-field__action {
+  font-weight: 700;
+  font-size: var(--form-field-font-size-sm);
+  color: var(--form-field-color-primary);
+  white-space: nowrap;
+}
+
+.form-field__info {
+  position: relative;
+  display: inline-flex;
+}
+
+.form-field__info-trigger {
+  display: inline-flex;
+  color: var(--form-field-color-gray-400);
+}
+
+.form-field__tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--form-field-color-black);
+  color: white;
+  font-size: var(--form-field-font-size-xs);
+  font-weight: 400;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.form-field__description,
+.form-field__help-text {
+  margin: 0;
+  width: 100%;
+  font-weight: 400;
+  font-size: var(--form-field-font-size-xs);
+  color: var(--form-field-color-gray-400);
+  text-align: left;
+}
+
+.form-field__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--form-field-gap);
+  width: 100%;
+  color: var(--form-field-color-red);
+  font-weight: 400;
+  font-size: var(--form-field-font-size-xs);
+}
+
+.form-field__error-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}

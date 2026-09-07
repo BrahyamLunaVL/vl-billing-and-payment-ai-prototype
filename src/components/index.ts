@@ -15,3 +15,6 @@ export type { BackgroundProps } from './Background';
 
 export { PopUp } from './PopUp';
 export type { PopUpProps } from './PopUp';
+
+export { FormField } from './FormField';
+export type { FormFieldProps } from './FormField';
