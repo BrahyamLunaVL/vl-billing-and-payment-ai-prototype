@@ -52,10 +52,6 @@ export const Disabled: Story = {
   },
 };
 
-export const WithFlag: Story = {
-  args: { flag: 'mexico', value: '+52 55 1234 5678', onChange: fn() },
-};
-
 export const WithIconAndRightText: Story = {
   args: {
     leftIcon: 'circle-info',

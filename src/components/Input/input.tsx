@@ -1,15 +1,12 @@
 import './input.css';
 import type { InputHTMLAttributes } from 'react';
 import { Icon, type IconName, type IconVariant } from '../Icon';
-import { Flag, type FlagCountry } from '../Flag';
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   /** Icon rendered at the start of the field, before the value/placeholder. */
   leftIcon?: IconName;
   /** Variant of `leftIcon`. Defaults to 'bold'. */
   leftIconVariant?: IconVariant;
-  /** Country flag rendered at the start of the field, before `leftIcon`. */
-  flag?: FlagCountry;
   /** Icon rendered at the end of the field, after `rightText`. */
   rightIcon?: IconName;
   /** Variant of `rightIcon`. Defaults to 'bold'. */
@@ -24,9 +21,9 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 /**
  * Design system text input: a bordered box (default/hover/selected/error/
  * disabled) wrapping a real, controlled `<input>`, plus optional leading
- * flag/icon and trailing icon/text content. Meant to be passed as
- * `FormField`'s `children` — it does not render its own label, description,
- * help text or error message.
+ * icon and trailing icon/text content. Meant to be passed as `FormField`'s
+ * `children` — it does not render its own label, description, help text or
+ * error message.
  *
  * "Selected" is real `:focus-within` on the wrapper (so clicking anywhere in
  * the box focuses the input and shows the ring), and "Disabled" comes from
@@ -37,7 +34,6 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 export const Input = ({
   leftIcon,
   leftIconVariant = 'bold',
-  flag,
   rightIcon,
   rightIconVariant = 'bold',
   rightText,
@@ -46,7 +42,7 @@ export const Input = ({
   className,
   ...rest
 }: InputProps) => {
-  const hasLeftContent = Boolean(flag || leftIcon);
+  const hasLeftContent = Boolean(leftIcon);
   const hasRightIcon = Boolean(rightIcon);
   const hasRightText = Boolean(rightText);
 
@@ -62,7 +58,6 @@ export const Input = ({
   return (
     <div className={classNames}>
       <div className="input__left">
-        {flag && <Flag country={flag} size={16} className="input__flag" />}
         {leftIcon && <Icon name={leftIcon} variant={leftIconVariant} size={16} className="input__icon" />}
         {hasLeftContent && <span className="input__divider" />}
         <input className="input__field" disabled={disabled} {...rest} />

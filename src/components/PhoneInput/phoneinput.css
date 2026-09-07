@@ -1,0 +1,113 @@
+.phone-input {
+  --phone-input-color-brand-primary: #c32059;
+  --phone-input-color-brand-black: #263238;
+
+  --phone-input-color-fucsia-200: #f6dee6;
+
+  --phone-input-color-gray-200: #ececef;
+  --phone-input-color-gray-300: #d5d7dd;
+  --phone-input-color-gray-400: #bbbbbb;
+
+  --phone-input-color-red-400: #f5aeae;
+
+  --phone-input-radius: 8px;
+  --phone-input-padding: 12px;
+  --phone-input-gap: 4px;
+
+  --phone-input-font-family: 'Roboto', sans-serif;
+  --phone-input-font-size: 14px;
+
+  --phone-input-transition-duration: 0.2s;
+
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--phone-input-gap);
+  padding: var(--phone-input-padding);
+  border: 1px solid var(--phone-input-color-gray-300);
+  border-radius: var(--phone-input-radius);
+  background: #ffffff;
+  color: var(--phone-input-color-brand-black);
+  transition:
+    border-color var(--phone-input-transition-duration) ease,
+    background-color var(--phone-input-transition-duration) ease;
+}
+
+.phone-input:hover:not(.phone-input--disabled) {
+  border-color: var(--phone-input-color-fucsia-200);
+}
+
+.phone-input:focus-within:not(.phone-input--disabled) {
+  border-color: var(--phone-input-color-brand-primary);
+}
+
+.phone-input--error:not(.phone-input--disabled) {
+  border-color: var(--phone-input-color-red-400);
+}
+
+.phone-input--disabled {
+  border-color: var(--phone-input-color-gray-300);
+  background: var(--phone-input-color-gray-200);
+  color: var(--phone-input-color-gray-400);
+}
+
+.phone-input__country-button {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+.phone-input__country-button:disabled {
+  cursor: not-allowed;
+}
+
+.phone-input__chevron {
+  transition: transform 0.15s ease;
+}
+
+.phone-input__chevron--open {
+  transform: rotate(180deg);
+}
+
+.phone-input__divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--phone-input-color-gray-300);
+}
+
+.phone-input__field {
+  flex: 1 1 0;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-family: var(--phone-input-font-family);
+  font-size: var(--phone-input-font-size);
+  font-weight: 400;
+}
+
+.phone-input__field::placeholder {
+  color: var(--phone-input-color-gray-400);
+}
+
+.phone-input__field:disabled {
+  cursor: not-allowed;
+}
+
+.phone-input__dropdown-wrapper {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 240px;
+  z-index: 20;
+}

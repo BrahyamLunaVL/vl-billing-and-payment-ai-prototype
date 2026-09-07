@@ -74,7 +74,6 @@
   background: var(--input-color-gray-300);
 }
 
-.input__flag,
 .input__icon {
   flex-shrink: 0;
 }

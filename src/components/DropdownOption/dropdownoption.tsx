@@ -1,5 +1,5 @@
 import './dropdownoption.css';
-import type { ButtonHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Icon, type IconName } from '../Icon';
 
 export interface DropdownOptionProps
@@ -8,6 +8,13 @@ export interface DropdownOptionProps
   text: string;
   /** Icon rendered at the start of the row, before the text. */
   leftIcon?: IconName;
+  /**
+   * Arbitrary content (e.g. a `Flag`/`Brand`) rendered at the start of the
+   * row instead of `leftIcon`, for options that need something other than
+   * one of `Icon`'s named icons. Takes priority over `leftIcon` when both
+   * are given.
+   */
+  leftIconImage?: ReactNode;
   /** Icon rendered at the end of the row, after the text. */
   rightIcon?: IconName;
   /**
@@ -37,6 +44,7 @@ export interface DropdownOptionProps
 export const DropdownOption = ({
   text,
   leftIcon,
+  leftIconImage,
   rightIcon,
   showCheckbox = false,
   selected = false,
@@ -70,9 +78,8 @@ export const DropdownOption = ({
             {selected && <Icon name="check" variant="bold" size={10} />}
           </span>
         )}
-        {leftIcon && (
-          <Icon name={leftIcon} size={16} className="dropdown-option__icon" />
-        )}
+        {leftIconImage ??
+          (leftIcon && <Icon name={leftIcon} size={16} className="dropdown-option__icon" />)}
         <span className="dropdown-option__text">{text}</span>
       </span>
       {rightIcon && (

@@ -36,3 +36,6 @@ export type { SelectProps, SelectOption } from './Select';
 
 export { MultiSelect } from './MultiSelect';
 export type { MultiSelectProps, MultiSelectOption } from './MultiSelect';
+
+export { PhoneInput } from './PhoneInput';
+export type { PhoneInputProps } from './PhoneInput';
