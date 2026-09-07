@@ -33,24 +33,46 @@
   --button-font-size-sm: 14px;
   --button-font-size-xs: 12px;
 
+  --button-transition-duration: 0.5s;
+
+  /* Isolated stacking context so the ::before crossfade overlay (used by
+     .button--primary) never has to fight page-level z-index. */
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
   padding: var(--button-padding-5xs);
-  border: none;
+  /* Border is always 1px, just transparent by default: changing only
+     border-color (never border-width) keeps state transitions smooth and
+     keeps every type's box the same size. */
+  border: 1px solid transparent;
   border-radius: var(--button-radius-lg);
   background: transparent;
+  color: inherit;
   font-family: var(--button-font-family);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--button-transition-duration) ease,
+    border-color var(--button-transition-duration) ease,
+    color var(--button-transition-duration) ease;
 }
 
 .button:disabled {
   cursor: not-allowed;
 }
 
+.button:focus-visible {
+  /* The design's focus indicator is the inner ring added per-type below,
+     not the browser's default outline. */
+  outline: none;
+}
+
 .button__inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,6 +82,7 @@
   padding: var(--button-padding-xs) var(--button-padding-sm);
   border: 1px solid transparent;
   border-radius: var(--button-radius-md);
+  transition: border-color var(--button-transition-duration) ease;
 }
 
 .button--small .button__inner {
@@ -68,24 +91,33 @@
 
 .button__icon {
   flex-shrink: 0;
+  /* Icons render via currentColor, so they always match the surrounding
+     text color (see button__text etc. below) with no extra rule needed. */
+  color: inherit;
+  transition: color var(--button-transition-duration) ease;
+}
+
+.button__text,
+.button__action-text,
+.button__supporting-text {
+  color: inherit;
+  font-family: var(--button-font-family);
+  line-height: normal;
+  white-space: nowrap;
+  transition: color var(--button-transition-duration) ease;
 }
 
 .button__text,
 .button__action-text {
-  font-family: var(--button-font-family);
   font-weight: 700;
   font-size: var(--button-font-size-sm);
-  line-height: normal;
-  white-space: nowrap;
 }
 
 .button__supporting-text {
-  font-family: var(--button-font-family);
   font-weight: 400;
   font-size: var(--button-font-size-sm);
-  line-height: normal;
-  white-space: nowrap;
-  color: var(--button-color-brand-black);
+  /* Same color as the action text by default (i.e. the type's normal
+     single-text color) — only Ghost overrides this to brand/black below. */
 }
 
 .button--small .button__text,
@@ -101,161 +133,148 @@
     var(--button-color-brand-primary),
     var(--button-color-brand-secondary)
   );
-}
-.button--primary .button__text,
-.button--primary .button__action-text {
   color: var(--button-color-brand-white);
 }
-.button--primary:hover:not(:disabled) {
+/* Hover crosses over to a solid fill via an opacity-faded overlay instead of
+   swapping `background` between a gradient and a solid color: a gradient is
+   a background-image, and background-image changes cannot be interpolated
+   by CSS transitions — animating it directly causes an instant flash/jump
+   instead of a smooth fade. Cross-fading two stacked layers via opacity
+   sidesteps that entirely. */
+.button--primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
   background: var(--button-color-fucsia-600);
+  opacity: 0;
+  transition: opacity var(--button-transition-duration) ease;
+  pointer-events: none;
 }
-.button--primary:focus-visible {
-  outline: none;
+.button--primary:hover:not(:disabled)::before {
+  opacity: 1;
 }
-.button--primary:focus-visible .button__inner {
+.button--primary:active:not(:disabled)::before,
+.button--primary:focus-visible:not(:disabled)::before {
+  /* Pressed/focused keeps the default gradient (per design) and shows the
+     ring on button__inner instead — so the overlay fades back out even
+     while still hovered. */
+  opacity: 0;
+}
+.button--primary:active:not(:disabled) .button__inner,
+.button--primary:focus-visible:not(:disabled) .button__inner {
   border-color: var(--button-color-brand-white);
 }
 .button--primary:disabled {
   background: var(--button-color-gray-200);
-}
-.button--primary:disabled .button__text,
-.button--primary:disabled .button__action-text {
   color: var(--button-color-gray-400);
 }
 
 /* Secondary */
 .button--secondary {
   background: var(--button-color-fucsia-200);
-}
-.button--secondary .button__text,
-.button--secondary .button__action-text {
   color: var(--button-color-brand-primary);
 }
 .button--secondary:hover:not(:disabled) {
   background: var(--button-color-fucsia-300);
 }
-.button--secondary:focus-visible {
-  outline: none;
+.button--secondary:active:not(:disabled),
+.button--secondary:focus-visible:not(:disabled) {
   background: var(--button-color-fucsia-200);
 }
-.button--secondary:focus-visible .button__inner {
+.button--secondary:active:not(:disabled) .button__inner,
+.button--secondary:focus-visible:not(:disabled) .button__inner {
   border-color: var(--button-color-brand-primary);
 }
 .button--secondary:disabled {
   background: var(--button-color-gray-200);
-}
-.button--secondary:disabled .button__text,
-.button--secondary:disabled .button__action-text {
   color: var(--button-color-gray-400);
 }
 
-/* Tertiary */
+/* Tertiary — the only type whose border is its permanent outer border
+   (not the focus-only inner ring the other types use), so it lives on
+   .button itself in every state, not on .button__inner. */
 .button--tertiary {
   background: var(--button-color-brand-white);
-}
-.button--tertiary .button__inner {
   border-color: var(--button-color-fucsia-400);
-}
-.button--tertiary .button__text,
-.button--tertiary .button__action-text {
   color: var(--button-color-brand-primary);
 }
 .button--tertiary:hover:not(:disabled) {
-  background: var(--button-color-brand-white);
-}
-.button--tertiary:hover:not(:disabled) .button__inner {
   border-color: var(--button-color-brand-primary);
 }
-.button--tertiary:focus-visible {
-  outline: none;
+.button--tertiary:active:not(:disabled),
+.button--tertiary:focus-visible:not(:disabled) {
   background: var(--button-color-fucsia-100);
-}
-.button--tertiary:focus-visible .button__inner {
   border-color: var(--button-color-brand-primary);
 }
 .button--tertiary:disabled {
   background: var(--button-color-gray-200);
-}
-.button--tertiary:disabled .button__inner {
   border-color: transparent;
-}
-.button--tertiary:disabled .button__text,
-.button--tertiary:disabled .button__action-text {
   color: var(--button-color-gray-400);
 }
 
 /* Ghost */
 .button--ghost {
   background: transparent;
-}
-.button--ghost .button__text,
-.button--ghost .button__action-text {
   color: var(--button-color-brand-primary);
 }
-.button--ghost:hover:not(:disabled) .button__text,
-.button--ghost:hover:not(:disabled) .button__action-text {
+.button--ghost:hover:not(:disabled) {
   color: var(--button-color-fucsia-600);
 }
-.button--ghost:focus-visible {
-  outline: none;
-}
-.button--ghost:focus-visible .button__text,
-.button--ghost:focus-visible .button__action-text {
+.button--ghost:active:not(:disabled),
+.button--ghost:focus-visible:not(:disabled) {
   color: var(--button-color-brand-secondary);
 }
-.button--ghost:disabled .button__text,
-.button--ghost:disabled .button__action-text {
+.button--ghost:disabled {
   color: var(--button-color-gray-400);
+}
+/* Ghost is the only type where the two multiple-text labels use different
+   colors (supporting text stays neutral black, action text stays pink) —
+   every other type keeps both labels the same color as its single-text
+   default, via plain inheritance from .button--<type> above. */
+.button--ghost .button__supporting-text {
+  color: var(--button-color-brand-black);
 }
 
 /* Success */
 .button--success {
   background: var(--button-color-green-500);
-}
-.button--success .button__text,
-.button--success .button__action-text {
   color: var(--button-color-brand-white);
 }
 .button--success:hover:not(:disabled) {
   background: var(--button-color-green-600);
 }
-.button--success:focus-visible {
-  outline: none;
+.button--success:active:not(:disabled),
+.button--success:focus-visible:not(:disabled) {
   background: var(--button-color-green-600);
 }
-.button--success:focus-visible .button__inner {
+.button--success:active:not(:disabled) .button__inner,
+.button--success:focus-visible:not(:disabled) .button__inner {
   border-color: var(--button-color-brand-white);
 }
 .button--success:disabled {
   background: var(--button-color-gray-200);
-}
-.button--success:disabled .button__text,
-.button--success:disabled .button__action-text {
   color: var(--button-color-gray-400);
 }
 
 /* Error */
 .button--error {
   background: var(--button-color-red-500);
-}
-.button--error .button__text,
-.button--error .button__action-text {
   color: var(--button-color-brand-white);
 }
 .button--error:hover:not(:disabled) {
   background: var(--button-color-red-600);
 }
-.button--error:focus-visible {
-  outline: none;
+.button--error:active:not(:disabled),
+.button--error:focus-visible:not(:disabled) {
   background: var(--button-color-red-600);
 }
-.button--error:focus-visible .button__inner {
+.button--error:active:not(:disabled) .button__inner,
+.button--error:focus-visible:not(:disabled) .button__inner {
   border-color: var(--button-color-brand-white);
 }
 .button--error:disabled {
   background: var(--button-color-gray-200);
-}
-.button--error:disabled .button__text,
-.button--error:disabled .button__action-text {
   color: var(--button-color-gray-400);
 }
