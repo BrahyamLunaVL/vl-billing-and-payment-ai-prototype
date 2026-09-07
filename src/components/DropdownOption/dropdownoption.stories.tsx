@@ -71,41 +71,14 @@ export const WithIcons: Story = {
   },
 };
 
-export const WithCheckbox: Story = {
-  args: {
-    text: 'Option with checkbox',
-    showCheckbox: true,
-  },
-  play: async ({ canvasElement }) => {
-    const checkbox = canvasElement.querySelector('.dropdown-option__checkbox');
-    if (!checkbox) throw new globalThis.Error('Expected checkbox affordance to render');
-    await expect(checkbox.querySelector('svg')).toBeNull();
-  },
-};
-
-export const WithCheckboxChecked: Story = {
-  args: {
-    text: 'Option with checkbox',
-    showCheckbox: true,
-    selected: true,
-  },
-  play: async ({ canvasElement }) => {
-    const checkbox = canvasElement.querySelector('.dropdown-option__checkbox');
-    if (!checkbox) throw new globalThis.Error('Expected checkbox affordance to render');
-    await expect(checkbox.querySelector('svg')).not.toBeNull();
-    await expect(getComputedStyle(checkbox).backgroundColor).toBe('rgb(195, 32, 89)');
-  },
-};
-
 /**
  * `DropdownOption` itself never tracks its own checked state — `selected` is
  * always a prop the caller controls (see the component's own doc comment).
- * `WithCheckbox`/`WithCheckboxChecked` above render fixed snapshots for that
- * reason (their `onClick` is a no-op mock, so clicking them does nothing —
- * that's not a bug in the component, it's just how a static story with an
- * uncontrolled prop behaves). This story wires up real local state so
- * clicking the row actually toggles the checkbox, demonstrating the pattern
- * `Select`/`MultiSelect` themselves use.
+ * This story wires up real local state so clicking the row actually toggles
+ * the checkbox, demonstrating the pattern `Select`/`MultiSelect` themselves
+ * use (a static story with an uncontrolled `selected` prop and a no-op
+ * `onClick` mock would make clicking look broken, so there's no such story
+ * here — this stateful one covers both the checked and unchecked look).
  */
 function ToggleableCheckboxDemo() {
   const [checked, setChecked] = useState(false);
