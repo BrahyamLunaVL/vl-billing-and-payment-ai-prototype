@@ -11,9 +11,10 @@ export interface DropdownOptionProps
   /** Icon rendered at the end of the row, after the text. */
   rightIcon?: IconName;
   /**
-   * Renders an empty 16x16 checkbox affordance before the text/left icon.
-   * This is a visual slot only — it does not track a checked state. A real
-   * Checkbox component can replace it once one exists in the system.
+   * Renders a 16x16 checkbox affordance before the text/left icon, filled
+   * with a checkmark whenever `selected` is true. A real Checkbox component
+   * can replace this once one exists in the system — for now it's this
+   * component's own minimal rendering of the checked/unchecked look.
    */
   showCheckbox?: boolean;
   /**
@@ -59,7 +60,16 @@ export const DropdownOption = ({
       {...rest}
     >
       <span className="dropdown-option__left">
-        {showCheckbox && <span className="dropdown-option__checkbox" aria-hidden="true" />}
+        {showCheckbox && (
+          <span
+            className={
+              selected ? 'dropdown-option__checkbox dropdown-option__checkbox--checked' : 'dropdown-option__checkbox'
+            }
+            aria-hidden="true"
+          >
+            {selected && <Icon name="check" variant="bold" size={10} />}
+          </span>
+        )}
         {leftIcon && (
           <Icon name={leftIcon} size={16} className="dropdown-option__icon" />
         )}

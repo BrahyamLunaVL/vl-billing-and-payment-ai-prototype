@@ -60,6 +60,21 @@ export const WithCheckbox: Story = {
   play: async ({ canvasElement }) => {
     const checkbox = canvasElement.querySelector('.dropdown-option__checkbox');
     if (!checkbox) throw new globalThis.Error('Expected checkbox affordance to render');
+    await expect(checkbox.querySelector('svg')).toBeNull();
+  },
+};
+
+export const WithCheckboxChecked: Story = {
+  args: {
+    text: 'Option with checkbox',
+    showCheckbox: true,
+    selected: true,
+  },
+  play: async ({ canvasElement }) => {
+    const checkbox = canvasElement.querySelector('.dropdown-option__checkbox');
+    if (!checkbox) throw new globalThis.Error('Expected checkbox affordance to render');
+    await expect(checkbox.querySelector('svg')).not.toBeNull();
+    await expect(getComputedStyle(checkbox).backgroundColor).toBe('rgb(195, 32, 89)');
   },
 };
 

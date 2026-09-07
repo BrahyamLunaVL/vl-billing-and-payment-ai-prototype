@@ -66,9 +66,21 @@
   width: 16px;
   height: 16px;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--dropdown-option-color-gray-300);
   border-radius: 4px;
   background: var(--dropdown-option-color-white);
+  color: var(--dropdown-option-color-white);
+  transition:
+    background-color var(--dropdown-option-transition-duration) ease,
+    border-color var(--dropdown-option-transition-duration) ease;
+}
+
+.dropdown-option__checkbox--checked {
+  background: var(--dropdown-option-color-brand-primary);
+  border-color: var(--dropdown-option-color-brand-primary);
 }
 
 .dropdown-option__icon {

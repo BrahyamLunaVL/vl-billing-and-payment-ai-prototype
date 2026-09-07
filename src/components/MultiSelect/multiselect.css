@@ -1,0 +1,169 @@
+.multiselect-container {
+  position: relative;
+}
+
+.multiselect {
+  --multiselect-color-brand-primary: #c32059;
+  --multiselect-color-brand-black: #263238;
+
+  --multiselect-color-fucsia-200: #f6dee6;
+
+  --multiselect-color-gray-200: #ececef;
+  --multiselect-color-gray-300: #d5d7dd;
+  --multiselect-color-gray-400: #bbbbbb;
+
+  --multiselect-color-red-400: #f5aeae;
+
+  --multiselect-radius: 8px;
+  --multiselect-padding: 12px;
+  --multiselect-gap: 4px;
+
+  --multiselect-font-family: 'Roboto', sans-serif;
+  --multiselect-font-size: 14px;
+
+  --multiselect-transition-duration: 0.2s;
+
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--multiselect-gap);
+  padding: var(--multiselect-padding);
+  border: 1px solid var(--multiselect-color-gray-300);
+  border-radius: var(--multiselect-radius);
+  background: #ffffff;
+  color: var(--multiselect-color-brand-black);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color var(--multiselect-transition-duration) ease,
+    background-color var(--multiselect-transition-duration) ease;
+}
+
+.multiselect:hover:not(.multiselect--disabled) {
+  border-color: var(--multiselect-color-fucsia-200);
+}
+
+.multiselect:focus-visible:not(.multiselect--disabled) {
+  outline: none;
+  border-color: var(--multiselect-color-brand-primary);
+}
+
+.multiselect--open:not(.multiselect--disabled) {
+  border-color: var(--multiselect-color-brand-primary);
+}
+
+.multiselect--error:not(.multiselect--disabled) {
+  border-color: var(--multiselect-color-red-400);
+}
+
+.multiselect--disabled {
+  border-color: var(--multiselect-color-gray-300);
+  background: var(--multiselect-color-gray-200);
+  color: var(--multiselect-color-gray-400);
+  cursor: not-allowed;
+}
+
+.multiselect__left,
+.multiselect__right {
+  display: flex;
+  align-items: center;
+  gap: var(--multiselect-gap);
+}
+
+/*
+ * Unlike Input's single-line left content, MultiSelect's left area wraps its
+ * chips onto multiple lines rather than clipping/truncating — the box grows
+ * taller (via the trigger's own padding) as more values are selected. This
+ * is a deliberate deviation from Figma's static single-row mock, which only
+ * ever showed a couple of chips and can't demonstrate real-world wrapping.
+ */
+.multiselect__left {
+  flex: 1 1 0;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.multiselect__right {
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+.multiselect__divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--multiselect-color-gray-300);
+}
+
+.multiselect__icon {
+  flex-shrink: 0;
+}
+
+.multiselect__placeholder {
+  font-family: var(--multiselect-font-family);
+  font-size: var(--multiselect-font-size);
+  font-weight: 400;
+  color: var(--multiselect-color-gray-400);
+}
+
+.multiselect__count {
+  font-family: var(--multiselect-font-family);
+  font-size: var(--multiselect-font-size);
+  font-weight: 700;
+  color: var(--multiselect-color-gray-400);
+  white-space: nowrap;
+}
+
+.multiselect__chevron {
+  flex-shrink: 0;
+  transition: transform var(--multiselect-transition-duration) ease;
+}
+
+.multiselect__chevron--open {
+  transform: rotate(180deg);
+}
+
+.multiselect__dropdown-wrapper {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  z-index: 20;
+}
+
+/* Chip */
+
+.multiselect-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 4px 12px;
+  border: 1px solid var(--multiselect-color-gray-200);
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.multiselect-chip__label {
+  font-family: var(--multiselect-font-family);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--multiselect-color-brand-black);
+  white-space: nowrap;
+}
+
+.multiselect-chip__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--multiselect-color-brand-black);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.multiselect-chip__remove:disabled {
+  cursor: not-allowed;
+}
