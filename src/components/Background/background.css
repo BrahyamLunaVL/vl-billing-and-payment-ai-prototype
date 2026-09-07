@@ -1,0 +1,17 @@
+.background {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  /* Locks the shape's proportions to the design (1920x661) so it never
+     looks stretched/squashed, regardless of the container's width. */
+  aspect-ratio: 1920 / 661;
+  display: block;
+  /* Sits behind real content: a position:absolute element with the default
+     z-index:auto actually paints ABOVE normal in-flow siblings, not below
+     them, so this needs an explicit negative z-index. The parent must be
+     `position: relative` (or similar) to contain it. */
+  z-index: -1;
+  pointer-events: none;
+}

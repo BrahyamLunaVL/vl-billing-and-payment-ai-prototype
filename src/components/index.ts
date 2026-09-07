@@ -9,3 +9,6 @@ export type { FlagCountry } from './Flag';
 
 export { Button } from './Button';
 export type { ButtonProps, ButtonType, ButtonSize } from './Button';
+
+export { Background } from './Background';
+export type { BackgroundProps } from './Background';
