@@ -1,0 +1,13 @@
+.popup {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* --brand/black (#263238) at 30% opacity, the design system's Pop Up
+     backdrop color. */
+  background: rgba(38, 50, 56, 0.3);
+  z-index: 1000;
+}

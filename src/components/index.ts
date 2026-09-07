@@ -12,3 +12,6 @@ export type { ButtonProps, ButtonType, ButtonSize } from './Button';
 
 export { Background } from './Background';
 export type { BackgroundProps } from './Background';
+
+export { PopUp } from './PopUp';
+export type { PopUpProps } from './PopUp';
