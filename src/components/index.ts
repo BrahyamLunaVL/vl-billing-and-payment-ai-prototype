@@ -6,3 +6,6 @@ export type { BrandName } from './Brand';
 
 export { Flag } from './Flag';
 export type { FlagCountry } from './Flag';
+
+export { Button } from './Button';
+export type { ButtonProps, ButtonType, ButtonSize } from './Button';
