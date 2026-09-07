@@ -44,10 +44,14 @@
   justify-content: center;
   box-sizing: border-box;
   padding: var(--button-padding-5xs);
-  /* Border is always 1px, just transparent by default: changing only
-     border-color (never border-width) keeps state transitions smooth and
-     keeps every type's box the same size. */
-  border: 1px solid transparent;
+  /* Only Tertiary has an outer border at all (set on .button--tertiary
+     below) — every other type is genuinely borderless here, matching the
+     source design. A "transparent 1px" placeholder was tried here before,
+     but it silently grew every other type by 1px per side and left a 1px
+     ring where .button--primary's own gradient background showed through
+     around the hover overlay (which stops at the padding edge, not the
+     border edge) — hence the visible 1px gradient "cut" at the sides. */
+  border: none;
   border-radius: var(--button-radius-lg);
   background: transparent;
   color: inherit;
@@ -162,6 +166,9 @@
      while still hovered. */
   opacity: 0;
 }
+/* Primary shows the inner ring on Hover too, not just Active/Focus — unlike
+   every other type, whose ring is focus/press-only. */
+.button--primary:hover:not(:disabled) .button__inner,
 .button--primary:active:not(:disabled) .button__inner,
 .button--primary:focus-visible:not(:disabled) .button__inner {
   border-color: var(--button-color-brand-white);
@@ -197,7 +204,7 @@
    .button itself in every state, not on .button__inner. */
 .button--tertiary {
   background: var(--button-color-brand-white);
-  border-color: var(--button-color-fucsia-400);
+  border: 1px solid var(--button-color-fucsia-400);
   color: var(--button-color-brand-primary);
 }
 .button--tertiary:hover:not(:disabled) {
