@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn } from 'storybook/test';
 import { DropdownOption } from './dropdownoption';
@@ -93,6 +94,44 @@ export const WithCheckboxChecked: Story = {
     if (!checkbox) throw new globalThis.Error('Expected checkbox affordance to render');
     await expect(checkbox.querySelector('svg')).not.toBeNull();
     await expect(getComputedStyle(checkbox).backgroundColor).toBe('rgb(195, 32, 89)');
+  },
+};
+
+/**
+ * `DropdownOption` itself never tracks its own checked state — `selected` is
+ * always a prop the caller controls (see the component's own doc comment).
+ * `WithCheckbox`/`WithCheckboxChecked` above render fixed snapshots for that
+ * reason (their `onClick` is a no-op mock, so clicking them does nothing —
+ * that's not a bug in the component, it's just how a static story with an
+ * uncontrolled prop behaves). This story wires up real local state so
+ * clicking the row actually toggles the checkbox, demonstrating the pattern
+ * `Select`/`MultiSelect` themselves use.
+ */
+function ToggleableCheckboxDemo() {
+  const [checked, setChecked] = useState(false);
+  return (
+    <DropdownOption
+      text="Click to toggle"
+      showCheckbox
+      selected={checked}
+      onClick={() => setChecked((prev) => !prev)}
+    />
+  );
+}
+
+export const ToggleableCheckbox: Story = {
+  render: () => <ToggleableCheckboxDemo />,
+  play: async ({ canvas, userEvent }) => {
+    const option = canvas.getByRole('option', { name: 'Click to toggle' });
+    await expect(option).toHaveAttribute('aria-selected', 'false');
+
+    await userEvent.click(option);
+    await expect(option).toHaveAttribute('aria-selected', 'true');
+    await expect(option.querySelector('.dropdown-option__checkbox svg')).not.toBeNull();
+
+    await userEvent.click(option);
+    await expect(option).toHaveAttribute('aria-selected', 'false');
+    await expect(option.querySelector('.dropdown-option__checkbox svg')).toBeNull();
   },
 };
 

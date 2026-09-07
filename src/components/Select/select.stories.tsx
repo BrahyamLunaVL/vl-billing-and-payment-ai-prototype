@@ -31,10 +31,20 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+// `Default`/`WithValueSelected` render through the stateful `Controlled`
+// wrapper below (declared further down, hoisted by function declaration)
+// rather than the static `onChange: fn()` from `meta.args` — a mock that
+// doesn't update anything makes manually testing in Storybook's UI look
+// broken (picking an option appears to do nothing), even though the
+// component itself already works correctly (proven by the `play`-based
+// stories further down).
+
+export const Default: Story = {
+  render: () => <Controlled />,
+};
 
 export const WithValueSelected: Story = {
-  args: { value: 'co' },
+  render: () => <Controlled initialValue="co" />,
 };
 
 export const Error: Story = {
@@ -58,8 +68,8 @@ export const Disabled: Story = {
   },
 };
 
-function Controlled() {
-  const [value, setValue] = useState<string | null>(null);
+function Controlled({ initialValue = null }: { initialValue?: string | null } = {}) {
+  const [value, setValue] = useState<string | null>(initialValue);
   return <Select options={OPTIONS} value={value} onChange={setValue} placeholder="Choose a country" />;
 }
 
