@@ -1,121 +1,84 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import logo from './assets/logo.png'
+import { Background, Form, FormField, Input, Button } from './components'
+import { login } from './services/auth'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [emailError, setEmailError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const canSubmit = email.trim() !== '' && password.trim() !== '' && !isSubmitting
+
+  const handleSubmit = async () => {
+    if (!canSubmit) return
+
+    setIsSubmitting(true)
+    setEmailError('')
+    setPasswordError('')
+
+    const result = await login(email, password)
+
+    if (result.success) {
+      alert(`Welcome, ${result.user.email}`)
+    } else if (result.code === 'EMAIL_NOT_REGISTERED') {
+      // Every other failure (wrong password, disabled user, too many
+      // requests) surfaces on the password field instead, matching Figma's
+      // edge-case screens exactly.
+      setEmailError(result.message)
+    } else {
+      setPasswordError(result.message)
+    }
+
+    setIsSubmitting(false)
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <div id="login-screen">
+      <Background />
+      <div className="login-screen__content">
+        <img src={logo} alt="Virtual Latinos" className="login-screen__logo" />
+        <Form>
+          <h1 className="login-screen__title">Login to your account</h1>
+          <div className="login-screen__fields">
+            <FormField label="Email Address" errorMessage={emailError}>
+              <Input
+                type="email"
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                error={Boolean(emailError)}
+              />
+            </FormField>
+            <FormField label="Password" errorMessage={passwordError}>
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                error={Boolean(passwordError)}
+                rightIcon={showPassword ? 'eye-slash' : 'eye'}
+                rightIconLabel={showPassword ? 'Hide password' : 'Show password'}
+                onRightIconClick={() => setShowPassword((prev) => !prev)}
+              />
+            </FormField>
+          </div>
+          <div className="login-screen__buttons">
+            <Button type="ghost" buttonText="Forgot your password?" />
+            <Button
+              buttonText={isSubmitting ? 'Logging in...' : 'Log in'}
+              disabled={!canSubmit}
+              onClick={handleSubmit}
+              style={{ width: '100%' }}
+            />
+          </div>
+        </Form>
+      </div>
+    </div>
   )
 }
 

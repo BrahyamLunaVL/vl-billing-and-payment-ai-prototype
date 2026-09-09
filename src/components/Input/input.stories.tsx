@@ -96,3 +96,34 @@ export const InsideFormFieldWithError: Story = {
     </FormField>
   ),
 };
+
+function PasswordToggleDemo() {
+  const [value, setValue] = useState('secret123');
+  const [visible, setVisible] = useState(false);
+  return (
+    <Input
+      type={visible ? 'text' : 'password'}
+      placeholder="Enter your password"
+      value={value}
+      onChange={(event) => setValue(event.target.value)}
+      rightIcon={visible ? 'eye-slash' : 'eye'}
+      rightIconLabel={visible ? 'Hide password' : 'Show password'}
+      onRightIconClick={() => setVisible((prev) => !prev)}
+    />
+  );
+}
+
+export const PasswordVisibilityToggle: Story = {
+  render: () => <PasswordToggleDemo />,
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText('Enter your password') as HTMLInputElement;
+    await expect(field.type).toBe('password');
+
+    const toggle = canvas.getByRole('button', { name: /show password/i });
+    await userEvent.click(toggle);
+    await expect(field.type).toBe('text');
+
+    await userEvent.click(canvas.getByRole('button', { name: /hide password/i }));
+    await expect(field.type).toBe('password');
+  },
+};
