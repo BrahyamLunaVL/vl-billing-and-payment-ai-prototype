@@ -1,5 +1,7 @@
 #login-screen {
   position: relative;
+  flex: 1 1 auto;
+  width: 100%;
   min-height: 100vh;
   overflow: hidden;
   box-sizing: border-box;
