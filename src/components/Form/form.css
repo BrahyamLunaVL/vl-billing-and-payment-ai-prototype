@@ -1,0 +1,22 @@
+.form {
+  --form-color-white: #ffffff;
+  --form-color-gray-200: #ececef;
+  --form-shadow-color: rgba(187, 157, 181, 0.2);
+
+  --form-radius: 32px;
+  --form-padding: 52px;
+  --form-gap: 40px;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--form-gap);
+  width: 100%;
+  max-width: 600px;
+  padding: var(--form-padding);
+  border: 1px solid var(--form-color-gray-200);
+  border-radius: var(--form-radius);
+  background: var(--form-color-white);
+  box-shadow: 2px 10px 50px var(--form-shadow-color);
+}

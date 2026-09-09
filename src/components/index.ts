@@ -39,3 +39,6 @@ export type { MultiSelectProps, MultiSelectOption } from './MultiSelect';
 
 export { PhoneInput } from './PhoneInput';
 export type { PhoneInputProps } from './PhoneInput';
+
+export { Form } from './Form';
+export type { FormProps } from './Form';
