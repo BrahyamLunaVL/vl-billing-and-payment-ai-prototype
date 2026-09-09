@@ -31,11 +31,6 @@
   box-sizing: border-box;
 }
 
-.auth-screen__logo {
-  height: 44px;
-  width: auto;
-}
-
 .auth-screen__title {
   margin: 0;
   font-size: 32px;

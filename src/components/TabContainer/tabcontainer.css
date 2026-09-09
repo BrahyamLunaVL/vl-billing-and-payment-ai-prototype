@@ -1,0 +1,109 @@
+.tab-container {
+  --tab-container-color-black: #263238;
+  --tab-container-color-white: #ffffff;
+  --tab-container-color-brand-primary: #c32059;
+  --tab-container-color-brand-secondary: #6f1d5d;
+  --tab-container-color-gray-200: #ececef;
+  --tab-container-color-gray-300: #d5d7dd;
+  --tab-container-color-gray-400: #bbbbbb;
+  --tab-container-color-gray-500: #7a7a7a;
+
+  --tab-container-font-family: 'Roboto', sans-serif;
+
+  --tab-container-transition-duration: 0.15s;
+
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border: none;
+  border-bottom: 2px solid var(--tab-container-color-gray-200);
+  background: transparent;
+  font-family: var(--tab-container-font-family);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color var(--tab-container-transition-duration) ease,
+    color var(--tab-container-transition-duration) ease;
+}
+
+.tab-container__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tab-container-color-gray-500);
+  white-space: nowrap;
+}
+
+.tab-container__counter {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--tab-container-color-gray-300);
+  color: var(--tab-container-color-gray-500);
+  font-size: 8px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+/* Hover and pressed are only shown while the tab isn't already selected —
+   selected must keep its own look even while hovered/pressed (Default/
+   Hover are mouse states, Selected is a data state that outranks them).
+   ":active" here means pressed/held down, not keyboard focus — see this
+   project's shared convention (Option, DropdownOption). */
+.tab-container:hover:not(.tab-container--selected):not(:disabled) .tab-container__title {
+  color: var(--tab-container-color-black);
+}
+
+.tab-container:hover:not(.tab-container--selected):not(:disabled) {
+  border-bottom-color: var(--tab-container-color-gray-400);
+}
+
+.tab-container:active:not(.tab-container--selected):not(:disabled) {
+  border-bottom-color: var(--tab-container-color-brand-secondary);
+}
+
+.tab-container:active:not(.tab-container--selected):not(:disabled) .tab-container__title {
+  color: var(--tab-container-color-brand-secondary);
+}
+
+.tab-container:active:not(.tab-container--selected):not(:disabled) .tab-container__counter {
+  background: var(--tab-container-color-brand-secondary);
+  color: var(--tab-container-color-white);
+}
+
+.tab-container--selected {
+  border-bottom-color: var(--tab-container-color-brand-primary);
+}
+
+.tab-container--selected .tab-container__title {
+  color: var(--tab-container-color-brand-primary);
+}
+
+.tab-container--selected .tab-container__counter {
+  background: var(--tab-container-color-brand-primary);
+  color: var(--tab-container-color-white);
+}
+
+.tab-container:focus-visible {
+  outline: 2px solid var(--tab-container-color-brand-primary);
+  outline-offset: -2px;
+}
+
+.tab-container:disabled {
+  cursor: not-allowed;
+  border-bottom-color: var(--tab-container-color-gray-400);
+}
+
+.tab-container:disabled .tab-container__title {
+  color: var(--tab-container-color-gray-400);
+}
+
+.tab-container:disabled .tab-container__counter {
+  background: var(--tab-container-color-gray-400);
+  color: var(--tab-container-color-gray-500);
+}

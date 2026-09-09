@@ -48,3 +48,24 @@ export type { NotificationProps } from './Notification';
 
 export { Alert } from './Alert';
 export type { AlertProps, AlertType } from './Alert';
+
+export { Option } from './Option';
+export type { OptionProps, OptionType } from './Option';
+
+export { Logo } from './Logo';
+export type { LogoProps, LogoSize } from './Logo';
+
+export { Sidebar } from './Sidebar';
+export type { SidebarProps, SidebarUser, SidebarNavItem } from './Sidebar';
+
+export { TabContainer } from './TabContainer';
+export type { TabContainerProps } from './TabContainer';
+
+export { TabBar } from './TabBar';
+export type { TabBarProps, TabBarTab } from './TabBar';
+
+export { Step } from './Step';
+export type { StepProps, StepPosition, StepStatus } from './Step';
+
+export { StepsNavigation } from './StepsNavigation';
+export type { StepsNavigationProps } from './StepsNavigation';

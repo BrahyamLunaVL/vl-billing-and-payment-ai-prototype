@@ -1,0 +1,29 @@
+.logo {
+  display: block;
+  object-fit: contain;
+}
+
+.logo--wordmark.logo--small {
+  width: 229.565px;
+  height: 44px;
+}
+
+.logo--wordmark.logo--large {
+  width: 459.13px;
+  height: 88px;
+}
+
+.logo--mark {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.logo--mark.logo--small {
+  width: 44px;
+  height: 44px;
+}
+
+.logo--mark.logo--large {
+  width: 52px;
+  height: 52px;
+}

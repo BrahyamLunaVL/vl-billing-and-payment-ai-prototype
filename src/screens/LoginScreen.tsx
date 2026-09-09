@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import logo from '../assets/logo.png'
-import { Background, Form, FormField, Input, Button } from '../components'
+import { Background, Form, FormField, Input, Button, Logo } from '../components'
 import { login } from '../services/auth'
 import './AuthScreen.css'
 
@@ -45,7 +44,7 @@ export const LoginScreen = ({ onForgotPassword }: LoginScreenProps) => {
     <div className="auth-screen">
       <Background />
       <div className="auth-screen__content">
-        <img src={logo} alt="Virtual Latinos" className="auth-screen__logo" />
+        <Logo />
         <Form>
           <h1 className="auth-screen__title">Login to your account</h1>
           <div className="auth-screen__fields">

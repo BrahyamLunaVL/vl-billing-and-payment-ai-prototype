@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import logo from '../assets/logo.png'
-import { Background, Form, FormField, Input, Button, Notification } from '../components'
+import { Background, Form, FormField, Input, Button, Notification, Logo } from '../components'
 import { requestPasswordReset } from '../services/auth'
 import './AuthScreen.css'
 
@@ -48,7 +47,7 @@ export const ForgotPasswordScreen = ({ onBackToLogin, onEmailSent }: ForgotPassw
         />
       )}
       <div className="auth-screen__content">
-        <img src={logo} alt="Virtual Latinos" className="auth-screen__logo" />
+        <Logo />
         {emailSent ? (
           // Matches Figma's "Forgot Password - Email Sent" frame exactly.
           <Form>

@@ -1,0 +1,17 @@
+.steps-navigation {
+  display: flex;
+  width: 100%;
+}
+
+.steps-navigation > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Each step's point/notch sits inside its own box, so this only needs to
+   close the hairline gap between boxes — comfortably smaller than the
+   step's own chevron depth (24px, see step.css), so it never eats into the
+   previous step's visible content. */
+.steps-navigation > * + * {
+  margin-left: -4px;
+}

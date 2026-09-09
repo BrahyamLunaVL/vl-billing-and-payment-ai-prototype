@@ -1,0 +1,103 @@
+.option {
+  --option-color-white: #ffffff;
+  --option-color-black: #263238;
+  --option-color-brand-primary: #c32059;
+  --option-color-brand-secondary: #6f1d5d;
+  --option-color-fucsia-50: #fdf6f8;
+  --option-color-fucsia-200: #f6dee6;
+  --option-color-gray-400: #bbbbbb;
+
+  --option-font-family: 'Roboto', sans-serif;
+  --option-font-size: 16px;
+
+  --option-gap: 8px;
+  --option-padding: 12px;
+  --option-radius: 8px;
+
+  --option-transition-duration: 0.15s;
+
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--option-gap);
+  width: 100%;
+  padding: var(--option-padding);
+  border: none;
+  border-radius: var(--option-radius);
+  background: var(--option-color-white);
+  color: var(--option-color-black);
+  font-family: var(--option-font-family);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--option-transition-duration) ease,
+    color var(--option-transition-duration) ease;
+}
+
+.option--navigation {
+  font-weight: 700;
+}
+
+.option--actions {
+  font-weight: 400;
+}
+
+/* Hover and pressed are only shown while the row isn't already the selected
+   item — selected must keep its own look even while hovered/pressed, per
+   the design (Default/Hover are mouse states, Selected is a data state
+   that outranks them). ":active" here means pressed/held down, not
+   keyboard focus — see Option/DropdownOption's shared convention. */
+.option--navigation:hover:not(.option--selected):not(:disabled) {
+  background: var(--option-color-fucsia-50);
+  color: var(--option-color-brand-primary);
+}
+
+.option--navigation:active:not(.option--selected):not(:disabled) {
+  background: var(--option-color-fucsia-200);
+  color: var(--option-color-brand-secondary);
+}
+
+.option--navigation.option--selected {
+  background: var(--option-color-fucsia-200);
+  color: var(--option-color-brand-secondary);
+}
+
+/* "Actions" rows (context-menu items) never tint their background — only
+   the icon/text color changes. */
+.option--actions:hover:not(.option--selected):not(:disabled) {
+  color: var(--option-color-brand-primary);
+}
+
+.option--actions:active:not(.option--selected):not(:disabled) {
+  color: var(--option-color-brand-secondary);
+}
+
+.option--actions.option--selected {
+  color: var(--option-color-brand-secondary);
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--option-color-brand-primary);
+  outline-offset: -2px;
+}
+
+.option:disabled {
+  color: var(--option-color-gray-400);
+  cursor: not-allowed;
+}
+
+.option__icon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.option__text {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--option-font-size);
+  color: inherit;
+}

@@ -1,0 +1,132 @@
+.step {
+  --step-color-white: #ffffff;
+  --step-color-brand-primary: #c32059;
+  --step-color-fucsia-200: #f6dee6;
+  --step-color-gray-100: #f6f6f7;
+  --step-color-gray-200: #ececef;
+  --step-color-gray-400: #bbbbbb;
+  --step-color-gray-500: #7a7a7a;
+
+  --step-chevron-depth: 24px;
+  --step-circle-size: 40px;
+
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 60px;
+  padding: 10px 40px;
+  border: none;
+  background: var(--step-color-white);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--step-chevron-depth)) 0,
+    100% 50%,
+    calc(100% - var(--step-chevron-depth)) 100%,
+    0 100%
+  );
+  /* clip-path can't take a stroke, so the shape's outline is faked with a
+     couple of zero-offset drop-shadows tracing its clipped silhouette. */
+  filter: drop-shadow(0 0 1px var(--step-color-gray-400)) drop-shadow(0 0 1px var(--step-color-gray-400));
+  font-family: 'Roboto', sans-serif;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.step--middle,
+.step--right {
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--step-chevron-depth)) 0,
+    100% 50%,
+    calc(100% - var(--step-chevron-depth)) 100%,
+    0 100%,
+    var(--step-chevron-depth) 50%
+  );
+}
+
+.step--right {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, var(--step-chevron-depth) 50%);
+}
+
+.step__circle {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--step-circle-size);
+  height: var(--step-circle-size);
+  border-radius: 20px;
+  background: var(--step-color-gray-200);
+  color: var(--step-color-gray-500);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.step__check {
+  color: var(--step-color-white);
+}
+
+.step__title {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--step-color-gray-400);
+  text-align: left;
+}
+
+/* Default's title darkens on real `:hover` — the circle stays the same;
+   only Selected/Completed/pressing the step recolor the circle (see
+   below). */
+.step--default:hover:not(:disabled) .step__title {
+  color: var(--step-color-gray-500);
+}
+
+/* Pressing/holding a default step down (real CSS `:active`) renders
+   identically to `selected` — see the component's own doc comment — and
+   takes priority over the hover rule above. */
+.step--default:active:not(:disabled) .step__circle,
+.step--selected .step__circle {
+  background: var(--step-color-fucsia-200);
+  color: var(--step-color-brand-primary);
+}
+
+.step--default:active:not(:disabled) .step__title,
+.step--selected .step__title {
+  color: var(--step-color-brand-primary);
+}
+
+.step--completed .step__circle {
+  background: var(--step-color-brand-primary);
+}
+
+.step--completed .step__title {
+  color: var(--step-color-brand-primary);
+}
+
+.step:focus-visible {
+  outline: 2px solid var(--step-color-brand-primary);
+  outline-offset: -2px;
+}
+
+.step--disabled,
+.step:disabled {
+  cursor: not-allowed;
+}
+
+.step--disabled .step__circle,
+.step:disabled .step__circle {
+  background: var(--step-color-gray-100);
+  color: var(--step-color-gray-400);
+}
+
+.step--disabled .step__title,
+.step:disabled .step__title {
+  color: var(--step-color-gray-400);
+}

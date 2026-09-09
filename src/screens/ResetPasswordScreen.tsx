@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import logo from '../assets/logo.png'
-import { Background, Form, FormField, Input, Button, Alert } from '../components'
+import { Background, Form, FormField, Input, Button, Alert, Logo } from '../components'
 import { resetPassword } from '../services/auth'
 import './AuthScreen.css'
 
@@ -56,7 +55,7 @@ export const ResetPasswordScreen = ({ email, onPasswordReset }: ResetPasswordScr
     <div className="auth-screen">
       <Background />
       <div className="auth-screen__content">
-        <img src={logo} alt="Virtual Latinos" className="auth-screen__logo" />
+        <Logo />
         <Form>
           <h1 className="auth-screen__title">Reset Password</h1>
           <div className="auth-screen__fields">
