@@ -24,12 +24,29 @@ type Story = StoryObj<typeof meta>;
 
 export const Admin: Story = {
   args: { user: 'admin' },
-  play: async ({ canvas }) => {
+  play: async ({ canvas, canvasElement }) => {
     await expect(canvas.getByRole('button', { name: /agreements & work hrs/i })).toBeVisible();
     await expect(canvas.getByRole('button', { name: /^users$/i })).toBeVisible();
     await expect(canvas.getByRole('button', { name: /notifications/i })).toBeVisible();
     await expect(canvas.getByRole('button', { name: /collapse sidebar/i })).toBeVisible();
     await expect(canvas.getByText('Jane Doe')).toBeVisible();
+    // No `userAvatarSrc` given — Sidebar shows a generic placeholder icon
+    // rather than assuming/hardcoding any specific photo of its own.
+    await expect(canvasElement.querySelector('.sidebar__avatar--placeholder')).not.toBeNull();
+    await expect(canvasElement.querySelector('img.sidebar__avatar')).toBeNull();
+  },
+};
+
+export const WithUserAvatar: Story = {
+  args: {
+    user: 'admin',
+    userAvatarSrc:
+      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="44" height="44"%3E%3Crect width="44" height="44" fill="%23c32059"/%3E%3C/svg%3E',
+  },
+  play: async ({ canvasElement }) => {
+    const img = canvasElement.querySelector('img.sidebar__avatar');
+    await expect(img).not.toBeNull();
+    await expect(canvasElement.querySelector('.sidebar__avatar--placeholder')).toBeNull();
   },
 };
 

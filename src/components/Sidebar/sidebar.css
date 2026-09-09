@@ -91,6 +91,14 @@
   object-fit: cover;
 }
 
+.sidebar__avatar--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sidebar-color-gray-200);
+  color: var(--sidebar-color-gray-500);
+}
+
 .sidebar__user-details {
   display: flex;
   flex-direction: column;

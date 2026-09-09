@@ -1,7 +1,6 @@
 import { Logo } from '../Logo';
 import { Option } from '../Option';
-import type { IconName } from '../Icon';
-import sampleUserPhoto from '../../assets/users/va.jpg';
+import { Icon, type IconName } from '../Icon';
 import './sidebar.css';
 
 export type SidebarUser = 'admin' | 'client' | 'va';
@@ -59,7 +58,12 @@ export interface SidebarProps {
   user: SidebarUser;
   userName: string;
   userEmail: string;
-  /** URL of the signed-in user's profile photo. Defaults to a sample photo. */
+  /**
+   * URL of the signed-in user's profile photo. Sidebar never has an
+   * opinion of its own about what this defaults to (that would mean
+   * hardcoding some specific real user's photo here) — omit it and a
+   * generic placeholder icon is shown instead.
+   */
   userAvatarSrc?: string;
   /** Key of the currently active nav/action item, if any. */
   selectedItem?: string;
@@ -80,7 +84,7 @@ export const Sidebar = ({
   user,
   userName,
   userEmail,
-  userAvatarSrc = sampleUserPhoto,
+  userAvatarSrc,
   selectedItem,
   onSelectItem,
   onCollapse,
@@ -121,7 +125,13 @@ export const Sidebar = ({
       <div className="sidebar__bottom">
         <div className="sidebar__divider" />
         <div className="sidebar__user">
-          <img src={userAvatarSrc} alt="" className="sidebar__avatar" />
+          {userAvatarSrc ? (
+            <img src={userAvatarSrc} alt="" className="sidebar__avatar" />
+          ) : (
+            <span className="sidebar__avatar sidebar__avatar--placeholder" aria-hidden="true">
+              <Icon name="circle-user" size={24} />
+            </span>
+          )}
           <div className="sidebar__user-details">
             <p className="sidebar__user-name">{userName}</p>
             <p className="sidebar__user-email">{userEmail}</p>
