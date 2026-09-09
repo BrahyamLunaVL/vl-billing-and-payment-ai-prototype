@@ -59,6 +59,17 @@
   flex-shrink: 0;
 }
 
+/* The main nav list grows to fill any leftover space, which pushes the
+   Notifications/Settings group (the next .sidebar__options-group) down to
+   the bottom of the scroll area whenever the nav list is short enough to
+   leave room — matching Figma's own "Options List Container" vs.
+   "Options List Slot 2" split. When the nav list is long enough to
+   overflow instead, this has no effect and .sidebar__options scrolls the
+   two groups together as normal. */
+.sidebar__options-group:first-child {
+  flex: 1 1 auto;
+}
+
 .sidebar__bottom {
   display: flex;
   flex-shrink: 0;
