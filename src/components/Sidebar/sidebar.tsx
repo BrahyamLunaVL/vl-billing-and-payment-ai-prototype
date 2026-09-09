@@ -1,6 +1,7 @@
 import { Logo } from '../Logo';
 import { Option } from '../Option';
 import type { IconName } from '../Icon';
+import sampleUserPhoto from '../../assets/users/sample-user.png';
 import './sidebar.css';
 
 export type SidebarUser = 'admin' | 'client' | 'va';
@@ -58,6 +59,8 @@ export interface SidebarProps {
   user: SidebarUser;
   userName: string;
   userEmail: string;
+  /** URL of the signed-in user's profile photo. Defaults to a sample photo. */
+  userAvatarSrc?: string;
   /** Key of the currently active nav/action item, if any. */
   selectedItem?: string;
   onSelectItem?: (key: string) => void;
@@ -77,6 +80,7 @@ export const Sidebar = ({
   user,
   userName,
   userEmail,
+  userAvatarSrc = sampleUserPhoto,
   selectedItem,
   onSelectItem,
   onCollapse,
@@ -117,7 +121,7 @@ export const Sidebar = ({
       <div className="sidebar__bottom">
         <div className="sidebar__divider" />
         <div className="sidebar__user">
-          <Logo rounded />
+          <img src={userAvatarSrc} alt="" className="sidebar__avatar" />
           <div className="sidebar__user-details">
             <p className="sidebar__user-name">{userName}</p>
             <p className="sidebar__user-email">{userEmail}</p>
