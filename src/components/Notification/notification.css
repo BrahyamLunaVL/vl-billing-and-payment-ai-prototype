@@ -1,0 +1,43 @@
+.notification {
+  --notification-color-green: #21a184;
+  --notification-color-black: #263238;
+  --notification-color-gray-200: #ececef;
+  --notification-shadow-color: rgba(187, 157, 181, 0.2);
+
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 20px;
+  border: 1px solid var(--notification-color-gray-200);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 2px 10px 50px var(--notification-shadow-color);
+  color: var(--notification-color-black);
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.notification:hover {
+  box-shadow: 2px 14px 60px var(--notification-shadow-color);
+}
+
+.notification:focus-visible {
+  outline: 2px solid var(--notification-color-green);
+  outline-offset: 2px;
+}
+
+.notification__icon {
+  flex-shrink: 0;
+  color: var(--notification-color-green);
+}
+
+.notification__message {
+  flex: 1 1 0;
+  min-width: 0;
+}

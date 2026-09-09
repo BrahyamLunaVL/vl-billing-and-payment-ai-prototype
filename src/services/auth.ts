@@ -1,4 +1,6 @@
-import { MOCK_USERS } from '../mocks/users';
+import { MOCK_USERS, resetMockUsers } from '../mocks/users';
+
+export { resetMockUsers };
 
 export type LoginErrorCode =
   | 'EMAIL_NOT_REGISTERED'
@@ -99,4 +101,63 @@ export async function login(email: string, password: string): Promise<LoginResul
 export function resetLoginRateLimit(): void {
   consecutiveFailures = 0;
   lockedUntil = null;
+}
+
+export type RequestPasswordResetErrorCode = 'EMAIL_NOT_REGISTERED';
+
+export type RequestPasswordResetResult =
+  | { success: true }
+  | { success: false; code: RequestPasswordResetErrorCode; message: string };
+
+/** Simulates the "forgot password" step: just checks the email is registered. */
+export async function requestPasswordReset(email: string): Promise<RequestPasswordResetResult> {
+  await wait(SIMULATED_LATENCY_MS);
+
+  const user = MOCK_USERS.find((candidate) => candidate.email === email);
+  if (!user) {
+    return { success: false, code: 'EMAIL_NOT_REGISTERED', message: ERROR_MESSAGES.EMAIL_NOT_REGISTERED };
+  }
+  return { success: true };
+}
+
+export type ResetPasswordErrorCode = 'PASSWORD_TOO_SHORT' | 'PASSWORDS_DONT_MATCH';
+
+export type ResetPasswordResult =
+  | { success: true }
+  | { success: false; code: ResetPasswordErrorCode; message: string };
+
+const MIN_PASSWORD_LENGTH = 12;
+
+const RESET_PASSWORD_ERROR_MESSAGES: Record<ResetPasswordErrorCode, string> = {
+  PASSWORD_TOO_SHORT: `The password must contain at least ${MIN_PASSWORD_LENGTH} characters`,
+  PASSWORDS_DONT_MATCH: "Passwords don't match",
+};
+
+/**
+ * Simulates completing a password reset: validates the new password length
+ * and that it matches its confirmation, then — since there's no real
+ * backend yet — actually mutates the matching `MOCK_USERS` entry so a
+ * subsequent `login()` call reflects the change, the same way a real API
+ * would persist it.
+ */
+export async function resetPassword(
+  email: string,
+  newPassword: string,
+  confirmPassword: string,
+): Promise<ResetPasswordResult> {
+  await wait(SIMULATED_LATENCY_MS);
+
+  if (newPassword.length < MIN_PASSWORD_LENGTH) {
+    return { success: false, code: 'PASSWORD_TOO_SHORT', message: RESET_PASSWORD_ERROR_MESSAGES.PASSWORD_TOO_SHORT };
+  }
+  if (newPassword !== confirmPassword) {
+    return { success: false, code: 'PASSWORDS_DONT_MATCH', message: RESET_PASSWORD_ERROR_MESSAGES.PASSWORDS_DONT_MATCH };
+  }
+
+  const user = MOCK_USERS.find((candidate) => candidate.email === email);
+  if (user) {
+    user.password = newPassword;
+  }
+
+  return { success: true };
 }

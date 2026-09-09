@@ -42,3 +42,6 @@ export type { PhoneInputProps } from './PhoneInput';
 
 export { Form } from './Form';
 export type { FormProps } from './Form';
+
+export { Notification } from './Notification';
+export type { NotificationProps } from './Notification';

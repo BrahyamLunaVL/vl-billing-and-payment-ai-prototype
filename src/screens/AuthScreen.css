@@ -1,10 +1,12 @@
-#login-screen {
+/*
+ * Shared layout for every full-screen auth-flow screen (Login, Forgot
+ * Password, Reset Password, ...): a full-bleed Background behind a
+ * centered Form card. Each screen's own .tsx composes its own title/
+ * fields/buttons as plain children — this file only owns the shell.
+ */
+
+.auth-screen {
   position: relative;
-  /* position:relative alone does NOT create a stacking context (that needs
-     a z-index too, or isolation). Without one, Background's z-index:-1
-     escapes past this element entirely and paints behind the page's own
-     root instead of just behind this element's white background below —
-     the opposite of what it's for. isolation:isolate contains it here. */
   isolation: isolate;
   flex: 1 1 auto;
   width: 100%;
@@ -17,7 +19,7 @@
   background: #ffffff;
 }
 
-.login-screen__content {
+.auth-screen__content {
   position: relative;
   z-index: 1;
   display: flex;
@@ -29,12 +31,12 @@
   box-sizing: border-box;
 }
 
-.login-screen__logo {
+.auth-screen__logo {
   height: 44px;
   width: auto;
 }
 
-.login-screen__title {
+.auth-screen__title {
   margin: 0;
   font-size: 32px;
   font-weight: 700;
@@ -42,14 +44,22 @@
   text-align: center;
 }
 
-.login-screen__fields {
+.auth-screen__description {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: #263238;
+  text-align: center;
+}
+
+.auth-screen__fields {
   display: flex;
   flex-direction: column;
   gap: 12px;
   width: 100%;
 }
 
-.login-screen__buttons {
+.auth-screen__buttons {
   display: flex;
   flex-direction: column;
   gap: 12px;

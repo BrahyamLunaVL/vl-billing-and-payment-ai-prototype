@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, waitFor } from 'storybook/test';
 import App from './App';
-import { resetLoginRateLimit } from './services/auth';
+import { resetLoginRateLimit, resetMockUsers } from './services/auth';
 
 const meta = {
   component: App,
@@ -10,6 +10,8 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+// --- Login screen -----------------------------------------------------
 
 export const Default: Story = {
   play: async ({ canvas }) => {
@@ -169,5 +171,165 @@ export const SixthConsecutiveFailureShowsTooManyRequests: Story = {
     await userEvent.click(button);
 
     await expect(await canvas.findByText('Too many requests. Try again later')).toBeVisible();
+  },
+};
+
+// --- Forgot Password screen --------------------------------------------
+
+export const NavigatesToForgotPasswordScreen: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /forgot your password/i }));
+
+    await expect(await canvas.findByText('Forgot Password')).toBeVisible();
+    const submitButton = canvas.getByRole('button', { name: /^reset password$/i });
+    await expect(submitButton).toBeDisabled();
+  },
+};
+
+export const ForgotPasswordUnregisteredEmailShowsError: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /forgot your password/i }));
+
+    const emailField = await canvas.findByPlaceholderText('Enter your email address');
+    await userEvent.type(emailField, 'nobody@virtuallatinos.com');
+    await userEvent.click(canvas.getByRole('button', { name: /^reset password$/i }));
+
+    await expect(
+      await canvas.findByText('The email address you entered is not registered'),
+    ).toBeVisible();
+  },
+};
+
+export const GoBackToLoginFromForgotPassword: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /forgot your password/i }));
+    await canvas.findByText('Forgot Password');
+
+    await userEvent.click(canvas.getByRole('button', { name: /go to login/i }));
+
+    await expect(await canvas.findByText('Login to your account')).toBeVisible();
+  },
+};
+
+export const ForgotPasswordSuccessShowsNotificationAndNavigatesToReset: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /forgot your password/i }));
+
+    const emailField = await canvas.findByPlaceholderText('Enter your email address');
+    await userEvent.type(emailField, 'admin@virtuallatinos.com');
+    await userEvent.click(canvas.getByRole('button', { name: /^reset password$/i }));
+
+    const notification = await canvas.findByRole('button', { name: /email sent/i });
+    await userEvent.click(notification);
+
+    await expect(await canvas.findByText('Reset Password')).toBeVisible();
+    const emailInReset = canvas.getByDisplayValue('admin@virtuallatinos.com') as HTMLInputElement;
+    await expect(emailInReset).toBeDisabled();
+  },
+};
+
+// --- Reset Password screen ---------------------------------------------
+
+async function navigateToResetPassword(canvas: any, userEvent: any, email = 'admin@virtuallatinos.com') {
+  await userEvent.click(canvas.getByRole('button', { name: /forgot your password/i }));
+  const emailField = await canvas.findByPlaceholderText('Enter your email address');
+  await userEvent.type(emailField, email);
+  await userEvent.click(canvas.getByRole('button', { name: /^reset password$/i }));
+  const notification = await canvas.findByRole('button', { name: /email sent/i });
+  await userEvent.click(notification);
+  await canvas.findByText('Reset Password');
+}
+
+export const ResetPasswordButtonDisabledUntilBothFieldsFilled: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await navigateToResetPassword(canvas, userEvent);
+
+    const submitButton = canvas.getByRole('button', { name: /^reset password$/i });
+    await expect(submitButton).toBeDisabled();
+
+    const [newPasswordField, confirmPasswordField] = canvas.getAllByPlaceholderText(
+      'Enter your new password',
+    );
+    await userEvent.type(newPasswordField, 'ANewPassword123');
+    await expect(submitButton).toBeDisabled();
+
+    await userEvent.type(confirmPasswordField, 'ANewPassword123');
+    await expect(submitButton).toBeEnabled();
+  },
+};
+
+export const ResetPasswordTooShortShowsError: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await navigateToResetPassword(canvas, userEvent);
+
+    const [newPasswordField, confirmPasswordField] = canvas.getAllByPlaceholderText(
+      'Enter your new password',
+    );
+    await userEvent.type(newPasswordField, 'short1');
+    await userEvent.type(confirmPasswordField, 'short1');
+    await userEvent.click(canvas.getByRole('button', { name: /^reset password$/i }));
+
+    await expect(
+      await canvas.findByText('The password must contain at least 12 characters'),
+    ).toBeVisible();
+  },
+};
+
+export const ResetPasswordMismatchShowsError: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await navigateToResetPassword(canvas, userEvent);
+
+    const [newPasswordField, confirmPasswordField] = canvas.getAllByPlaceholderText(
+      'Enter your new password',
+    );
+    await userEvent.type(newPasswordField, 'ANewPassword123');
+    await userEvent.type(confirmPasswordField, 'ADifferentPassword456');
+    await userEvent.click(canvas.getByRole('button', { name: /^reset password$/i }));
+
+    await expect(await canvas.findByText("Passwords don't match")).toBeVisible();
+  },
+};
+
+export const ResetPasswordSuccessUpdatesPasswordAndReturnsToLogin: Story = {
+  play: async ({ canvas, userEvent }) => {
+    resetLoginRateLimit();
+    try {
+      await navigateToResetPassword(canvas, userEvent);
+
+      const [newPasswordField, confirmPasswordField] = canvas.getAllByPlaceholderText(
+        'Enter your new password',
+      );
+      await userEvent.type(newPasswordField, 'ANewPassword123');
+      await userEvent.type(confirmPasswordField, 'ANewPassword123');
+      await userEvent.click(canvas.getByRole('button', { name: /^reset password$/i }));
+
+      const notification = await canvas.findByRole('button', { name: /password updated/i });
+      await userEvent.click(notification);
+
+      await expect(await canvas.findByText('Login to your account')).toBeVisible();
+
+      // The mock "database" was actually mutated — the old password no
+      // longer works, and the new one does.
+      const emailField = canvas.getByPlaceholderText('Enter your email address');
+      const passwordField = canvas.getByPlaceholderText('Enter your password');
+      const loginButton = canvas.getByRole('button', { name: /^log in$/i });
+
+      await userEvent.type(emailField, 'admin@virtuallatinos.com');
+      await userEvent.type(passwordField, 'VL-Testing-2026');
+      await userEvent.click(loginButton);
+      await expect(await canvas.findByText('The password you entered is incorrect')).toBeVisible();
+
+      await userEvent.clear(passwordField);
+      await userEvent.type(passwordField, 'ANewPassword123');
+      await userEvent.click(loginButton);
+      await waitFor(() =>
+        expect(canvas.queryByText('The password you entered is incorrect')).not.toBeInTheDocument(),
+      );
+    } finally {
+      // This test is the only one that actually mutates the mock "database"
+      // — restore it so every other story/test keeps seeing the original
+      // seed data regardless of run order.
+      resetMockUsers();
+    }
   },
 };
