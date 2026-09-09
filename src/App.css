@@ -1,5 +1,11 @@
 #login-screen {
   position: relative;
+  /* position:relative alone does NOT create a stacking context (that needs
+     a z-index too, or isolation). Without one, Background's z-index:-1
+     escapes past this element entirely and paints behind the page's own
+     root instead of just behind this element's white background below —
+     the opposite of what it's for. isolation:isolate contains it here. */
+  isolation: isolate;
   flex: 1 1 auto;
   width: 100%;
   min-height: 100vh;
