@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Background, Form, FormField, Input, Button, Logo } from '../components'
-import { login } from '../services/auth'
+import { login, type AuthenticatedUser } from '../services/auth'
 import './AuthScreen.css'
 
 export interface LoginScreenProps {
   onForgotPassword: () => void
+  onLoginSuccess: (user: AuthenticatedUser) => void
 }
 
-export const LoginScreen = ({ onForgotPassword }: LoginScreenProps) => {
+export const LoginScreen = ({ onForgotPassword, onLoginSuccess }: LoginScreenProps) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -27,7 +28,8 @@ export const LoginScreen = ({ onForgotPassword }: LoginScreenProps) => {
     const result = await login(email, password)
 
     if (result.success) {
-      alert(`Welcome, ${result.user.email}`)
+      onLoginSuccess(result.user)
+      return
     } else if (result.code === 'INVALID_EMAIL_FORMAT' || result.code === 'EMAIL_NOT_REGISTERED') {
       // Every other failure (wrong password, disabled user, too many
       // requests) surfaces on the password field instead, matching Figma's

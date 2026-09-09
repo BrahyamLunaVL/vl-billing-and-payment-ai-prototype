@@ -1,15 +1,26 @@
+import clientPhoto from '../assets/users/client.jpg';
+import vaPhoto from '../assets/users/va.jpg';
+
+export type UserRole = 'admin' | 'client' | 'va';
+
 export interface MockUser {
   email: string;
   password: string;
+  name: string;
+  role: UserRole;
+  /** URL of the user's profile photo. */
+  photo: string;
   /** Defaults to false when omitted. */
   disabled?: boolean;
 }
 
 const INITIAL_USERS: MockUser[] = [
-  { email: 'admin@virtuallatinos.com', password: 'VL-Testing-2026' },
-  { email: 'client@virtuallatinos.com', password: 'VL-Testing-2026' },
-  { email: 'va@virtuallatinos.com', password: 'VL-Testing-2026' },
-  { email: 'va2@virtuallatinos.com', password: 'VL-Testing-2026', disabled: true },
+  // TODO: swap in the admin's own photo once available — reusing the VA's
+  // for now as a placeholder.
+  { email: 'admin@virtuallatinos.com', password: 'VL-Testing-2026', name: 'James Carter', role: 'admin', photo: vaPhoto },
+  { email: 'client@virtuallatinos.com', password: 'VL-Testing-2026', name: 'Sofia Martinez', role: 'client', photo: clientPhoto },
+  { email: 'va@virtuallatinos.com', password: 'VL-Testing-2026', name: 'Elena Ruiz', role: 'va', photo: vaPhoto },
+  { email: 'va2@virtuallatinos.com', password: 'VL-Testing-2026', name: 'Laura Gomez', role: 'va', photo: vaPhoto, disabled: true },
 ];
 
 /**

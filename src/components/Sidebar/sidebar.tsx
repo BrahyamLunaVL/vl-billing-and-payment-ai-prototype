@@ -1,7 +1,7 @@
 import { Logo } from '../Logo';
 import { Option } from '../Option';
 import type { IconName } from '../Icon';
-import sampleUserPhoto from '../../assets/users/sample-user.png';
+import sampleUserPhoto from '../../assets/users/va.jpg';
 import './sidebar.css';
 
 export type SidebarUser = 'admin' | 'client' | 'va';

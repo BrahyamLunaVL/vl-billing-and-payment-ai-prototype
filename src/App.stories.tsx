@@ -109,27 +109,46 @@ export const DisabledUserShowsError: Story = {
 export const CorrectCredentialsLogIn: Story = {
   play: async ({ canvas, userEvent }) => {
     resetLoginRateLimit();
-    const alertCalls: unknown[] = [];
-    const originalAlert = window.alert;
-    window.alert = (message?: unknown) => {
-      alertCalls.push(message);
-    };
+    const emailField = canvas.getByPlaceholderText('Enter your email address');
+    const passwordField = canvas.getByPlaceholderText('Enter your password');
+    const button = canvas.getByRole('button', { name: /^log in$/i });
 
-    try {
-      const emailField = canvas.getByPlaceholderText('Enter your email address');
-      const passwordField = canvas.getByPlaceholderText('Enter your password');
-      const button = canvas.getByRole('button', { name: /^log in$/i });
+    await userEvent.type(emailField, 'client@virtuallatinos.com');
+    await userEvent.type(passwordField, 'VL-Testing-2026');
+    await userEvent.click(button);
 
-      await userEvent.type(emailField, 'client@virtuallatinos.com');
-      await userEvent.type(passwordField, 'VL-Testing-2026');
-      await userEvent.click(button);
+    // A successful login navigates to the Home screen, whose Sidebar shows
+    // the signed-in user's own name and role-specific nav (Client, not
+    // Admin/VA).
+    await expect(await canvas.findByText('Welcome, Sofia Martinez')).toBeVisible();
+    await expect(canvas.getByRole('button', { name: /my account/i })).toBeVisible();
+    await expect(canvas.queryByRole('button', { name: /^users$/i })).not.toBeInTheDocument();
+  },
+};
 
-      await waitFor(() => expect(alertCalls).toHaveLength(1));
-      await expect(alertCalls[0]).toBe('Welcome, client@virtuallatinos.com');
-      await expect(canvas.queryByText('The password you entered is incorrect')).not.toBeInTheDocument();
-    } finally {
-      window.alert = originalAlert;
-    }
+export const AdminLoginShowsAdminSidebar: Story = {
+  play: async ({ canvas, userEvent }) => {
+    resetLoginRateLimit();
+    await userEvent.type(canvas.getByPlaceholderText('Enter your email address'), 'admin@virtuallatinos.com');
+    await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
+    await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
+
+    await expect(await canvas.findByText('Welcome, James Carter')).toBeVisible();
+    await expect(canvas.getByRole('button', { name: /^users$/i })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: /clients/i })).toBeVisible();
+  },
+};
+
+export const VaLoginShowsVaSidebar: Story = {
+  play: async ({ canvas, userEvent }) => {
+    resetLoginRateLimit();
+    await userEvent.type(canvas.getByPlaceholderText('Enter your email address'), 'va@virtuallatinos.com');
+    await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
+    await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
+
+    await expect(await canvas.findByText('Welcome, Elena Ruiz')).toBeVisible();
+    await expect(canvas.getByRole('button', { name: /^invoices$/i })).toBeVisible();
+    await expect(canvas.queryByRole('button', { name: /^client invoice$/i })).not.toBeInTheDocument();
   },
 };
 

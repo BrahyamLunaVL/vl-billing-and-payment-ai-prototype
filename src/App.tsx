@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { LoginScreen } from './screens/LoginScreen'
 import { ForgotPasswordScreen } from './screens/ForgotPasswordScreen'
 import { ResetPasswordScreen } from './screens/ResetPasswordScreen'
+import { HomeScreen } from './screens/HomeScreen'
+import type { AuthenticatedUser } from './services/auth'
 
-type Screen = 'login' | 'forgot-password' | 'reset-password'
+type Screen = 'login' | 'forgot-password' | 'reset-password' | 'home'
 
 /**
  * Thin screen switcher. There's no router yet — this is a small enough set
@@ -15,6 +17,7 @@ type Screen = 'login' | 'forgot-password' | 'reset-password'
 function App() {
   const [screen, setScreen] = useState<Screen>('login')
   const [resetEmail, setResetEmail] = useState('')
+  const [loggedInUser, setLoggedInUser] = useState<AuthenticatedUser | null>(null)
 
   if (screen === 'forgot-password') {
     return (
@@ -37,7 +40,19 @@ function App() {
     )
   }
 
-  return <LoginScreen onForgotPassword={() => setScreen('forgot-password')} />
+  if (screen === 'home' && loggedInUser) {
+    return <HomeScreen user={loggedInUser} />
+  }
+
+  return (
+    <LoginScreen
+      onForgotPassword={() => setScreen('forgot-password')}
+      onLoginSuccess={(user) => {
+        setLoggedInUser(user)
+        setScreen('home')
+      }}
+    />
+  )
 }
 
 export default App

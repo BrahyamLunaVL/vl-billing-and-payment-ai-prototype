@@ -1,6 +1,7 @@
-import { MOCK_USERS, resetMockUsers } from '../mocks/users';
+import { MOCK_USERS, resetMockUsers, type UserRole } from '../mocks/users';
 
 export { resetMockUsers };
+export type { UserRole };
 
 export type LoginErrorCode =
   | 'INVALID_EMAIL_FORMAT'
@@ -9,9 +10,17 @@ export type LoginErrorCode =
   | 'USER_DISABLED'
   | 'TOO_MANY_REQUESTS';
 
+/** The signed-in user's public profile — everything but their password. */
+export interface AuthenticatedUser {
+  email: string;
+  name: string;
+  role: UserRole;
+  photo: string;
+}
+
 export interface LoginSuccess {
   success: true;
-  user: { email: string };
+  user: AuthenticatedUser;
 }
 
 export interface LoginFailure {
@@ -105,7 +114,7 @@ export async function login(email: string, password: string): Promise<LoginResul
 
   consecutiveFailures = 0;
   lockedUntil = null;
-  return { success: true, user: { email: user.email } };
+  return { success: true, user: { email: user.email, name: user.name, role: user.role, photo: user.photo } };
 }
 
 /**
