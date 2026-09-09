@@ -41,3 +41,24 @@
   flex: 1 1 0;
   min-width: 0;
 }
+
+.notification--floating {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1000;
+  width: auto;
+  max-width: 360px;
+  animation: notification-pop-in 0.25s ease-out;
+}
+
+@keyframes notification-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

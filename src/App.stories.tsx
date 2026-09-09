@@ -219,12 +219,39 @@ export const ForgotPasswordSuccessShowsNotificationAndNavigatesToReset: Story = 
     await userEvent.type(emailField, 'admin@virtuallatinos.com');
     await userEvent.click(canvas.getByRole('button', { name: /^reset password$/i }));
 
-    const notification = await canvas.findByRole('button', { name: /email sent/i });
+    // The form itself swaps to Figma's "Email Sent" content...
+    await expect(await canvas.findByText('Password reset email sent')).toBeVisible();
+    await expect(
+      canvas.getByText('Please check your email inbox and follow the steps to reset your password.'),
+    ).toBeVisible();
+    await expect(canvas.getByRole('button', { name: /^back to login$/i })).toBeVisible();
+
+    // ...and a floating toast (not part of Figma's design) is the actual
+    // way to continue to Reset Password.
+    const notification = canvas.getByRole('button', { name: /email sent — click to continue/i });
+    await expect(getComputedStyle(notification).position).toBe('fixed');
     await userEvent.click(notification);
 
     await expect(await canvas.findByText('Reset Password')).toBeVisible();
     const emailInReset = canvas.getByDisplayValue('admin@virtuallatinos.com') as HTMLInputElement;
     await expect(emailInReset).toBeDisabled();
+  },
+};
+
+export const BackToLoginFromEmailSentConfirmation: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /forgot your password/i }));
+
+    const emailField = await canvas.findByPlaceholderText('Enter your email address');
+    await userEvent.type(emailField, 'admin@virtuallatinos.com');
+    await userEvent.click(canvas.getByRole('button', { name: /^reset password$/i }));
+    await canvas.findByText('Password reset email sent');
+
+    // Distinct from clicking the floating toast — this goes straight back
+    // to Login instead of continuing to Reset Password.
+    await userEvent.click(canvas.getByRole('button', { name: /^back to login$/i }));
+
+    await expect(await canvas.findByText('Login to your account')).toBeVisible();
   },
 };
 
