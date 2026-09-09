@@ -16,7 +16,11 @@
   flex-direction: column;
   gap: var(--sidebar-gap);
   width: var(--sidebar-width);
-  height: 100%;
+  /* Always exactly the page's height — never shorter (so the footer stays
+     pinned to the bottom) and never taller (so a long nav list scrolls
+     inside .sidebar__options instead of growing the page). */
+  min-height: 100vh;
+  max-height: 100vh;
   padding: var(--sidebar-padding);
   background: var(--sidebar-color-white);
   box-shadow: 2px 10px 50px var(--sidebar-shadow-color);

@@ -1,15 +1,17 @@
 .home-screen {
   display: flex;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   background: #ffffff;
 }
 
 .home-screen__content {
   flex: 1 1 0;
   min-width: 0;
+  height: 100%;
   padding: 32px;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .home-screen__title {
