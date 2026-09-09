@@ -54,6 +54,26 @@ export const UnregisteredEmailShowsError: Story = {
   },
 };
 
+export const InvalidEmailFormatShowsError: Story = {
+  play: async ({ canvas, userEvent }) => {
+    resetLoginRateLimit();
+    const emailField = canvas.getByPlaceholderText('Enter your email address');
+    const passwordField = canvas.getByPlaceholderText('Enter your password');
+    const button = canvas.getByRole('button', { name: /^log in$/i });
+
+    // Missing "@" and "." — this can never be a registered email, so it
+    // should be flagged as an invalid format instead of "not registered".
+    await userEvent.type(emailField, 'not-an-email');
+    await userEvent.type(passwordField, 'VL-Testing-2026');
+    await userEvent.click(button);
+
+    await expect(await canvas.findByText('Please enter a valid email address')).toBeVisible();
+    await expect(
+      canvas.queryByText('The email address you entered is not registered'),
+    ).not.toBeInTheDocument();
+  },
+};
+
 export const WrongPasswordShowsError: Story = {
   play: async ({ canvas, userEvent }) => {
     resetLoginRateLimit();
@@ -197,6 +217,23 @@ export const ForgotPasswordUnregisteredEmailShowsError: Story = {
     await expect(
       await canvas.findByText('The email address you entered is not registered'),
     ).toBeVisible();
+  },
+};
+
+export const ForgotPasswordInvalidEmailFormatShowsError: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /forgot your password/i }));
+
+    const emailField = await canvas.findByPlaceholderText('Enter your email address');
+    // Missing "@" and "." — this can never be a registered email, so it
+    // should be flagged as an invalid format instead of "not registered".
+    await userEvent.type(emailField, 'not-an-email');
+    await userEvent.click(canvas.getByRole('button', { name: /^reset password$/i }));
+
+    await expect(await canvas.findByText('Please enter a valid email address')).toBeVisible();
+    await expect(
+      canvas.queryByText('The email address you entered is not registered'),
+    ).not.toBeInTheDocument();
   },
 };
 

@@ -29,7 +29,7 @@ export const LoginScreen = ({ onForgotPassword }: LoginScreenProps) => {
 
     if (result.success) {
       alert(`Welcome, ${result.user.email}`)
-    } else if (result.code === 'EMAIL_NOT_REGISTERED') {
+    } else if (result.code === 'INVALID_EMAIL_FORMAT' || result.code === 'EMAIL_NOT_REGISTERED') {
       // Every other failure (wrong password, disabled user, too many
       // requests) surfaces on the password field instead, matching Figma's
       // edge-case screens exactly.

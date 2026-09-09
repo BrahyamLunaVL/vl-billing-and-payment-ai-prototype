@@ -3,6 +3,7 @@ import { MOCK_USERS, resetMockUsers } from '../mocks/users';
 export { resetMockUsers };
 
 export type LoginErrorCode =
+  | 'INVALID_EMAIL_FORMAT'
   | 'EMAIL_NOT_REGISTERED'
   | 'WRONG_PASSWORD'
   | 'USER_DISABLED'
@@ -22,11 +23,21 @@ export interface LoginFailure {
 export type LoginResult = LoginSuccess | LoginFailure;
 
 const ERROR_MESSAGES: Record<LoginErrorCode, string> = {
+  INVALID_EMAIL_FORMAT: 'Please enter a valid email address',
   EMAIL_NOT_REGISTERED: 'The email address you entered is not registered',
   WRONG_PASSWORD: 'The password you entered is incorrect',
   USER_DISABLED: 'User is currently disabled. Please contact system administrator.',
   TOO_MANY_REQUESTS: 'Too many requests. Try again later',
 };
+
+// A value missing "@" or "." can't possibly be a registered email — flag it
+// as a format error instead of a misleading "not registered" one, and
+// without spending a request/rate-limit attempt on it.
+const EMAIL_FORMAT_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function isValidEmailFormat(email: string): boolean {
+  return EMAIL_FORMAT_REGEX.test(email.trim());
+}
 
 const MAX_CONSECUTIVE_FAILURES = 5;
 // Simulated only — a real rate limiter would use a much longer window. This
@@ -66,6 +77,10 @@ function recordFailure(code: LoginErrorCode): LoginFailure {
  * own. A successful login also resets the counter immediately.
  */
 export async function login(email: string, password: string): Promise<LoginResult> {
+  if (!isValidEmailFormat(email)) {
+    return fail('INVALID_EMAIL_FORMAT');
+  }
+
   await wait(SIMULATED_LATENCY_MS);
 
   if (lockedUntil !== null) {
@@ -103,7 +118,7 @@ export function resetLoginRateLimit(): void {
   lockedUntil = null;
 }
 
-export type RequestPasswordResetErrorCode = 'EMAIL_NOT_REGISTERED';
+export type RequestPasswordResetErrorCode = 'INVALID_EMAIL_FORMAT' | 'EMAIL_NOT_REGISTERED';
 
 export type RequestPasswordResetResult =
   | { success: true }
@@ -111,6 +126,10 @@ export type RequestPasswordResetResult =
 
 /** Simulates the "forgot password" step: just checks the email is registered. */
 export async function requestPasswordReset(email: string): Promise<RequestPasswordResetResult> {
+  if (!isValidEmailFormat(email)) {
+    return { success: false, code: 'INVALID_EMAIL_FORMAT', message: ERROR_MESSAGES.INVALID_EMAIL_FORMAT };
+  }
+
   await wait(SIMULATED_LATENCY_MS);
 
   const user = MOCK_USERS.find((candidate) => candidate.email === email);
