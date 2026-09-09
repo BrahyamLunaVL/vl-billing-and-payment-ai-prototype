@@ -24,6 +24,7 @@
   display: flex;
   align-items: center;
   gap: var(--phone-input-gap);
+  width: 100%;
   padding: var(--phone-input-padding);
   border: 1px solid var(--phone-input-color-gray-300);
   border-radius: var(--phone-input-radius);

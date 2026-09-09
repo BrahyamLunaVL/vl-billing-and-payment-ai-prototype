@@ -24,6 +24,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--input-gap);
+  width: 100%;
   padding: var(--input-padding);
   border: 1px solid var(--input-color-gray-300);
   border-radius: var(--input-radius);

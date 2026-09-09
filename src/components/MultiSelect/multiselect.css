@@ -1,5 +1,6 @@
 .multiselect-container {
   position: relative;
+  width: 100%;
 }
 
 .multiselect {
@@ -28,6 +29,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--multiselect-gap);
+  width: 100%;
   padding: var(--multiselect-padding);
   border: 1px solid var(--multiselect-color-gray-300);
   border-radius: var(--multiselect-radius);

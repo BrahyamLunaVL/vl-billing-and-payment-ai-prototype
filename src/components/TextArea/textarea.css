@@ -23,6 +23,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--textarea-gap);
+  width: 100%;
   height: 200px;
   padding: var(--textarea-padding);
   border: 1px solid var(--textarea-color-gray-300);
