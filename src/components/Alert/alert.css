@@ -1,0 +1,45 @@
+.alert {
+  --alert-color-green-bg: #def1ed;
+  --alert-color-green-text: #21a184;
+  --alert-color-orange-bg: #fcefe0;
+  --alert-color-orange-text: #ed9731;
+  --alert-color-red-bg: #fadcdc;
+  --alert-color-red-text: #de1515;
+
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 20px;
+  border-radius: 4px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.alert--success {
+  background: var(--alert-color-green-bg);
+  color: var(--alert-color-green-text);
+}
+
+.alert--warning {
+  background: var(--alert-color-orange-bg);
+  color: var(--alert-color-orange-text);
+}
+
+.alert--error {
+  background: var(--alert-color-red-bg);
+  color: var(--alert-color-red-text);
+}
+
+.alert__icon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.alert__message {
+  flex: 1 1 0;
+  min-width: 0;
+}

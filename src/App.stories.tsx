@@ -330,10 +330,12 @@ export const ResetPasswordSuccessUpdatesPasswordAndReturnsToLogin: Story = {
       await userEvent.type(confirmPasswordField, 'ANewPassword123');
       await userEvent.click(canvas.getByRole('button', { name: /^reset password$/i }));
 
-      const notification = await canvas.findByRole('button', { name: /password updated/i });
-      await userEvent.click(notification);
+      await expect(
+        await canvas.findByText('Password successfully updated. You will now be redirected to login.'),
+      ).toBeVisible();
 
-      await expect(await canvas.findByText('Login to your account')).toBeVisible();
+      // No click needed — the screen auto-redirects back to login on its own.
+      await expect(await canvas.findByText('Login to your account', {}, { timeout: 3000 })).toBeVisible();
 
       // The mock "database" was actually mutated — the old password no
       // longer works, and the new one does.

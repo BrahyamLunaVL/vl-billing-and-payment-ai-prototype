@@ -45,3 +45,6 @@ export type { FormProps } from './Form';
 
 export { Notification } from './Notification';
 export type { NotificationProps } from './Notification';
+
+export { Alert } from './Alert';
+export type { AlertProps, AlertType } from './Alert';
