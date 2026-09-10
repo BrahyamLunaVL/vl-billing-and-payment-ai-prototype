@@ -19,7 +19,7 @@
 }
 
 .ca-wizard__column--narrow {
-  flex: 0 1 360px;
+  flex: 0 1 400px;
 }
 
 .ca-wizard__column--wide {
@@ -50,7 +50,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 16px;
+  padding: 20px;
   border-radius: 8px;
   font-size: 14px;
 }
@@ -58,6 +58,7 @@
 .ca-wizard__info-card--purple {
   background: #e9dde7;
   color: #263238;
+  text-align: center;
 }
 
 .ca-wizard__info-card--orange {
@@ -92,15 +93,16 @@
 .ca-wizard__metric-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  padding: 16px;
+  gap: 20px;
+  padding: 10px;
+  border: 1px solid #ececef;
   border-radius: 8px;
   background: #f6f6f7;
 }
 
 .ca-wizard__metric-value {
   margin: 0;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
   color: #c32059;
 }
@@ -109,6 +111,17 @@
   font-size: 14px;
   font-weight: 400;
   color: #7a7a7a;
+}
+
+.ca-wizard__details-box {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid #ececef;
+  border-radius: 8px;
 }
 
 .ca-wizard__calendar-row {
@@ -120,7 +133,8 @@
 
 .ca-wizard__calendar-column {
   display: flex;
-  flex: 0 0 auto;
+  flex: 0 0 244px;
+  width: 244px;
   flex-direction: column;
   gap: 12px;
 }
