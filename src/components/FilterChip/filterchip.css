@@ -15,6 +15,9 @@
 .filter-chip__label {
   font-size: 12px;
   font-weight: 700;
+  /* See Chip's own comment: the page's inherited root line-height (145%)
+     otherwise inflates this pill past its intended height. */
+  line-height: 1;
   color: var(--filter-chip-color-brand-primary);
   white-space: nowrap;
 }

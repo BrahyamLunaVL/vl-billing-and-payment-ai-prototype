@@ -23,6 +23,11 @@
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 700;
+  /* The page's root line-height (145%, from the original Vite scaffold)
+     otherwise inherits in and inflates this pill well past Figma's ~22px
+     spec (100% line-height) — reset it explicitly rather than relying on
+     whatever line-height happens to cascade down. */
+  line-height: 1;
   color: var(--chip-color-black);
   white-space: nowrap;
 }
