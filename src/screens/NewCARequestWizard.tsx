@@ -260,55 +260,71 @@ export const NewCARequestWizard = ({ recentRequest, onCancel }: NewCARequestWiza
                 </FormField>
               </div>
 
-              <FormField
-                label="Specific dates that you worked extra hours"
-                helpText="Select the dates you worked extra hours in the last 4 weeks. Only past dates are eligible."
-              >
-                <Calendar selectedDates={selectedDates} onToggleDate={toggleDate} minDate={minDate} maxDate={maxDate} />
-              </FormField>
-              <div className="ca-wizard__actions">
-                <Button type="secondary" buttonText="Reset" onClick={handleReset} disabled={selectedDates.length === 0} />
-              </div>
-
-              {selectedDates.length === 0 ? (
-                <div className="ca-wizard__empty-state">
-                  <Icon name="calendar" size={40} />
-                  <p className="ca-wizard__empty-title">No days selected</p>
-                  <p className="ca-wizard__empty-subtitle">
-                    Select at least one date to enter the hours you worked as extra hours
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <h3 className="ca-wizard__subheading">Extra Hours Worked</h3>
-                  <p className="ca-wizard__description">
-                    Enter the number of extra hours your worked on each of the dates listed below.
-                    Please make sure to enter only the additional hours worked on each date. If the
-                    total requested hours exceed the pre-approved amount of hours, the additional
-                    hours will require the client approval.
-                  </p>
-                  <div className="ca-wizard__date-rows">
-                    {selectedDates.map((date) => (
-                      <FormField
-                        key={date}
-                        errorMessage={
-                          hoursByDate[date] >= DAILY_MAX_HOURS
-                            ? "You've reached the maximum of 12 extra hours per day"
-                            : undefined
-                        }
-                      >
-                        <div className="ca-wizard__date-row">
-                          <span>{formatFullDate(date)}</span>
-                          <HourStepper
-                            value={hoursByDate[date] ?? 0}
-                            onChange={(value) => setHoursByDate((prev) => ({ ...prev, [date]: value }))}
-                          />
-                        </div>
-                      </FormField>
-                    ))}
+              <div className="ca-wizard__calendar-row">
+                <div className="ca-wizard__calendar-column">
+                  <FormField
+                    label="Specific dates that you worked extra hours"
+                    helpText="Select the dates you worked extra hours in the last 4 weeks. Only past dates are eligible."
+                  >
+                    <Calendar
+                      selectedDates={selectedDates}
+                      onToggleDate={toggleDate}
+                      minDate={minDate}
+                      maxDate={maxDate}
+                    />
+                  </FormField>
+                  <div className="ca-wizard__actions">
+                    <Button
+                      type="secondary"
+                      buttonText="Reset"
+                      onClick={handleReset}
+                      disabled={selectedDates.length === 0}
+                    />
                   </div>
-                </>
-              )}
+                </div>
+
+                <div className="ca-wizard__hours-column">
+                  {selectedDates.length === 0 ? (
+                    <div className="ca-wizard__empty-state">
+                      <Icon name="calendar" size={40} />
+                      <p className="ca-wizard__empty-title">No days selected</p>
+                      <p className="ca-wizard__empty-subtitle">
+                        Select at least one date to enter the hours you worked as extra hours
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <h3 className="ca-wizard__subheading">Extra Hours Worked</h3>
+                      <p className="ca-wizard__description">
+                        Enter the number of extra hours your worked on each of the dates listed
+                        below. Please make sure to enter only the additional hours worked on each
+                        date. If the total requested hours exceed the pre-approved amount of hours,
+                        the additional hours will require the client approval.
+                      </p>
+                      <div className="ca-wizard__date-rows">
+                        {selectedDates.map((date) => (
+                          <FormField
+                            key={date}
+                            errorMessage={
+                              hoursByDate[date] >= DAILY_MAX_HOURS
+                                ? "You've reached the maximum of 12 extra hours per day"
+                                : undefined
+                            }
+                          >
+                            <div className="ca-wizard__date-row">
+                              <span>{formatFullDate(date)}</span>
+                              <HourStepper
+                                value={hoursByDate[date] ?? 0}
+                                onChange={(value) => setHoursByDate((prev) => ({ ...prev, [date]: value }))}
+                              />
+                            </div>
+                          </FormField>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
 
               <div className="ca-wizard__totals">
                 <div className="ca-wizard__totals-row">
