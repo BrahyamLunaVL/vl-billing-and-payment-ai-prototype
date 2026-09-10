@@ -86,12 +86,21 @@ export const MyAccountScreen = ({ user }: MyAccountScreenProps) => {
       />
       <main className="my-account-screen__content">
         <div className="my-account-screen__header">
-          <h1 className="my-account-screen__title">{selectedCARequest ? '' : 'My Account'}</h1>
+          {selectedCARequest ? (
+            <Button
+              type="tertiary"
+              leftIcon="chevron-left"
+              buttonText="Back to Changes & Approvals"
+              onClick={() => setSelectedCARequestId(null)}
+            />
+          ) : (
+            <h1 className="my-account-screen__title">My Account</h1>
+          )}
           <Button type="secondary" buttonText="Click to see SAM Contact Info" />
         </div>
 
         {selectedCARequest ? (
-          <CADetailsView request={selectedCARequest} onBack={() => setSelectedCARequestId(null)} />
+          <CADetailsView request={selectedCARequest} />
         ) : (
           <>
             <div className="my-account-screen__row">

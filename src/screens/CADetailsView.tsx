@@ -1,4 +1,4 @@
-import { ProfileCard, Chip, Button, type ChipTone } from '../components'
+import { ProfileCard, Chip, type ChipTone } from '../components'
 import type { CARequest, CARequestStatus } from '../services/vaAccount'
 import './CADetailsView.css'
 
@@ -18,15 +18,18 @@ const STATUS_TONE: Record<CARequestStatus, ChipTone> = {
 
 export interface CADetailsViewProps {
   request: CARequest
-  onBack: () => void
 }
 
-/** The detail view opened by clicking a CACard (Figma's "My Account - C&A Details"). */
-export const CADetailsView = ({ request, onBack }: CADetailsViewProps) => {
+/**
+ * The detail view opened by clicking a CACard (Figma's "My Account - C&A
+ * Details"). The way back to the dashboard is a tertiary button in the
+ * screen's own header row (next to the SAM contact button), not part of
+ * this component.
+ */
+export const CADetailsView = ({ request }: CADetailsViewProps) => {
   return (
     <div className="ca-details-view">
-      <Button type="ghost" leftIcon="chevron-left" buttonText="Back to Changes & Approvals" onClick={onBack} />
-      <ProfileCard>
+      <ProfileCard className="ca-details-view__card">
         <div className="ca-details-view__header">
           <h1 className="ca-details-view__title">{request.title}</h1>
           <Chip label={STATUS_LABEL[request.status]} tone={STATUS_TONE[request.status]} />
