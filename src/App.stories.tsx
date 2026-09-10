@@ -146,9 +146,18 @@ export const VaLoginShowsVaSidebar: Story = {
     await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
     await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
 
-    await expect(await canvas.findByText('Welcome, Elena Ruiz')).toBeVisible();
+    // VAs land on "My Account" (not the generic Home screen), whose
+    // Sidebar shows the VA's own nav.
+    await expect(await canvas.findByText('My Account', { selector: 'h1' })).toBeVisible();
     await expect(canvas.getByRole('button', { name: /^invoices$/i })).toBeVisible();
     await expect(canvas.queryByRole('button', { name: /^client invoice$/i })).not.toBeInTheDocument();
+
+    // The profile card, an active agreement with its weekly schedule, a
+    // C&A request, and an invoice all render from the VA's own mock data.
+    await expect(canvas.getAllByText('Elena Ruiz')[0]).toBeVisible();
+    await expect(canvas.getAllByText('The Matian Firm @ $8.00')[0]).toBeVisible();
+    await expect(canvas.getByText('Request approval for short time off')).toBeVisible();
+    await expect(canvas.getByText('Invoice Preview #1940-3326')).toBeVisible();
   },
 };
 

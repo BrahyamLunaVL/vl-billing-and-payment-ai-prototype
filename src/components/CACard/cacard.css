@@ -1,0 +1,48 @@
+.ca-card {
+  --ca-card-color-white: #ffffff;
+  --ca-card-color-black: #263238;
+  --ca-card-color-gray-200: #ececef;
+
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--ca-card-color-gray-200);
+  border-radius: 8px;
+  background: var(--ca-card-color-white);
+  font-family: 'Roboto', sans-serif;
+  text-align: left;
+}
+
+button.ca-card {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.ca-card:focus-visible {
+  outline: 2px solid var(--ca-card-color-black);
+  outline-offset: -2px;
+}
+
+.ca-card__content {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--ca-card-color-black);
+}
+
+.ca-card__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ca-card__date {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 400;
+}

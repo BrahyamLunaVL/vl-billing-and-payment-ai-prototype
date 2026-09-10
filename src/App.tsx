@@ -3,6 +3,7 @@ import { LoginScreen } from './screens/LoginScreen'
 import { ForgotPasswordScreen } from './screens/ForgotPasswordScreen'
 import { ResetPasswordScreen } from './screens/ResetPasswordScreen'
 import { HomeScreen } from './screens/HomeScreen'
+import { MyAccountScreen } from './screens/MyAccountScreen'
 import type { AuthenticatedUser } from './services/auth'
 
 type Screen = 'login' | 'forgot-password' | 'reset-password' | 'home'
@@ -41,6 +42,11 @@ function App() {
   }
 
   if (screen === 'home' && loggedInUser) {
+    // VAs land on "My Account" (their agreements/C&A/invoices); other
+    // roles get the generic Home screen until their own is built.
+    if (loggedInUser.role === 'va') {
+      return <MyAccountScreen user={loggedInUser} />
+    }
     return <HomeScreen user={loggedInUser} />
   }
 

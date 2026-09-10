@@ -1,0 +1,74 @@
+.agreement-card {
+  --agreement-card-color-white: #ffffff;
+  --agreement-card-color-black: #263238;
+  --agreement-card-color-gray-200: #ececef;
+  --agreement-card-color-gray-300: #d5d7dd;
+  --agreement-card-color-gray-500: #7a7a7a;
+  --agreement-card-color-brand-primary: #c32059;
+  --agreement-card-color-brand-secondary: #6f1d5d;
+  --agreement-card-color-fucsia-200: #f6dee6;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding: 16px;
+  background: var(--agreement-card-color-white);
+  border: 1px solid var(--agreement-card-color-gray-200);
+  border-radius: 8px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.agreement-card__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--agreement-card-color-brand-secondary);
+}
+
+.agreement-card__chip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.agreement-card__edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--agreement-card-color-fucsia-200);
+  color: var(--agreement-card-color-brand-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.agreement-card__edit:focus-visible {
+  outline: 2px solid var(--agreement-card-color-brand-primary);
+  outline-offset: 2px;
+}
+
+.agreement-card__divider {
+  width: 100%;
+  height: 1px;
+  background: var(--agreement-card-color-gray-300);
+}
+
+.agreement-card__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--agreement-card-color-gray-500);
+}
+
+.agreement-card__item-icon {
+  flex-shrink: 0;
+  color: inherit;
+}

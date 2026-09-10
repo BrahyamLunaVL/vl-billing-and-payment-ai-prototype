@@ -1,0 +1,70 @@
+.chip {
+  --chip-color-black: #263238;
+  --chip-color-gray-200: #ececef;
+  --chip-color-gray-400: #bbbbbb;
+  --chip-color-red-300: #fadcdc;
+  --chip-color-red-500: #de1515;
+  --chip-color-green-400: #def1ed;
+  --chip-color-green-500: #21a184;
+  --chip-color-blue-400: #ebfbfc;
+  --chip-color-blue-500: #378fce;
+  --chip-color-orange-300: #fcefe0;
+  --chip-color-orange-500: #ed9731;
+  --chip-color-purple-300: #e9dde7;
+  --chip-color-purple-500: #6f1d5d;
+
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--chip-color-black);
+  white-space: nowrap;
+}
+
+.chip__dot {
+  flex-shrink: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.chip__label {
+  color: var(--chip-color-black);
+}
+
+.chip--gray {
+  background: var(--chip-color-gray-200);
+  color: var(--chip-color-gray-400);
+}
+
+.chip--red {
+  background: var(--chip-color-red-300);
+  color: var(--chip-color-red-500);
+}
+
+.chip--green {
+  background: var(--chip-color-green-400);
+  color: var(--chip-color-green-500);
+}
+
+.chip--blue {
+  background: var(--chip-color-blue-400);
+  color: var(--chip-color-blue-500);
+}
+
+.chip--orange {
+  background: var(--chip-color-orange-300);
+  color: var(--chip-color-orange-500);
+}
+
+.chip--purple {
+  background: var(--chip-color-purple-300);
+  color: var(--chip-color-purple-500);
+}

@@ -1,0 +1,115 @@
+.my-account-screen {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  background: #ffffff;
+}
+
+.my-account-screen__content {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  padding: 32px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.my-account-screen__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.my-account-screen__title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.my-account-screen__section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.my-account-screen__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.my-account-screen__column {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.my-account-screen__profile-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+.my-account-screen__profile-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.my-account-screen__profile-description {
+  margin: 0;
+  font-size: 14px;
+  color: #263238;
+}
+
+.my-account-screen__profile-chip {
+  margin-left: auto;
+}
+
+.my-account-screen__field-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.my-account-screen__field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+  color: #263238;
+}
+
+.my-account-screen__field-value {
+  font-weight: 700;
+}
+
+.my-account-screen__field-value--link {
+  color: #378fce;
+}
+
+.my-account-screen__card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.my-account-screen__invoices-title {
+  margin: 0;
+}
+
+.my-account-screen__notice {
+  margin: 0;
+  font-size: 14px;
+  color: #263238;
+}
