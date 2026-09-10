@@ -161,6 +161,31 @@ export const VaLoginShowsVaSidebar: Story = {
   },
 };
 
+export const ClickingACARequestShowsItsDetails: Story = {
+  play: async ({ canvas, userEvent }) => {
+    resetLoginRateLimit();
+    await userEvent.type(canvas.getByPlaceholderText('Enter your email address'), 'va@virtuallatinos.com');
+    await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
+    await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
+
+    await userEvent.click(await canvas.findByRole('button', { name: /request approval for short time off/i }));
+
+    // The dashboard grid/invoices are replaced by the request's details —
+    // Figma's "My Account - C&A Details" — and the page title is hidden,
+    // matching that frame exactly.
+    await expect(await canvas.findByText('Time Off Dates')).toBeVisible();
+    await expect(canvas.getByText('2025-12-10')).toBeVisible();
+    await expect(canvas.getByText(/requested by/i)).toBeVisible();
+    await expect(canvas.queryByText('My Account', { selector: 'h1' })).not.toBeInTheDocument();
+    await expect(canvas.queryByText('Virtual Latinos Invoices')).not.toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole('button', { name: /back to changes & approvals/i }));
+
+    await expect(await canvas.findByText('My Account', { selector: 'h1' })).toBeVisible();
+    await expect(canvas.getByText('Virtual Latinos Invoices')).toBeVisible();
+  },
+};
+
 export const PasswordVisibilityToggle: Story = {
   play: async ({ canvas, userEvent }) => {
     resetLoginRateLimit();

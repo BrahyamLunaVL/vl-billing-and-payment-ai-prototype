@@ -5,7 +5,7 @@ import { MOCK_INVOICES, type InvoiceRecord } from '../mocks/invoices';
 
 export type { VAProfile } from '../mocks/vaProfiles';
 export type { Agreement, AgreementStatus } from '../mocks/agreements';
-export type { CARequest, CARequestStatus } from '../mocks/caRequests';
+export type { CARequest, CARequestStatus, CARequestDetail } from '../mocks/caRequests';
 export type { InvoiceRecord, InvoiceLineItemData } from '../mocks/invoices';
 
 /**
@@ -23,6 +23,10 @@ export function getAgreementsForVA(email: string): Agreement[] {
 
 export function getCARequestsForVA(email: string): CARequest[] {
   return MOCK_CA_REQUESTS.filter((request) => request.vaEmail === email);
+}
+
+export function getCARequestById(id: string): CARequest | undefined {
+  return MOCK_CA_REQUESTS.find((request) => request.id === id);
 }
 
 export function getInvoicesForVA(email: string): InvoiceRecord[] {
