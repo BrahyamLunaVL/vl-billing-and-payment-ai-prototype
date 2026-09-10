@@ -1,0 +1,70 @@
+.radio {
+  --radio-color-white: #ffffff;
+  --radio-color-black: #263238;
+  --radio-color-brand-primary: #c32059;
+  --radio-color-gray-300: #d5d7dd;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Roboto', sans-serif;
+  cursor: pointer;
+}
+
+.radio__input {
+  position: absolute;
+  inset: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.radio__circle {
+  box-sizing: border-box;
+  position: relative;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--radio-color-gray-300);
+  border-radius: 50%;
+  background: var(--radio-color-white);
+}
+
+.radio__input:checked ~ .radio__circle {
+  border-color: var(--radio-color-brand-primary);
+}
+
+.radio__input:checked ~ .radio__circle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--radio-color-brand-primary);
+  transform: translate(-50%, -50%);
+}
+
+.radio__input:focus-visible ~ .radio__circle {
+  outline: 2px solid var(--radio-color-brand-primary);
+  outline-offset: 2px;
+}
+
+.radio__input:disabled ~ .radio__circle {
+  border-color: var(--radio-color-gray-300);
+  background: var(--radio-color-gray-300);
+}
+
+.radio__input:disabled ~ .radio__label {
+  color: var(--radio-color-gray-300);
+}
+
+.radio__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--radio-color-black);
+}

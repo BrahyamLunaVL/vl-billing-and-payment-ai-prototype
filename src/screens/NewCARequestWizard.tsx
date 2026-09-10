@@ -10,6 +10,7 @@ import {
   Alert,
   Icon,
   Button,
+  Radio,
 } from '../components'
 import { CA_STATUS_LABEL, CA_STATUS_TONE, type CARequest } from '../services/vaAccount'
 import './NewCARequestWizard.css'
@@ -159,7 +160,7 @@ export const NewCARequestWizard = ({ recentRequest, onCancel }: NewCARequestWiza
 
       {step === 1 && (
         <div className="ca-wizard__row">
-          <div className="ca-wizard__column">
+          <div className="ca-wizard__column ca-wizard__column--narrow">
             <h2 className="ca-wizard__heading">Change Request or Approval Details</h2>
             <p className="ca-wizard__description">
               Please let us know the details of what you&apos;d like to change or approve.
@@ -176,23 +177,21 @@ export const NewCARequestWizard = ({ recentRequest, onCancel }: NewCARequestWiza
               </>
             )}
           </div>
-          <div className="ca-wizard__column">
+          <div className="ca-wizard__column ca-wizard__column--wide">
             <ProfileCard>
               <fieldset className="ca-wizard__radio-group">
                 <legend className="ca-wizard__radio-legend">
                   Main Changes Requested from the Virtual Assistant (VA)
                 </legend>
                 {REQUEST_TYPE_OPTIONS.map((option) => (
-                  <label key={option.value} className="ca-wizard__radio-option">
-                    <input
-                      type="radio"
-                      name="request-type"
-                      value={option.value}
-                      checked={requestType === option.value}
-                      onChange={() => setRequestType(option.value)}
-                    />
-                    <span>{option.label}</span>
-                  </label>
+                  <Radio
+                    key={option.value}
+                    name="request-type"
+                    value={option.value}
+                    label={option.label}
+                    checked={requestType === option.value}
+                    onChange={() => setRequestType(option.value)}
+                  />
                 ))}
               </fieldset>
               <div className="ca-wizard__actions">
