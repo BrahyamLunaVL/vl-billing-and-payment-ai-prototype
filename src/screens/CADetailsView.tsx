@@ -1,20 +1,6 @@
-import { ProfileCard, Chip, type ChipTone } from '../components'
-import type { CARequest, CARequestStatus } from '../services/vaAccount'
+import { ProfileCard, Chip } from '../components'
+import { CA_STATUS_LABEL, CA_STATUS_TONE, type CARequest } from '../services/vaAccount'
 import './CADetailsView.css'
-
-const STATUS_LABEL: Record<CARequestStatus, string> = {
-  new: 'New',
-  approved: 'Approved',
-  rejected: 'Rejected',
-  expired: 'Expired',
-}
-
-const STATUS_TONE: Record<CARequestStatus, ChipTone> = {
-  new: 'purple',
-  approved: 'blue',
-  rejected: 'red',
-  expired: 'red',
-}
 
 export interface CADetailsViewProps {
   request: CARequest
@@ -32,7 +18,7 @@ export const CADetailsView = ({ request }: CADetailsViewProps) => {
       <ProfileCard className="ca-details-view__card">
         <div className="ca-details-view__header">
           <h1 className="ca-details-view__title">{request.title}</h1>
-          <Chip label={STATUS_LABEL[request.status]} tone={STATUS_TONE[request.status]} />
+          <Chip label={CA_STATUS_LABEL[request.status]} tone={CA_STATUS_TONE[request.status]} />
         </div>
         <p className="ca-details-view__meta">
           Requested by <strong>{request.requestedBy}</strong> on <strong>{request.requestedDate}</strong>

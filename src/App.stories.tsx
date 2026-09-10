@@ -186,6 +186,86 @@ export const ClickingACARequestShowsItsDetails: Story = {
   },
 };
 
+async function loginAsVA(canvas: any, userEvent: any) {
+  resetLoginRateLimit();
+  await userEvent.type(canvas.getByPlaceholderText('Enter your email address'), 'va@virtuallatinos.com');
+  await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
+  await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
+  await canvas.findByText('My Account', { selector: 'h1' });
+}
+
+export const NavigatingToChangesApprovalsAndBack: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await loginAsVA(canvas, userEvent);
+
+    await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
+
+    // Sidebar navigation swaps the whole page — My Account's content is
+    // gone, replaced by the full Changes & Approvals list/accordion.
+    await expect(await canvas.findByText('Changes & Approvals Form', { selector: 'h1' })).toBeVisible();
+    await expect(canvas.queryByText('Virtual Latinos Invoices')).not.toBeInTheDocument();
+
+    // Clicking a list card expands it in place (an accordion, not a
+    // navigation), showing its richer detail grid.
+    await userEvent.click(canvas.getByRole('button', { name: /request approval for extra hours/i }));
+    await expect(await canvas.findByText('Approval Type')).toBeVisible();
+    await expect(canvas.getByText('Manual')).toBeVisible();
+
+    await userEvent.click(canvas.getByRole('button', { name: /^my account$/i }));
+    await expect(await canvas.findByText('My Account', { selector: 'h1' })).toBeVisible();
+  },
+};
+
+export const CreatingAnExtraHoursRequest: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await loginAsVA(canvas, userEvent);
+    await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
+    await userEvent.click(await canvas.findByRole('button', { name: /^new request for changes$/i }));
+
+    // Step 1: the type picker defaults to "extra hours" (matching Figma's
+    // shown state) — Next moves to step 2's real form.
+    await expect(await canvas.findByText('Choose Request for Changes')).toBeVisible();
+    await userEvent.click(canvas.getByRole('button', { name: /^next$/i }));
+
+    await expect(await canvas.findByText('No days selected')).toBeVisible();
+
+    // Selecting a day on the calendar (today is always enabled — it's the
+    // max date) replaces the empty state with an hour entry for that day.
+    const enabledDay = canvasElement.querySelector<HTMLButtonElement>(
+      '.calendar__day:not(:disabled):not(.calendar__day--outside)',
+    );
+    if (!enabledDay) throw new globalThis.Error('Expected at least one enabled calendar day');
+    await userEvent.click(enabledDay);
+
+    await expect(canvas.queryByText('No days selected')).not.toBeInTheDocument();
+    await expect(await canvas.findByText('Extra Hours Worked')).toBeVisible();
+    await expect(canvas.getByText('1 Hours')).toBeVisible(); // total starts at the new day's default 1 hour
+
+    // Pushing that single day's hours to the 12/day cap surfaces the
+    // per-field warning.
+    const increaseButton = canvas.getByRole('button', { name: /increase hours/i });
+    for (let i = 0; i < 11; i += 1) {
+      await userEvent.click(increaseButton);
+    }
+    await expect(await canvas.findByText("You've reached the maximum of 12 extra hours per day")).toBeVisible();
+  },
+};
+
+export const ViewingAnInvoiceFromMyAccount: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await loginAsVA(canvas, userEvent);
+
+    await userEvent.click(await canvas.findByRole('button', { name: /^view$/i }));
+
+    await expect(await canvas.findByText('Invoice #9')).toBeVisible();
+    await expect(canvas.getByText('Bloominari, LLC')).toBeVisible();
+    await expect(canvas.getAllByText(/invoice preview total/i).length).toBeGreaterThan(0);
+
+    await userEvent.click(canvas.getByRole('button', { name: /back to my account/i }));
+    await expect(await canvas.findByText('My Account', { selector: 'h1' })).toBeVisible();
+  },
+};
+
 export const PasswordVisibilityToggle: Story = {
   play: async ({ canvas, userEvent }) => {
     resetLoginRateLimit();

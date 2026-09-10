@@ -1,12 +1,40 @@
+import type { ChipTone } from '../components';
 import { MOCK_VA_PROFILES, type VAProfile } from '../mocks/vaProfiles';
-import { MOCK_AGREEMENTS, type Agreement } from '../mocks/agreements';
-import { MOCK_CA_REQUESTS, type CARequest } from '../mocks/caRequests';
+import { MOCK_AGREEMENTS, type Agreement, type AgreementStatus } from '../mocks/agreements';
+import { MOCK_CA_REQUESTS, type CARequest, type CARequestStatus } from '../mocks/caRequests';
 import { MOCK_INVOICES, type InvoiceRecord } from '../mocks/invoices';
 
 export type { VAProfile } from '../mocks/vaProfiles';
 export type { Agreement, AgreementStatus } from '../mocks/agreements';
 export type { CARequest, CARequestStatus, CARequestDetail } from '../mocks/caRequests';
 export type { InvoiceRecord, InvoiceLineItemData } from '../mocks/invoices';
+
+/** Shared status -> display label/color mappings, so every screen that shows one of these statuses agrees. */
+export const AGREEMENT_STATUS_LABEL: Record<AgreementStatus, string> = {
+  active: 'Active',
+  terminated: 'Terminated',
+  paused: 'Paused',
+};
+
+export const AGREEMENT_STATUS_TONE: Record<AgreementStatus, ChipTone> = {
+  active: 'blue',
+  terminated: 'red',
+  paused: 'orange',
+};
+
+export const CA_STATUS_LABEL: Record<CARequestStatus, string> = {
+  new: 'New',
+  approved: 'Approved',
+  rejected: 'Rejected',
+  expired: 'Expired',
+};
+
+export const CA_STATUS_TONE: Record<CARequestStatus, ChipTone> = {
+  new: 'purple',
+  approved: 'blue',
+  rejected: 'red',
+  expired: 'red',
+};
 
 /**
  * Everything a VA's "My Account" screen needs, keyed off the same email
@@ -31,4 +59,8 @@ export function getCARequestById(id: string): CARequest | undefined {
 
 export function getInvoicesForVA(email: string): InvoiceRecord[] {
   return MOCK_INVOICES.filter((invoice) => invoice.vaEmail === email);
+}
+
+export function getInvoiceById(id: string): InvoiceRecord | undefined {
+  return MOCK_INVOICES.find((invoice) => invoice.id === id);
 }

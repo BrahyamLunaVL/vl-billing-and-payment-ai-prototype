@@ -1,0 +1,114 @@
+.calendar {
+  --calendar-color-white: #ffffff;
+  --calendar-color-black: #263238;
+  --calendar-color-brand-primary: #c32059;
+  --calendar-color-gray-200: #ececef;
+  --calendar-color-gray-300: #d5d7dd;
+  --calendar-color-gray-400: #bbbbbb;
+  --calendar-color-gray-500: #7a7a7a;
+
+  box-sizing: border-box;
+  width: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+
+.calendar__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.calendar__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--calendar-color-gray-300);
+  border-radius: 50%;
+  background: var(--calendar-color-white);
+  color: var(--calendar-color-black);
+  cursor: pointer;
+}
+
+.calendar__nav:disabled {
+  color: var(--calendar-color-gray-400);
+  border-color: var(--calendar-color-gray-200);
+  cursor: not-allowed;
+}
+
+.calendar__select {
+  flex: 1 1 0;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border: 1px solid var(--calendar-color-gray-300);
+  border-radius: 8px;
+  background: var(--calendar-color-white);
+  color: var(--calendar-color-black);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.calendar__weekdays,
+.calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar__weekday {
+  padding: 4px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--calendar-color-gray-500);
+}
+
+.calendar__day {
+  box-sizing: border-box;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--calendar-color-black);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calendar__day:hover:not(:disabled):not(.calendar__day--selected) {
+  background: var(--calendar-color-gray-200);
+}
+
+.calendar__day--outside {
+  color: var(--calendar-color-gray-400);
+}
+
+.calendar__day--today {
+  box-shadow: inset 0 0 0 1px var(--calendar-color-brand-primary);
+}
+
+.calendar__day--selected {
+  background: var(--calendar-color-brand-primary);
+  color: var(--calendar-color-white);
+  font-weight: 700;
+}
+
+.calendar__day:disabled {
+  color: var(--calendar-color-gray-300);
+  cursor: not-allowed;
+}
+
+.calendar__day:focus-visible {
+  outline: 2px solid var(--calendar-color-brand-primary);
+  outline-offset: 2px;
+}

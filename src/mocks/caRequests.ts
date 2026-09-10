@@ -15,6 +15,8 @@ export interface CARequest {
   /** e.g. "December 10, 2025" — shown in the C&A list. */
   date: string;
   status: CARequestStatus;
+  /** The client the underlying agreement is with, e.g. "Bloominari dba Virtual Latinos". */
+  clientName: string;
   requestedBy: string;
   requestedDate: string;
   resolvedBy?: string;
@@ -31,6 +33,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     title: 'Request approval for short time off',
     date: 'December 10, 2025',
     status: 'new',
+    clientName: 'Bloominari dba Virtual Latinos',
     requestedBy: 'you',
     requestedDate: 'December 10, 2025',
     details: [
@@ -47,20 +50,31 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     id: 'ca-2',
     vaEmail: 'va@virtuallatinos.com',
     title: 'Request approval for extra hours',
-    date: 'December 2, 2025',
+    date: 'August 3, 2026',
     status: 'approved',
+    clientName: 'Bloominari dba Virtual Latinos',
     requestedBy: 'you',
-    requestedDate: 'December 2, 2025',
-    resolvedBy: 'Javiera Mercado',
-    resolvedDate: 'December 2, 2025',
+    requestedDate: 'August 3, 2026',
+    resolvedBy: 'Erick Farias VL',
+    resolvedDate: 'August 3, 2026',
     details: [
-      { label: 'Extra Hours Date', value: '2025-12-01' },
-      { label: 'Hours Requested', value: '4 Hours' },
-      { label: 'Reason', value: 'Client requested urgent report delivery' },
-      { label: 'Hourly Rate', value: '$11.00' },
-      { label: 'Total Extra Pay', value: '$44.00', fullWidth: true },
+      { label: 'Approval Type', value: 'Manual' },
+      { label: 'Total Extra Hours', value: '7 Hours' },
+      { label: 'Pre-approved Hours', value: '5 Hours' },
+      { label: 'Manual Approved', value: '2 Hours' },
+      { label: 'Extra Hours Dates', value: '08/05/2026\n08/07/2026\n08/11/2026' },
+      {
+        label: 'Extra Hours by Day',
+        value: 'On 08/05/2026: 1 Hour\nOn 08/07/2026: 2 Hours\nOn 08/11/2026: 2 Hours',
+      },
+      { label: 'Description', value: 'I worked 7 extra hours', fullWidth: true },
+      {
+        label: 'Agreement',
+        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Juan G.-2024-05-17 07:25:51',
+      },
     ],
-    comments: 'Client approved the extra hours over email.',
+    comments:
+      'I was working on the invoice project during the extra hours taken on august 5th, 7th and 11th',
   },
   {
     id: 'ca-3',
@@ -68,6 +82,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     title: 'Request approval for a raise',
     date: 'November 18, 2025',
     status: 'rejected',
+    clientName: 'Bloominari dba Virtual Latinos',
     requestedBy: 'you',
     requestedDate: 'November 18, 2025',
     resolvedBy: 'Erick Farias VL',
@@ -85,6 +100,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     title: 'Request approval for a BOH package',
     date: 'October 30, 2025',
     status: 'expired',
+    clientName: 'Bloominari dba Virtual Latinos',
     requestedBy: 'you',
     requestedDate: 'October 30, 2025',
     details: [

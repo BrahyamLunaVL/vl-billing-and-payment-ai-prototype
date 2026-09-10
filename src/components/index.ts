@@ -93,3 +93,6 @@ export type { CACardProps } from './CACard';
 
 export { Invoice } from './Invoice';
 export type { InvoiceProps, InvoiceLineItem, InvoiceAction } from './Invoice';
+
+export { Calendar } from './Calendar';
+export type { CalendarProps } from './Calendar';

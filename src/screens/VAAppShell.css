@@ -1,0 +1,18 @@
+.va-shell {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  background: #ffffff;
+}
+
+.va-shell__content {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  padding: 32px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
