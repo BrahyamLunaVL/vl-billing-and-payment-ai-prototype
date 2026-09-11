@@ -4,12 +4,13 @@ import { ClientAppShell } from './ClientAppShell'
 import { ClientMyAccountScreen } from './ClientMyAccountScreen'
 import { ClientAgreementScreen } from './ClientAgreementScreen'
 import { ClientInvoiceScreen } from './ClientInvoiceScreen'
+import { ClientChangesApprovalsScreen } from './ClientChangesApprovalsScreen'
 
 export interface ClientAppProps {
   user: AuthenticatedUser
 }
 
-type ClientPage = 'my-account' | 'agreement' | 'client-invoice'
+type ClientPage = 'my-account' | 'agreement' | 'client-invoice' | 'changes-approvals-form'
 
 /** Owns which Client page is showing and drives the shared Sidebar's selection to match. */
 export const ClientApp = ({ user }: ClientAppProps) => {
@@ -21,6 +22,7 @@ export const ClientApp = ({ user }: ClientAppProps) => {
     setSelectedSidebarItem(key)
     if (key === 'my-account') setPage('my-account')
     else if (key === 'client-invoice') setPage('client-invoice')
+    else if (key === 'changes-approvals-form') setPage('changes-approvals-form')
   }
 
   const handleViewAgreement = (agreementId: string) => {
@@ -46,6 +48,7 @@ export const ClientApp = ({ user }: ClientAppProps) => {
         <ClientAgreementScreen user={user} agreementId={selectedAgreementId} onBack={handleBackToMyAccount} />
       )}
       {page === 'client-invoice' && <ClientInvoiceScreen user={user} />}
+      {page === 'changes-approvals-form' && <ClientChangesApprovalsScreen user={user} />}
     </ClientAppShell>
   )
 }

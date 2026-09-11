@@ -120,3 +120,6 @@ export type { CheckboxProps } from './Checkbox';
 
 export { CardRow } from './CardRow';
 export type { CardRowProps } from './CardRow';
+
+export { Table } from './Table';
+export type { TableColumn, TableProps, SortDirection } from './Table';

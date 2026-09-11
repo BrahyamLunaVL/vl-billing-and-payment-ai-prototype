@@ -2,7 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, waitFor } from 'storybook/test';
 import App from './App';
 import { resetLoginRateLimit, resetMockUsers } from './services/auth';
-import { updateAgreementSettings, getAgreementById, resetMockAgreements } from './services/clientAccount';
+import {
+  updateAgreementSettings,
+  getAgreementById,
+  resetMockAgreements,
+  resetMockCARequests,
+} from './services/clientAccount';
 
 const meta = {
   component: App,
@@ -283,6 +288,73 @@ export const ClientAgreementSettingsDriveTheVAWizard: Story = {
       // Mutates the shared mock "database" — restore it so later
       // stories/tests don't inherit this session's edit.
       resetMockAgreements();
+    }
+  },
+};
+
+async function loginAsClient(canvas: any, userEvent: any) {
+  resetLoginRateLimit();
+  await userEvent.type(canvas.getByPlaceholderText('Enter your email address'), 'client@virtuallatinos.com');
+  await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
+  await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
+  await canvas.findByText('My Account', { selector: 'h1' });
+}
+
+export const ClientReviewingASingleRequest: Story = {
+  play: async ({ canvas, userEvent }) => {
+    try {
+      await loginAsClient(canvas, userEvent);
+      await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
+
+      await expect(await canvas.findByText('Changes & Approvals Form', { selector: 'h1' })).toBeVisible();
+      await expect(canvas.getByText('Request approval for short time off')).toBeVisible();
+
+      // The pending ("New") request's View modal offers Reject/Approve —
+      // approving it updates the table in place, from the same underlying
+      // mock the "View" modal itself reads.
+      const viewButtons = canvas.getAllByRole('button', { name: /^view$/i });
+      await userEvent.click(viewButtons[0]);
+
+      await expect(await canvas.findByText('VA Name')).toBeVisible();
+      const approveButton = canvas.getByRole('button', { name: /^approve$/i });
+      await userEvent.click(approveButton);
+
+      await expect(canvas.queryByRole('button', { name: /^approve$/i })).not.toBeInTheDocument();
+      await expect(await canvas.findAllByText('Approved')).not.toHaveLength(0);
+    } finally {
+      resetMockCARequests();
+    }
+  },
+};
+
+export const ClientBulkApprovingSelectedRequests: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    try {
+      await loginAsClient(canvas, userEvent);
+      await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
+      await canvas.findByText('Changes & Approvals Form', { selector: 'h1' });
+
+      // "Review Request" starts disabled until at least one row is selected.
+      const reviewRequestButton = canvas.getByRole('button', { name: /^review request$/i });
+      await expect(reviewRequestButton).toBeDisabled();
+
+      const rowCheckboxes = canvasElement.querySelectorAll('.table__checkbox');
+      // rowCheckboxes[0] is the header's "select all" — select the first 2 data rows.
+      await userEvent.click(rowCheckboxes[1]);
+      await userEvent.click(rowCheckboxes[2]);
+      await expect(reviewRequestButton).toBeEnabled();
+
+      await userEvent.click(reviewRequestButton);
+      await expect(await canvas.findByText(/review 2 selected requests/i)).toBeVisible();
+
+      await userEvent.click(canvas.getByRole('button', { name: /^approve all$/i }));
+
+      // The modal closes and selection clears — "Review Request" is
+      // disabled again — once the bulk action resolves both requests.
+      await expect(canvas.queryByText(/review 2 selected requests/i)).not.toBeInTheDocument();
+      await expect(reviewRequestButton).toBeDisabled();
+    } finally {
+      resetMockCARequests();
     }
   },
 };

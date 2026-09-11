@@ -3,10 +3,17 @@ import { MOCK_AGREEMENTS, resetMockAgreements, type Agreement, type AgreementSet
 import { MOCK_VA_PROFILES } from '../mocks/vaProfiles';
 import { MOCK_USERS } from '../mocks/users';
 import { MOCK_INVOICES, type InvoiceLineItemData, type InvoiceLineItemGroup } from '../mocks/invoices';
+import {
+  MOCK_CA_REQUESTS,
+  resetMockCARequests,
+  type CARequest,
+  type CARequestStatus,
+} from '../mocks/caRequests';
 
 export type { ClientProfile, ClientContact } from '../mocks/clients';
 export type { Agreement, AgreementStatus, AgreementSettings } from '../mocks/agreements';
-export { resetMockAgreements };
+export type { CARequest, CARequestStatus, CARequestDetail } from '../mocks/caRequests';
+export { resetMockAgreements, resetMockCARequests };
 
 export function getClientProfile(email: string): ClientProfile | undefined {
   return MOCK_CLIENT_PROFILES.find((profile) => profile.email === email);
@@ -124,4 +131,43 @@ export function getInvoiceBreakdownByChargeTypeForClient(clientEmail: string): I
     (invoice) => invoice.items,
   );
   return groupItems(items);
+}
+
+/** A `CARequest` plus the VA display name the client's table shows it under. */
+export interface ClientCARequestView extends CARequest {
+  vaName: string;
+}
+
+/** Every Changes & Approvals request under this client's account (Figma's client-facing table). */
+export function getCARequestsForClient(clientEmail: string): ClientCARequestView[] {
+  return MOCK_CA_REQUESTS.filter((request) => request.clientEmail === clientEmail).map((request) => {
+    const vaUser = MOCK_USERS.find((user) => user.email === request.vaEmail);
+    return { ...request, vaName: vaUser?.name ?? request.vaEmail };
+  });
+}
+
+export function getCARequestByIdForClient(id: string): ClientCARequestView | undefined {
+  const request = MOCK_CA_REQUESTS.find((candidate) => candidate.id === id);
+  if (!request) return undefined;
+  const vaUser = MOCK_USERS.find((user) => user.email === request.vaEmail);
+  return { ...request, vaName: vaUser?.name ?? request.vaEmail };
+}
+
+const RESOLUTION_STATUS: Record<'approved' | 'rejected', CARequestStatus> = {
+  approved: 'approved',
+  rejected: 'rejected',
+};
+
+/** Resolves one request from the client's table — used by both the single "View" modal and the bulk "Review Request" action. */
+export function resolveCARequest(id: string, decision: 'approved' | 'rejected', resolvedBy = 'You'): void {
+  const request = MOCK_CA_REQUESTS.find((candidate) => candidate.id === id);
+  if (!request) return;
+  request.status = RESOLUTION_STATUS[decision];
+  request.resolvedBy = resolvedBy;
+  request.resolvedDate = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+}
+
+/** Resolves several requests at once — the client table's checkbox multi-select + "Review Request" action. */
+export function resolveCARequests(ids: string[], decision: 'approved' | 'rejected', resolvedBy = 'You'): void {
+  ids.forEach((id) => resolveCARequest(id, decision, resolvedBy));
 }

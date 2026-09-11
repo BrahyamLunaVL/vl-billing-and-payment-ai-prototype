@@ -11,16 +11,22 @@ export interface CARequest {
   id: string;
   /** References a MOCK_USERS email. */
   vaEmail: string;
+  /** References a MOCK_USERS email — the client the underlying agreement is with. */
+  clientEmail: string;
   title: string;
   /** e.g. "December 10, 2025" — shown in the C&A list. */
   date: string;
   status: CARequestStatus;
-  /** The client the underlying agreement is with, e.g. "Bloominari dba Virtual Latinos". */
+  /** The client the underlying agreement is with, e.g. "LTM Innovation". */
   clientName: string;
   requestedBy: string;
+  /** Who actually initiated the request — drives the client table's "Req By" column. */
+  requestedByRole: 'va' | 'client';
   requestedDate: string;
   resolvedBy?: string;
   resolvedDate?: string;
+  /** e.g. "8/17/2026 - 8/30/2026" — the invoice period this request's effect is applied to, once known. */
+  appliedBillingPeriod?: string;
   /** The request-specific fields shown in its details view, 2 per row unless `fullWidth`. */
   details: CARequestDetail[];
   comments?: string;
@@ -33,8 +39,10 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     title: 'Request approval for short time off',
     date: 'December 10, 2025',
     status: 'new',
-    clientName: 'Bloominari dba Virtual Latinos',
+    clientEmail: 'client@virtuallatinos.com',
+    clientName: 'LTM Innovation',
     requestedBy: 'you',
+    requestedByRole: 'va',
     requestedDate: 'December 10, 2025',
     details: [
       { label: 'Time Off Dates', value: '2025-12-10' },
@@ -52,11 +60,14 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     title: 'Request approval for extra hours',
     date: 'August 3, 2026',
     status: 'approved',
-    clientName: 'Bloominari dba Virtual Latinos',
+    clientEmail: 'client@virtuallatinos.com',
+    clientName: 'LTM Innovation',
     requestedBy: 'you',
+    requestedByRole: 'va',
     requestedDate: 'August 3, 2026',
     resolvedBy: 'Erick Farias VL',
     resolvedDate: 'August 3, 2026',
+    appliedBillingPeriod: '8/17/2026 - 8/30/2026',
     details: [
       { label: 'Approval Type', value: 'Manual' },
       { label: 'Total Extra Hours', value: '7 Hours' },
@@ -82,8 +93,10 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     title: 'Request approval for a raise',
     date: 'November 18, 2025',
     status: 'rejected',
-    clientName: 'Bloominari dba Virtual Latinos',
+    clientEmail: 'client@virtuallatinos.com',
+    clientName: 'LTM Innovation',
     requestedBy: 'you',
+    requestedByRole: 'va',
     requestedDate: 'November 18, 2025',
     resolvedBy: 'Erick Farias VL',
     resolvedDate: 'November 18, 2025',
@@ -100,8 +113,10 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     title: 'Request approval for a BOH package',
     date: 'October 30, 2025',
     status: 'expired',
-    clientName: 'Bloominari dba Virtual Latinos',
+    clientEmail: 'client@virtuallatinos.com',
+    clientName: 'LTM Innovation',
     requestedBy: 'you',
+    requestedByRole: 'va',
     requestedDate: 'October 30, 2025',
     details: [
       { label: 'Package Type', value: 'Extra 10 hours/week' },
@@ -114,3 +129,13 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
 
 /** Stand-in for a Changes & Approvals requests table — see MOCK_USERS' own doc comment for the pattern. */
 export const MOCK_CA_REQUESTS: CARequest[] = INITIAL_CA_REQUESTS.map((request) => ({ ...request }));
+
+/**
+ * Restores the seed data — for tests/stories that resolve a request (a real
+ * mutation, same as `resetPassword` in src/services/auth.ts) to avoid
+ * leaking state into whatever runs next in the same session.
+ */
+export function resetMockCARequests(): void {
+  MOCK_CA_REQUESTS.length = 0;
+  MOCK_CA_REQUESTS.push(...INITIAL_CA_REQUESTS.map((request) => ({ ...request })));
+}
