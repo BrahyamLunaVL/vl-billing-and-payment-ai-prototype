@@ -1,0 +1,93 @@
+.client-my-account-screen__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.client-my-account-screen__title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.client-my-account-screen__profile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.client-my-account-screen__profile-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.client-my-account-screen__profile-description {
+  margin: 0;
+  font-size: 14px;
+  color: #7a7a7a;
+}
+
+.client-my-account-screen__profile-chip {
+  margin-left: auto;
+}
+
+.client-my-account-screen__field-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.client-my-account-screen__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: #7a7a7a;
+}
+
+.client-my-account-screen__field-value {
+  font-weight: 700;
+  color: #263238;
+}
+
+.client-my-account-screen__section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.client-my-account-screen__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.client-my-account-screen__section-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.client-my-account-screen__card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.client-my-account-screen__toggle-row {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.client-my-account-screen__notice {
+  margin: 0;
+  font-size: 14px;
+  color: #7a7a7a;
+}

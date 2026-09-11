@@ -117,12 +117,20 @@ export const CorrectCredentialsLogIn: Story = {
     await userEvent.type(passwordField, 'VL-Testing-2026');
     await userEvent.click(button);
 
-    // A successful login navigates to the Home screen, whose Sidebar shows
-    // the signed-in user's own name and role-specific nav (Client, not
-    // Admin/VA).
-    await expect(await canvas.findByText('Welcome, Sofia Martinez')).toBeVisible();
-    await expect(canvas.getByRole('button', { name: /my account/i })).toBeVisible();
+    // A successful login navigates to the Client's own "My Account", whose
+    // Sidebar shows the signed-in user's own name and role-specific nav
+    // (Client, not Admin/VA).
+    await expect(await canvas.findByText('My Account', { selector: 'h1' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: /^my account$/i })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: /^client invoice$/i })).toBeVisible();
     await expect(canvas.queryByRole('button', { name: /^users$/i })).not.toBeInTheDocument();
+
+    // The client's company profile, an agreement with its VA's info, and
+    // the grouped invoice breakdown all render from the client's own mock
+    // data.
+    await expect(canvas.getByText('LTM Innovation')).toBeVisible();
+    await expect(canvas.getAllByText(/Elena Ruiz/)[0]).toBeVisible();
+    await expect(canvas.getByText('(1) Invoice Total:')).toBeVisible();
   },
 };
 

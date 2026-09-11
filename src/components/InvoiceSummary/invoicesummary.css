@@ -1,0 +1,125 @@
+.invoice-summary {
+  --invoice-summary-color-white: #ffffff;
+  --invoice-summary-color-black: #263238;
+  --invoice-summary-color-gray-200: #ececef;
+  --invoice-summary-color-brand-secondary: #6f1d5d;
+  --invoice-summary-color-fucsia-100: #f7edf3;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  font-family: 'Roboto', sans-serif;
+  line-height: 1;
+}
+
+.invoice-summary__tree {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid var(--invoice-summary-color-gray-200);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--invoice-summary-color-white);
+}
+
+.invoice-summary__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 20px;
+  padding-left: 20px;
+  border: none;
+  border-top: 1px solid var(--invoice-summary-color-gray-200);
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.invoice-summary__tree > .invoice-summary__section:first-child > .invoice-summary__section-header {
+  border-top: none;
+}
+
+.invoice-summary__section-header:disabled {
+  cursor: default;
+}
+
+.invoice-summary__section-header--depth-0 {
+  color: var(--invoice-summary-color-brand-secondary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.invoice-summary__section-header--depth-1 {
+  color: var(--invoice-summary-color-black);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.invoice-summary__section-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.invoice-summary__count {
+  font-weight: 700;
+}
+
+.invoice-summary__chevron {
+  flex-shrink: 0;
+  color: inherit;
+  transition: transform 0.2s ease;
+}
+
+.invoice-summary__chevron--collapsed {
+  transform: rotate(-90deg);
+}
+
+.invoice-summary__section-total {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.invoice-summary__amount {
+  display: inline-block;
+  min-width: 90px;
+  text-align: right;
+  font-weight: 700;
+}
+
+.invoice-summary__amount--regular {
+  font-weight: 400;
+  color: var(--invoice-summary-color-black);
+}
+
+.invoice-summary__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px;
+  padding-right: 20px;
+  border-top: 1px solid var(--invoice-summary-color-gray-200);
+  font-size: 14px;
+  color: var(--invoice-summary-color-black);
+}
+
+.invoice-summary__total-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+  background: var(--invoice-summary-color-fucsia-100);
+  color: var(--invoice-summary-color-brand-secondary);
+  font-size: 16px;
+  font-weight: 700;
+}

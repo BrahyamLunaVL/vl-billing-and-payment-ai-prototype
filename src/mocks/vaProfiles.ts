@@ -9,6 +9,10 @@ export interface VAProfile {
   paymentEmail: string;
   paymentMethod: string;
   hiredStatus: 'hired' | 'inactive';
+  /** Shown on the client-facing agreement card, e.g. "Peru". */
+  country: string;
+  /** The VA's preferred/alias name, shown to clients as "AKA: ...". */
+  aka: string;
 }
 
 const INITIAL_VA_PROFILES: VAProfile[] = [
@@ -21,6 +25,8 @@ const INITIAL_VA_PROFILES: VAProfile[] = [
     paymentEmail: 'elena.ruiz@virtuallatinos.com',
     paymentMethod: 'Payoneer',
     hiredStatus: 'hired',
+    country: 'Peru',
+    aka: 'Elena R.',
   },
   {
     email: 'va2@virtuallatinos.com',
@@ -31,6 +37,8 @@ const INITIAL_VA_PROFILES: VAProfile[] = [
     paymentEmail: 'laura.gomez@virtuallatinos.com',
     paymentMethod: 'Payoneer',
     hiredStatus: 'inactive',
+    country: 'Colombia',
+    aka: 'Laura G.',
   },
 ];
 

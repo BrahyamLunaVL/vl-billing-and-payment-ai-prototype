@@ -1,0 +1,133 @@
+.agreement-details-card {
+  --agreement-details-card-color-white: #ffffff;
+  --agreement-details-card-color-black: #263238;
+  --agreement-details-card-color-gray-100: #f6f6f7;
+  --agreement-details-card-color-gray-200: #ececef;
+  --agreement-details-card-color-gray-500: #7a7a7a;
+  --agreement-details-card-color-brand-secondary: #6f1d5d;
+  --agreement-details-card-color-blue-500: #378fce;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--agreement-details-card-color-white);
+  border: 1px solid var(--agreement-details-card-color-gray-200);
+  border-radius: 8px;
+  box-shadow: 0 4px 3px rgba(0, 0, 0, 0.12);
+  font-family: 'Roboto', sans-serif;
+  line-height: 1;
+}
+
+.agreement-details-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px;
+}
+
+.agreement-details-card__title-row {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  align-items: center;
+  gap: 20px;
+}
+
+.agreement-details-card__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--agreement-details-card-color-brand-secondary);
+}
+
+.agreement-details-card__header-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.agreement-details-card__divider {
+  height: 1px;
+  background: var(--agreement-details-card-color-gray-200);
+}
+
+.agreement-details-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background: var(--agreement-details-card-color-gray-100);
+}
+
+.agreement-details-card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 40px;
+}
+
+.agreement-details-card__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--agreement-details-card-color-gray-500);
+}
+
+.agreement-details-card__item-icon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.agreement-details-card__va-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--agreement-details-card-color-black);
+}
+
+.agreement-details-card__va-label {
+  font-weight: 700;
+}
+
+.agreement-details-card__va-name {
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--agreement-details-card-color-blue-500);
+  text-decoration: underline;
+}
+
+.agreement-details-card__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 40px;
+}
+
+.agreement-details-card__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.agreement-details-card__meta-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--agreement-details-card-color-black);
+}
+
+.agreement-details-card__meta-value {
+  font-size: 14px;
+  color: var(--agreement-details-card-color-black);
+}
+
+.agreement-details-card__meta-value--link {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--agreement-details-card-color-blue-500);
+  text-decoration: underline;
+}
