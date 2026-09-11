@@ -1,0 +1,41 @@
+.card-row {
+  --card-row-color-black: #263238;
+  --card-row-color-blue-500: #378fce;
+
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  color: var(--card-row-color-black);
+}
+
+.card-row__title {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.card-row__value {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--card-row-color-black);
+}
+
+.card-row__value--link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--card-row-color-blue-500);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.card-row__value--link:focus-visible {
+  outline: 2px solid var(--card-row-color-blue-500);
+  outline-offset: 2px;
+}

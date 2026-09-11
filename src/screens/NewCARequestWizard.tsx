@@ -13,6 +13,7 @@ import {
   Radio,
 } from '../components'
 import { CA_STATUS_LABEL, CA_STATUS_TONE, type CARequest } from '../services/vaAccount'
+import type { AgreementSettings } from '../services/clientAccount'
 import './NewCARequestWizard.css'
 
 type RequestType =
@@ -36,8 +37,17 @@ const REQUEST_TYPE_OPTIONS: { value: RequestType; label: string }[] = [
 
 const DAILY_MAX_HOURS = 12
 const TOTAL_MAX_HOURS = 60
-const PRE_APPROVED_HOURS = 5
 const RATE_PER_HOUR = 10
+
+const DEFAULT_AGREEMENT_SETTINGS: AgreementSettings = {
+  autoApproveChanges: false,
+  notifyOverThreshold: false,
+  overThresholdAmount: 500,
+  autoApproveExtraHours: true,
+  preApprovedHoursPerWeek: 5,
+  reportBackWeeks: 4,
+  emailOnPreApprovedExtraHours: false,
+}
 
 function toISODate(date: Date): string {
   const year = date.getFullYear()
@@ -51,9 +61,9 @@ function parseISODate(iso: string): Date {
   return new Date(year, month - 1, day)
 }
 
-function addMonths(date: Date, months: number): Date {
+function addDays(date: Date, days: number): Date {
   const result = new Date(date)
-  result.setMonth(result.getMonth() + months)
+  result.setDate(result.getDate() + days)
   return result
 }
 
@@ -104,19 +114,33 @@ function HourStepper({ value, onChange }: HourStepperProps) {
 export interface NewCARequestWizardProps {
   /** The VA's most recent request, shown as a reference on step 1. */
   recentRequest?: CARequest
+  /**
+   * The client's Agreement Settings for the agreement this request is
+   * under — the source of the pre-approved-hours/lookback-window rules
+   * below, so a change the client makes on their Agreement screen is
+   * reflected here immediately. Falls back to sensible defaults when the
+   * VA has no active agreement (shouldn't normally happen).
+   */
+  agreementSettings?: AgreementSettings
   onCancel: () => void
 }
 
 /** The 3-step "New Request for Changes" wizard (Figma's "Changes & Approvals Form" flow). */
-export const NewCARequestWizard = ({ recentRequest, onCancel }: NewCARequestWizardProps) => {
+export const NewCARequestWizard = ({
+  recentRequest,
+  agreementSettings = DEFAULT_AGREEMENT_SETTINGS,
+  onCancel,
+}: NewCARequestWizardProps) => {
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [requestType, setRequestType] = useState<RequestType>('extra-hours')
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [hoursByDate, setHoursByDate] = useState<Record<string, number>>({})
 
+  const preApprovedHours = agreementSettings.preApprovedHoursPerWeek
+
   const today = new Date()
   const maxDate = toISODate(today)
-  const minDate = toISODate(addMonths(today, -4))
+  const minDate = toISODate(addDays(today, -agreementSettings.reportBackWeeks * 7))
 
   const toggleDate = (date: string) => {
     setSelectedDates((prev) => {
@@ -135,7 +159,7 @@ export const NewCARequestWizard = ({ recentRequest, onCancel }: NewCARequestWiza
 
   const totalHours = selectedDates.reduce((sum, date) => sum + (hoursByDate[date] ?? 0), 0)
   const totalAmount = totalHours * RATE_PER_HOUR
-  const exceededPreApproved = totalHours > PRE_APPROVED_HOURS
+  const exceededPreApproved = totalHours > preApprovedHours
   const exceededMax = totalHours > TOTAL_MAX_HOURS
   const canGoNext = requestType === 'extra-hours' ? selectedDates.length > 0 && totalHours > 0 && !exceededMax : true
 
@@ -256,7 +280,7 @@ export const NewCARequestWizard = ({ recentRequest, onCancel }: NewCARequestWiza
                       info="The number of extra hours your agreement already allows without needing separate client approval."
                     >
                       <p className="ca-wizard__metric-value">
-                        {PRE_APPROVED_HOURS} <span>Hours</span>
+                        {preApprovedHours} <span>Hours</span>
                       </p>
                     </FormField>
                     <FormField label="Current Working Hours/Day">

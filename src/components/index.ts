@@ -111,3 +111,12 @@ export type { AgreementDetailsCardProps } from './AgreementDetailsCard';
 
 export { InvoiceSummary } from './InvoiceSummary';
 export type { InvoiceSummaryProps, InvoiceSummarySection, InvoiceSummaryLineItem } from './InvoiceSummary';
+
+export { Switch } from './Switch';
+export type { SwitchProps } from './Switch';
+
+export { Checkbox } from './Checkbox';
+export type { CheckboxProps } from './Checkbox';
+
+export { CardRow } from './CardRow';
+export type { CardRowProps } from './CardRow';

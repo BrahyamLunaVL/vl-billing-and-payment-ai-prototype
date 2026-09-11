@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, waitFor } from 'storybook/test';
 import App from './App';
 import { resetLoginRateLimit, resetMockUsers } from './services/auth';
+import { updateAgreementSettings, getAgreementById, resetMockAgreements } from './services/clientAccount';
 
 const meta = {
   component: App,
@@ -256,6 +257,33 @@ export const CreatingAnExtraHoursRequest: Story = {
       await userEvent.click(increaseButton);
     }
     await expect(await canvas.findByText("You've reached the maximum of 12 extra hours per day")).toBeVisible();
+  },
+};
+
+export const ClientAgreementSettingsDriveTheVAWizard: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    try {
+      // The client's Agreement Settings are the single source of truth for
+      // the VA's Extra Hours wizard — a change saved on one side must show
+      // up on the other, since both read the same underlying Agreement
+      // record (agr-1, the VA's active agreement).
+      updateAgreementSettings('agr-1', { ...getAgreementById('agr-1')!.settings, preApprovedHoursPerWeek: 8 });
+
+      await loginAsVA(canvas, userEvent);
+      await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
+      await userEvent.click(await canvas.findByRole('button', { name: /^new request for changes$/i }));
+      await userEvent.click(canvas.getByRole('button', { name: /^next$/i }));
+
+      await waitFor(() => {
+        const metricValue = canvasElement.querySelector('.ca-wizard__metric-value');
+        if (!metricValue) throw new globalThis.Error('Expected the pre-approved hours metric to render');
+        expect(metricValue.textContent).toContain('8');
+      });
+    } finally {
+      // Mutates the shared mock "database" — restore it so later
+      // stories/tests don't inherit this session's edit.
+      resetMockAgreements();
+    }
   },
 };
 

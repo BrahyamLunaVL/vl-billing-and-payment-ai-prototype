@@ -3,6 +3,7 @@ import { Icon, Chip, Button } from '../components'
 import type { AuthenticatedUser } from '../services/auth'
 import {
   getCARequestsForVA,
+  getAgreementsForVA,
   CA_STATUS_LABEL,
   CA_STATUS_TONE,
   type CARequest,
@@ -82,6 +83,7 @@ export const ChangesApprovalsScreen = ({ user }: ChangesApprovalsScreenProps) =>
   const [showWizard, setShowWizard] = useState(false)
 
   const requests = getCARequestsForVA(user.email)
+  const activeAgreement = getAgreementsForVA(user.email).find((agreement) => agreement.status === 'active')
 
   return (
     <div className="ca-screen">
@@ -91,7 +93,11 @@ export const ChangesApprovalsScreen = ({ user }: ChangesApprovalsScreenProps) =>
       </div>
 
       {showWizard ? (
-        <NewCARequestWizard recentRequest={requests[0]} onCancel={() => setShowWizard(false)} />
+        <NewCARequestWizard
+          recentRequest={requests[0]}
+          agreementSettings={activeAgreement?.settings}
+          onCancel={() => setShowWizard(false)}
+        />
       ) : (
         <>
           <p className="ca-screen__description">

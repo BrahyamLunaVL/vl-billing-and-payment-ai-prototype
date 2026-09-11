@@ -32,11 +32,18 @@ export interface Agreement {
   clientRate?: string;
   /** The bare hourly rate the client is billed, e.g. "$18.00" — used in the client-facing agreement title. */
   billedRate: string;
+  /** The bare hourly rate the VA is paid, e.g. "$11.00" — used on the client-facing Agreement screen's VA card. */
+  vaHourlyRate: string;
   hoursPerWeek: string;
   billingType: string;
   status: AgreementStatus;
   dateStart: string;
   dateEnd?: string;
+  /** Bare start date, e.g. "7/21/2026" — used by the client-facing Agreement header (unlike `dateStart`, which bakes in its own "Date Start " label for the VA's AgreementCard). */
+  startDate: string;
+  /** Bare end date, e.g. "6/1/2026". Omit for an ongoing agreement. */
+  endDate?: string;
+  hubspotId: string;
   /** Omit for a terminated/paused agreement with no ongoing schedule. */
   week?: WeekDayData[];
   settings: AgreementSettings;
@@ -70,9 +77,12 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     clientName: 'The Matian Firm @ $8.00',
     vaRate: 'VA Rate: $11.00',
     billedRate: '$18.00',
+    vaHourlyRate: '$11.00',
     hoursPerWeek: '40 Hours per week',
     billingType: 'Post Pay',
     dateStart: 'Date Start 2025-04-28',
+    startDate: '4/28/2025',
+    hubspotId: '44787728131',
     status: 'active',
     week: FULL_TIME_WEEK,
     settings: { ...DEFAULT_SETTINGS },
@@ -85,10 +95,14 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     vaRate: 'VA Rate: $11.00',
     clientRate: 'Client Rate: $15.00',
     billedRate: '$15.00',
+    vaHourlyRate: '$11.00',
     hoursPerWeek: '40 Hours per week',
     billingType: 'Post Pay',
     dateStart: 'Date Start 2025-04-28',
     dateEnd: 'Date End: 2025-01-24',
+    startDate: '4/28/2025',
+    endDate: '1/24/2025',
+    hubspotId: '44787728132',
     status: 'terminated',
     settings: { ...DEFAULT_SETTINGS, autoApproveExtraHours: false },
   },
@@ -99,3 +113,13 @@ export const MOCK_AGREEMENTS: Agreement[] = INITIAL_AGREEMENTS.map((agreement) =
   ...agreement,
   settings: { ...agreement.settings },
 }));
+
+/**
+ * Restores the seed data — for tests/stories that call `updateAgreementSettings`
+ * (itself a real mutation, same as `resetPassword` in src/services/auth.ts)
+ * to avoid leaking state into whatever runs next in the same session.
+ */
+export function resetMockAgreements(): void {
+  MOCK_AGREEMENTS.length = 0;
+  MOCK_AGREEMENTS.push(...INITIAL_AGREEMENTS.map((agreement) => ({ ...agreement, settings: { ...agreement.settings } })));
+}

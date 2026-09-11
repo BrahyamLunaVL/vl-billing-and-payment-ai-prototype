@@ -1,11 +1,12 @@
 import { MOCK_CLIENT_PROFILES, type ClientProfile } from '../mocks/clients';
-import { MOCK_AGREEMENTS, type Agreement, type AgreementSettings } from '../mocks/agreements';
+import { MOCK_AGREEMENTS, resetMockAgreements, type Agreement, type AgreementSettings } from '../mocks/agreements';
 import { MOCK_VA_PROFILES } from '../mocks/vaProfiles';
 import { MOCK_USERS } from '../mocks/users';
 import { MOCK_INVOICES, type InvoiceLineItemData, type InvoiceLineItemGroup } from '../mocks/invoices';
 
 export type { ClientProfile, ClientContact } from '../mocks/clients';
 export type { Agreement, AgreementStatus, AgreementSettings } from '../mocks/agreements';
+export { resetMockAgreements };
 
 export function getClientProfile(email: string): ClientProfile | undefined {
   return MOCK_CLIENT_PROFILES.find((profile) => profile.email === email);
@@ -14,29 +15,44 @@ export function getClientProfile(email: string): ClientProfile | undefined {
 /** An `Agreement` plus the VA display info the client's screens show alongside it. */
 export interface ClientAgreementView extends Agreement {
   vaName: string;
+  vaEmail: string;
+  vaWorkEmail: string;
   vaCountry: string;
   vaAka: string;
   vaTelegramHandle: string;
   vaHiredStatus: 'hired' | 'inactive';
+  vaPaymentMethod: string;
+  vaPhoneNumber: string;
+  vaHubspotId: string;
+  clientCompanyName: string;
+}
+
+function joinAgreementWithVA(agreement: Agreement): ClientAgreementView {
+  const vaUser = MOCK_USERS.find((user) => user.email === agreement.vaEmail);
+  const vaProfile = MOCK_VA_PROFILES.find((profile) => profile.email === agreement.vaEmail);
+  const clientProfile = MOCK_CLIENT_PROFILES.find((profile) => profile.email === agreement.clientEmail);
+  return {
+    ...agreement,
+    vaName: vaUser?.name ?? agreement.vaEmail,
+    vaWorkEmail: vaUser?.email ?? '',
+    vaCountry: vaProfile?.country ?? '',
+    vaAka: vaProfile?.aka ?? '',
+    vaTelegramHandle: vaProfile?.telegramHandle ?? '',
+    vaHiredStatus: vaProfile?.hiredStatus ?? 'hired',
+    vaPaymentMethod: vaProfile?.paymentMethod ?? '',
+    vaPhoneNumber: vaProfile?.phoneNumber ?? '',
+    vaHubspotId: vaProfile?.hubspotId ?? '',
+    clientCompanyName: clientProfile?.companyName ?? agreement.clientName,
+  };
 }
 
 export function getAgreementsForClient(clientEmail: string): ClientAgreementView[] {
-  return MOCK_AGREEMENTS.filter((agreement) => agreement.clientEmail === clientEmail).map((agreement) => {
-    const vaUser = MOCK_USERS.find((user) => user.email === agreement.vaEmail);
-    const vaProfile = MOCK_VA_PROFILES.find((profile) => profile.email === agreement.vaEmail);
-    return {
-      ...agreement,
-      vaName: vaUser?.name ?? agreement.vaEmail,
-      vaCountry: vaProfile?.country ?? '',
-      vaAka: vaProfile?.aka ?? '',
-      vaTelegramHandle: vaProfile?.telegramHandle ?? '',
-      vaHiredStatus: vaProfile?.hiredStatus ?? 'hired',
-    };
-  });
+  return MOCK_AGREEMENTS.filter((agreement) => agreement.clientEmail === clientEmail).map(joinAgreementWithVA);
 }
 
-export function getAgreementById(id: string): Agreement | undefined {
-  return MOCK_AGREEMENTS.find((agreement) => agreement.id === id);
+export function getAgreementById(id: string): ClientAgreementView | undefined {
+  const agreement = MOCK_AGREEMENTS.find((candidate) => candidate.id === id);
+  return agreement ? joinAgreementWithVA(agreement) : undefined;
 }
 
 /** Persists edits made from the client's Agreement Settings screen — the VA's wizard reads the same record. */

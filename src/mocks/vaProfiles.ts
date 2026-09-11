@@ -9,10 +9,13 @@ export interface VAProfile {
   paymentEmail: string;
   paymentMethod: string;
   hiredStatus: 'hired' | 'inactive';
-  /** Shown on the client-facing agreement card, e.g. "Peru". */
+  /** Shown on the client-facing agreement card, e.g. "Peru" — also used for the Country Billing/Citizenship/Residence rows on the client's Agreement screen, which are all the same value in practice. */
   country: string;
   /** The VA's preferred/alias name, shown to clients as "AKA: ...". */
   aka: string;
+  phoneNumber: string;
+  /** The VA's own HubSpot contact ID — distinct from the agreement's own HubSpot ID. */
+  hubspotId: string;
 }
 
 const INITIAL_VA_PROFILES: VAProfile[] = [
@@ -27,6 +30,8 @@ const INITIAL_VA_PROFILES: VAProfile[] = [
     hiredStatus: 'hired',
     country: 'Peru',
     aka: 'Elena R.',
+    phoneNumber: '+51 984 123 456',
+    hubspotId: '124318284947',
   },
   {
     email: 'va2@virtuallatinos.com',
@@ -39,6 +44,8 @@ const INITIAL_VA_PROFILES: VAProfile[] = [
     hiredStatus: 'inactive',
     country: 'Colombia',
     aka: 'Laura G.',
+    phoneNumber: '+57 300 462 1845',
+    hubspotId: '124318284948',
   },
 ];
 
