@@ -23,7 +23,7 @@ export interface ClientAgreementScreenProps {
   onBack: () => void
 }
 
-const REPORT_BACK_WEEK_OPTIONS = Array.from({ length: 8 }, (_, index) => {
+const REPORT_BACK_WEEK_OPTIONS = Array.from({ length: 16 }, (_, index) => {
   const weeks = index + 1
   return { value: String(weeks), label: `${weeks} week${weeks === 1 ? '' : 's'}` }
 })

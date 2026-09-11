@@ -45,7 +45,7 @@ const DEFAULT_AGREEMENT_SETTINGS: AgreementSettings = {
   overThresholdAmount: 500,
   autoApproveExtraHours: true,
   preApprovedHoursPerWeek: 5,
-  reportBackWeeks: 4,
+  reportBackWeeks: 12,
   emailOnPreApprovedExtraHours: false,
 }
 
@@ -251,8 +251,8 @@ export const NewCARequestWizard = ({
                 <h3 className="ca-wizard__subheading">Request Approval for Extra Hours</h3>
                 <p className="ca-wizard__description">
                   Fill out this section of the form if you&apos;d like to report any extra hours
-                  worked during the last 4 weeks, in order to receive the corresponding payment on
-                  your next invoice
+                  worked during the last {agreementSettings.reportBackWeeks} weeks, in order to
+                  receive the corresponding payment on your next invoice
                 </p>
                 <div className="ca-wizard__info-card ca-wizard__info-card--purple">
                   <span>Current Invoice period from:</span>
@@ -299,7 +299,7 @@ export const NewCARequestWizard = ({
                     <div className="ca-wizard__calendar-column">
                       <FormField
                         label="Specific dates that you worked extra hours"
-                        description="Select the dates you worked extra hours in the last 4 weeks. Only past dates are eligible."
+                        description={`Select the dates you worked extra hours in the last ${agreementSettings.reportBackWeeks} weeks. Only past dates are eligible.`}
                       >
                         <Input placeholder="mm/dd/yyyy" rightIcon="calendar" readOnly value="" />
                       </FormField>
