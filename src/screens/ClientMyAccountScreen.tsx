@@ -1,23 +1,8 @@
-import { useState } from 'react'
-import {
-  ProfileCard,
-  AgreementDetailsCard,
-  ContactCard,
-  Toggle,
-  InvoiceSummary,
-  Chip,
-  Button,
-  Icon,
-  TabBar,
-} from '../components'
+import { ProfileCard, AgreementDetailsCard, ContactCard, Chip, Button, Icon } from '../components'
 import type { AuthenticatedUser } from '../services/auth'
-import {
-  getClientProfile,
-  getAgreementsForClient,
-  getInvoiceBreakdownForClient,
-  getInvoiceBreakdownByChargeTypeForClient,
-} from '../services/clientAccount'
+import { getClientProfile, getAgreementsForClient } from '../services/clientAccount'
 import { AGREEMENT_STATUS_LABEL, AGREEMENT_STATUS_TONE } from '../services/vaAccount'
+import { ClientInvoicesPanel } from './ClientInvoicesPanel'
 import './ClientMyAccountScreen.css'
 
 export interface ClientMyAccountScreenProps {
@@ -26,45 +11,10 @@ export interface ClientMyAccountScreenProps {
   onRequestChanges: (agreementId: string) => void
 }
 
-const INVOICE_TABS = [
-  { key: 'upcoming', label: 'Upcoming Invoice (Current Working Period)' },
-  { key: 'all', label: 'All Invoices' },
-]
-
-function formatUSD(amount: number): string {
-  return `$${amount.toFixed(2)}`
-}
-
 /** The client's home screen after login (Figma's "My Account" — client "Enabled" state). */
 export const ClientMyAccountScreen = ({ user, onEditAgreement, onRequestChanges }: ClientMyAccountScreenProps) => {
-  const [selectedTab, setSelectedTab] = useState('upcoming')
-  const [invoiceViewKey, setInvoiceViewKey] = useState('per-va')
-
   const profile = getClientProfile(user.email)
   const agreements = getAgreementsForClient(user.email)
-  const perVABreakdown = getInvoiceBreakdownForClient(user.email)
-  const perChargeTypeBreakdown = getInvoiceBreakdownByChargeTypeForClient(user.email)
-
-  const invoiceTotal = perVABreakdown.reduce((sum, va) => sum + va.totalAmount, 0)
-
-  const perVASections = perVABreakdown.map((va) => ({
-    key: va.vaEmail,
-    label: va.vaName,
-    totalAmount: formatUSD(va.totalAmount),
-    sections: va.groups.map((group) => ({
-      key: `${va.vaEmail}-${group.group}`,
-      label: group.label,
-      totalAmount: formatUSD(group.totalAmount),
-      items: group.items,
-    })),
-  }))
-
-  const perChargeTypeSections = perChargeTypeBreakdown.map((group) => ({
-    key: group.group,
-    label: group.label,
-    totalAmount: formatUSD(group.totalAmount),
-    items: group.items,
-  }))
 
   return (
     <>
@@ -156,28 +106,7 @@ export const ClientMyAccountScreen = ({ user, onEditAgreement, onRequestChanges 
 
       <div className="client-my-account-screen__section">
         <h2 className="client-my-account-screen__section-title">Invoices</h2>
-        <TabBar tabs={INVOICE_TABS} selectedKey={selectedTab} onSelectTab={setSelectedTab} />
-        <ProfileCard>
-          <div className="client-my-account-screen__toggle-row">
-            <Toggle
-              options={[
-                { key: 'per-va', label: 'Per VA', icon: 'user-group' },
-                { key: 'per-charge-type', label: 'Per Charge Type', icon: 'folders' },
-              ]}
-              selectedKey={invoiceViewKey}
-              onSelect={setInvoiceViewKey}
-            />
-          </div>
-          {perVABreakdown.length === 0 ? (
-            <p className="client-my-account-screen__notice">No invoices found</p>
-          ) : (
-            <InvoiceSummary
-              sections={invoiceViewKey === 'per-va' ? perVASections : perChargeTypeSections}
-              totalLabel="(1) Invoice Total:"
-              totalAmount={formatUSD(invoiceTotal)}
-            />
-          )}
-        </ProfileCard>
+        <ClientInvoicesPanel clientEmail={user.email} />
       </div>
     </>
   )

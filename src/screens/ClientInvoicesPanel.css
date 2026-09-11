@@ -1,0 +1,10 @@
+.client-invoices-panel__toggle-row {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.client-invoices-panel__notice {
+  margin: 0;
+  font-size: 14px;
+  color: #7a7a7a;
+}

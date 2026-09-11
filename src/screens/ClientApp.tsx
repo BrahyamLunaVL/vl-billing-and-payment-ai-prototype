@@ -3,12 +3,13 @@ import type { AuthenticatedUser } from '../services/auth'
 import { ClientAppShell } from './ClientAppShell'
 import { ClientMyAccountScreen } from './ClientMyAccountScreen'
 import { ClientAgreementScreen } from './ClientAgreementScreen'
+import { ClientInvoiceScreen } from './ClientInvoiceScreen'
 
 export interface ClientAppProps {
   user: AuthenticatedUser
 }
 
-type ClientPage = 'my-account' | 'agreement'
+type ClientPage = 'my-account' | 'agreement' | 'client-invoice'
 
 /** Owns which Client page is showing and drives the shared Sidebar's selection to match. */
 export const ClientApp = ({ user }: ClientAppProps) => {
@@ -19,6 +20,7 @@ export const ClientApp = ({ user }: ClientAppProps) => {
   const handleSelectSidebarItem = (key: string) => {
     setSelectedSidebarItem(key)
     if (key === 'my-account') setPage('my-account')
+    else if (key === 'client-invoice') setPage('client-invoice')
   }
 
   const handleViewAgreement = (agreementId: string) => {
@@ -43,6 +45,7 @@ export const ClientApp = ({ user }: ClientAppProps) => {
       {page === 'agreement' && selectedAgreementId && (
         <ClientAgreementScreen user={user} agreementId={selectedAgreementId} onBack={handleBackToMyAccount} />
       )}
+      {page === 'client-invoice' && <ClientInvoiceScreen user={user} />}
     </ClientAppShell>
   )
 }

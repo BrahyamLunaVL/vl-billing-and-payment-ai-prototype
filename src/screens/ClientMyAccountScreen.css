@@ -80,14 +80,3 @@
   flex-direction: column;
   gap: 16px;
 }
-
-.client-my-account-screen__toggle-row {
-  display: flex;
-  margin-bottom: 20px;
-}
-
-.client-my-account-screen__notice {
-  margin: 0;
-  font-size: 14px;
-  color: #7a7a7a;
-}
