@@ -37,6 +37,7 @@
   align-items: flex-start;
   gap: 12px;
   width: 100%;
+  color: #6f1d5d;
 }
 
 .my-account-screen__profile-name {

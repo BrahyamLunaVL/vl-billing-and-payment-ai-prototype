@@ -89,6 +89,14 @@
 
 .option__icon {
   flex-shrink: 0;
+  /* The icon stays brand/secondary in every state (default, hover, selected)
+     — only the text and background react to interaction/selection. Figma's
+     icon assets are baked with this exact fill (#6f1d5d) regardless of the
+     option's state. */
+  color: var(--option-color-brand-secondary);
+}
+
+.option:disabled .option__icon {
   color: inherit;
 }
 

@@ -105,7 +105,6 @@
   gap: 12px;
   padding: 20px;
   padding-right: 20px;
-  border-top: 1px solid var(--invoice-summary-color-gray-200);
   font-size: 14px;
   color: var(--invoice-summary-color-black);
 }

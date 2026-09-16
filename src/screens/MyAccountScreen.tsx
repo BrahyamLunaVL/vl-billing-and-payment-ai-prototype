@@ -20,14 +20,6 @@ export interface MyAccountScreenProps {
   onViewInvoice: (invoiceId: string) => void
 }
 
-const INVOICE_TABS = [
-  { key: 'preview', label: 'Invoice Preview' },
-  { key: 'approved', label: 'Approved Invoices' },
-  { key: 'pending', label: 'Pending Approval' },
-  { key: 'previously-approved', label: 'Previously Approved' },
-  { key: 'past', label: 'Past' },
-]
-
 /** The VA's home screen after login (Figma's "My Account" — Invoice Preview state). */
 export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) => {
   const [selectedTab, setSelectedTab] = useState('preview')
@@ -38,6 +30,14 @@ export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) =
   const caRequests = getCARequestsForVA(user.email)
   const invoiceBreakdowns = getInvoiceBreakdownForVA(user.email)
   const selectedCARequest = selectedCARequestId ? getCARequestById(selectedCARequestId) : undefined
+
+  const invoiceTabs = [
+    { key: 'preview', label: 'Invoice Preview', counter: String(invoiceBreakdowns.length) },
+    { key: 'approved', label: 'Approved Invoices', counter: '0' },
+    { key: 'pending', label: 'Pending Approval', counter: '0' },
+    { key: 'previously-approved', label: 'Previously Approved', counter: '0' },
+    { key: 'past', label: 'Past', counter: '0' },
+  ]
 
   return (
     <>
@@ -160,7 +160,7 @@ export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) =
           <h2 className="my-account-screen__section-title my-account-screen__invoices-title">
             Virtual Latinos Invoices
           </h2>
-          <TabBar tabs={INVOICE_TABS} selectedKey={selectedTab} onSelectTab={setSelectedTab} />
+          <TabBar tabs={invoiceTabs} selectedKey={selectedTab} onSelectTab={setSelectedTab} />
 
           {selectedTab === 'preview' ? (
             <>

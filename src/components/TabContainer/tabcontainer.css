@@ -41,12 +41,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 2px 8px;
+  border-radius: 9px;
   background: var(--tab-container-color-gray-300);
   color: var(--tab-container-color-gray-500);
-  font-size: 8px;
-  font-weight: 400;
+  font-size: 12px;
+  font-weight: 700;
   white-space: nowrap;
 }
 
