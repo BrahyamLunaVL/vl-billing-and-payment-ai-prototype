@@ -22,6 +22,8 @@ export interface TableProps<T> {
   selectedIds?: Set<string>;
   onToggleRow?: (id: string) => void;
   onToggleAll?: () => void;
+  /** When provided, rows this returns false for render a disabled, unchecked checkbox and are excluded from "select all". */
+  isRowSelectable?: (row: T) => boolean;
   sortKey?: string;
   sortDirection?: SortDirection;
   onSort?: (key: string) => void;
@@ -60,10 +62,12 @@ export function Table<T>({
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   onPageChange,
   onPageSizeChange,
+  isRowSelectable,
   className,
 }: TableProps<T>) {
   const selectable = Boolean(selectedIds && onToggleRow && onToggleAll);
-  const allSelected = selectable && rows.length > 0 && rows.every((row) => selectedIds!.has(getRowId(row)));
+  const selectableRows = isRowSelectable ? rows.filter(isRowSelectable) : rows;
+  const allSelected = selectable && selectableRows.length > 0 && selectableRows.every((row) => selectedIds!.has(getRowId(row)));
   const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
   const firstRowIndex = totalRows === 0 ? 0 : (page - 1) * pageSize + 1;
   const lastRowIndex = Math.min(totalRows, page * pageSize);
@@ -81,6 +85,7 @@ export function Table<T>({
                 className="table__checkbox"
                 checked={allSelected}
                 onChange={onToggleAll}
+                disabled={selectableRows.length === 0}
                 aria-label="Select all rows"
               />
             </div>
@@ -113,6 +118,7 @@ export function Table<T>({
 
         {rows.map((row) => {
           const id = getRowId(row);
+          const rowSelectable = !isRowSelectable || isRowSelectable(row);
           return (
             <div key={id} className="table__row">
               {selectable && (
@@ -122,6 +128,7 @@ export function Table<T>({
                     className="table__checkbox"
                     checked={selectedIds!.has(id)}
                     onChange={() => onToggleRow!(id)}
+                    disabled={!rowSelectable}
                     aria-label={`Select row ${id}`}
                   />
                 </div>

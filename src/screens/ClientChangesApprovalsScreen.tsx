@@ -68,6 +68,8 @@ export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientC
     }
   }
 
+  const isRowSelectable = (row: ClientCARequestView) => row.status === 'new'
+
   const handleToggleRow = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev)
@@ -78,10 +80,11 @@ export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientC
   }
 
   const handleToggleAll = () => {
+    const selectableRows = pageRows.filter(isRowSelectable)
     setSelectedIds((prev) => {
-      const allOnPageSelected = pageRows.every((row) => prev.has(row.id))
-      if (allOnPageSelected) return new Set()
-      return new Set(pageRows.map((row) => row.id))
+      const allSelected = selectableRows.length > 0 && selectableRows.every((row) => prev.has(row.id))
+      if (allSelected) return new Set()
+      return new Set(selectableRows.map((row) => row.id))
     })
   }
 
@@ -207,6 +210,7 @@ export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientC
         selectedIds={selectedIds}
         onToggleRow={handleToggleRow}
         onToggleAll={handleToggleAll}
+        isRowSelectable={isRowSelectable}
         sortKey={sortKey}
         sortDirection={sortDirection}
         onSort={handleSort}

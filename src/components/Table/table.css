@@ -91,6 +91,11 @@ button.table__cell--header:disabled {
   cursor: pointer;
 }
 
+.table__checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
 .table__pagination {
   display: flex;
   align-items: center;
