@@ -21,6 +21,8 @@ export interface ClientAgreementScreenProps {
   user: AuthenticatedUser
   agreementId: string
   onBack: () => void
+  /** Omit for the Client's own view. Admin's view adds rate/details buttons to the Client card and shows one VA country row instead of three. */
+  viewerRole?: 'client' | 'admin'
 }
 
 const REPORT_BACK_WEEK_OPTIONS = Array.from({ length: 16 }, (_, index) => {
@@ -37,7 +39,7 @@ const MAX_PRE_APPROVED_HOURS_PER_WEEK = 60
  * the single source of truth the VA's Extra Hours wizard reads its
  * pre-approved-hours/lookback-window/auto-approval rules from.
  */
-export const ClientAgreementScreen = ({ agreementId, onBack }: ClientAgreementScreenProps) => {
+export const ClientAgreementScreen = ({ agreementId, onBack, viewerRole = 'client' }: ClientAgreementScreenProps) => {
   const [agreement, setAgreement] = useState(() => getAgreementById(agreementId))
   const [draftSettings, setDraftSettings] = useState<AgreementSettings | undefined>(agreement?.settings)
   const [changesExpanded, setChangesExpanded] = useState(true)
@@ -93,6 +95,12 @@ export const ClientAgreementScreen = ({ agreementId, onBack }: ClientAgreementSc
               <CardRow title="Rate:" value={`${agreement.billedRate}/hr`} />
               <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
             </div>
+            {viewerRole === 'admin' && (
+              <div className="client-agreement-screen__va-actions">
+                <Button type="tertiary" rightIcon="chevron-down" buttonText="View Client Rate ranges" />
+                <Button type="secondary" buttonText="View Client Details" />
+              </div>
+            )}
           </ProfileCard>
 
           {agreement.week && (
@@ -250,9 +258,15 @@ export const ClientAgreementScreen = ({ agreementId, onBack }: ClientAgreementSc
               <CardRow title="Payment Method:" value={agreement.vaPaymentMethod} />
               <CardRow title="Email:" value={agreement.vaWorkEmail} />
               <CardRow title="Phone Number:" value={agreement.vaPhoneNumber} />
-              <CardRow title="Country Billing:" value={agreement.vaCountry} />
-              <CardRow title="Country Citizenship:" value={agreement.vaCountry} />
-              <CardRow title="Country Residence:" value={agreement.vaCountry} />
+              {viewerRole === 'admin' ? (
+                <CardRow title="Country Residence:" value={agreement.vaCountry} />
+              ) : (
+                <>
+                  <CardRow title="Country Billing:" value={agreement.vaCountry} />
+                  <CardRow title="Country Citizenship:" value={agreement.vaCountry} />
+                  <CardRow title="Country Residence:" value={agreement.vaCountry} />
+                </>
+              )}
               <CardRow title="Telegram:" value={agreement.vaTelegramHandle} link />
               <CardRow title="HubSpot ID:" value={agreement.vaHubspotId} />
             </div>

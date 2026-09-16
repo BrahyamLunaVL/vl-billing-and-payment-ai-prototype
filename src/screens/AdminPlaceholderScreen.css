@@ -1,0 +1,12 @@
+.admin-placeholder-screen__title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.admin-placeholder-screen__notice {
+  margin: 0;
+  font-size: 14px;
+  color: #bbbbbb;
+}

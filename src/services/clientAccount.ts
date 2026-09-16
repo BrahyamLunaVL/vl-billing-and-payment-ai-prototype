@@ -115,6 +115,14 @@ export function getCARequestsForClient(clientEmail: string): ClientCARequestView
   });
 }
 
+/** Every Changes & Approvals request platform-wide — the Admin table's view, unscoped to one client. */
+export function getAllCARequests(): ClientCARequestView[] {
+  return MOCK_CA_REQUESTS.map((request) => {
+    const vaUser = MOCK_USERS.find((user) => user.email === request.vaEmail);
+    return { ...request, vaName: vaUser?.name ?? request.vaEmail };
+  });
+}
+
 export function getCARequestByIdForClient(id: string): ClientCARequestView | undefined {
   const request = MOCK_CA_REQUESTS.find((candidate) => candidate.id === id);
   if (!request) return undefined;

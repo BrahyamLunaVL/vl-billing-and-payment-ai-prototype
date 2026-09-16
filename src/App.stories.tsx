@@ -147,9 +147,12 @@ export const AdminLoginShowsAdminSidebar: Story = {
     await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
     await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
 
-    await expect(await canvas.findByText('Welcome, James Carter')).toBeVisible();
+    // Admin's home page is the Agreements & Work Hrs screen itself (this
+    // agreement's own detail view), not a dashboard/home screen.
+    await expect(await canvas.findByText('LTM Innovation - Elena Ruiz (40 Hours)')).toBeVisible();
     await expect(canvas.getByRole('button', { name: /^users$/i })).toBeVisible();
     await expect(canvas.getByRole('button', { name: /clients/i })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: /view client details/i })).toBeVisible();
   },
 };
 

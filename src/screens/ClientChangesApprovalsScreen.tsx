@@ -3,6 +3,7 @@ import { Table, type TableColumn, Chip, Button, Icon, Input, PopUp } from '../co
 import type { AuthenticatedUser } from '../services/auth'
 import {
   getCARequestsForClient,
+  getAllCARequests,
   resolveCARequest,
   resolveCARequests,
   type ClientCARequestView,
@@ -13,6 +14,8 @@ import './ClientChangesApprovalsScreen.css'
 
 export interface ClientChangesApprovalsScreenProps {
   user: AuthenticatedUser
+  /** Omit for the Admin table, which shows every request platform-wide instead of one client's own. */
+  scope?: 'client' | 'admin'
 }
 
 type SortDirection = 'asc' | 'desc'
@@ -30,7 +33,7 @@ function compareValues(a: string, b: string, direction: SortDirection): number {
  * approve or reject them all) — Figma didn't detail its exact result view
  * for this specific interaction yet.
  */
-export const ClientChangesApprovalsScreen = ({ user }: ClientChangesApprovalsScreenProps) => {
+export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientChangesApprovalsScreenProps) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [sortKey, setSortKey] = useState<string | undefined>(undefined)
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
@@ -44,7 +47,7 @@ export const ClientChangesApprovalsScreen = ({ user }: ClientChangesApprovalsScr
   // to trigger a re-render is all a "refresh" needs to be.
   const [, forceRefresh] = useState(0)
 
-  const allRequests = getCARequestsForClient(user.email)
+  const allRequests = scope === 'admin' ? getAllCARequests() : getCARequestsForClient(user.email)
 
   const sorted = sortKey
     ? [...allRequests].sort((a, b) =>

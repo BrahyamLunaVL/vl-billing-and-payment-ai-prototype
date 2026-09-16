@@ -5,6 +5,7 @@ import { ResetPasswordScreen } from './screens/ResetPasswordScreen'
 import { HomeScreen } from './screens/HomeScreen'
 import { VAApp } from './screens/VAApp'
 import { ClientApp } from './screens/ClientApp'
+import { AdminApp } from './screens/AdminApp'
 import type { AuthenticatedUser } from './services/auth'
 
 type Screen = 'login' | 'forgot-password' | 'reset-password' | 'home'
@@ -44,13 +45,17 @@ function App() {
 
   if (screen === 'home' && loggedInUser) {
     // VAs and Clients land on their own "My Account" (agreements/C&A/
-    // invoices, plus whatever pages are reachable from it); other roles get
-    // the generic Home screen until their own is built.
+    // invoices, plus whatever pages are reachable from it); Admin lands on
+    // Agreements & Work Hrs; other roles get the generic Home screen until
+    // their own is built.
     if (loggedInUser.role === 'va') {
       return <VAApp user={loggedInUser} />
     }
     if (loggedInUser.role === 'client') {
       return <ClientApp user={loggedInUser} />
+    }
+    if (loggedInUser.role === 'admin') {
+      return <AdminApp user={loggedInUser} />
     }
     return <HomeScreen user={loggedInUser} />
   }
