@@ -91,9 +91,6 @@ export type { AgreementCardProps } from './AgreementCard';
 export { CACard } from './CACard';
 export type { CACardProps } from './CACard';
 
-export { Invoice } from './Invoice';
-export type { InvoiceProps, InvoiceLineItem, InvoiceAction } from './Invoice';
-
 export { Calendar } from './Calendar';
 export type { CalendarProps } from './Calendar';
 
@@ -111,6 +108,9 @@ export type { AgreementDetailsCardProps } from './AgreementDetailsCard';
 
 export { InvoiceSummary } from './InvoiceSummary';
 export type { InvoiceSummaryProps, InvoiceSummarySection, InvoiceSummaryLineItem } from './InvoiceSummary';
+
+export { InvoiceCard } from './InvoiceCard';
+export type { InvoiceCardProps, InvoiceCardAction } from './InvoiceCard';
 
 export { Switch } from './Switch';
 export type { SwitchProps } from './Switch';

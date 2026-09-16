@@ -2,7 +2,7 @@ import { MOCK_CLIENT_PROFILES, type ClientProfile } from '../mocks/clients';
 import { MOCK_AGREEMENTS, resetMockAgreements, type Agreement, type AgreementSettings } from '../mocks/agreements';
 import { MOCK_VA_PROFILES } from '../mocks/vaProfiles';
 import { MOCK_USERS } from '../mocks/users';
-import { MOCK_INVOICES, type InvoiceLineItemData, type InvoiceLineItemGroup } from '../mocks/invoices';
+import { MOCK_INVOICES, groupInvoiceItems, type InvoiceGroupView } from '../mocks/invoices';
 import {
   MOCK_CA_REQUESTS,
   resetMockCARequests,
@@ -13,6 +13,7 @@ import {
 export type { ClientProfile, ClientContact } from '../mocks/clients';
 export type { Agreement, AgreementStatus, AgreementSettings } from '../mocks/agreements';
 export type { CARequest, CARequestStatus, CARequestDetail } from '../mocks/caRequests';
+export type { InvoiceGroupView } from '../mocks/invoices';
 export { resetMockAgreements, resetMockCARequests };
 
 export function getClientProfile(email: string): ClientProfile | undefined {
@@ -70,13 +71,6 @@ export function updateAgreementSettings(agreementId: string, settings: Agreement
   }
 }
 
-export interface InvoiceGroupView {
-  group: InvoiceLineItemGroup;
-  label: string;
-  items: InvoiceLineItemData[];
-  totalAmount: number;
-}
-
 export interface InvoiceByVAView {
   vaEmail: string;
   vaName: string;
@@ -85,36 +79,11 @@ export interface InvoiceByVAView {
   totalAmount: number;
 }
 
-const GROUP_LABEL: Record<InvoiceLineItemGroup, string> = {
-  agreement: 'Agreement',
-  'extra-hours': 'Extra Hours',
-};
-
-function parseAmount(amount: string): number {
-  return Number(amount.replace(/[^0-9.-]/g, '')) || 0;
-}
-
-function groupItems(items: InvoiceLineItemData[]): InvoiceGroupView[] {
-  const order: InvoiceLineItemGroup[] = ['agreement', 'extra-hours'];
-  return order
-    .map((group) => {
-      const groupItemsList = items.filter((item) => item.group === group);
-      if (groupItemsList.length === 0) return null;
-      return {
-        group,
-        label: GROUP_LABEL[group],
-        items: groupItemsList,
-        totalAmount: groupItemsList.reduce((sum, item) => sum + parseAmount(item.amount), 0),
-      };
-    })
-    .filter((group): group is InvoiceGroupView => group !== null);
-}
-
 /** The client's invoices grouped "Per VA" (Figma's default Invoice breakdown view). */
 export function getInvoiceBreakdownForClient(clientEmail: string): InvoiceByVAView[] {
   return MOCK_INVOICES.filter((invoice) => invoice.clientAccountEmail === clientEmail).map((invoice) => {
     const vaUser = MOCK_USERS.find((user) => user.email === invoice.vaEmail);
-    const groups = groupItems(invoice.items);
+    const groups = groupInvoiceItems(invoice.items);
     return {
       vaEmail: invoice.vaEmail,
       vaName: vaUser?.name ?? invoice.vaEmail,
@@ -130,7 +99,7 @@ export function getInvoiceBreakdownByChargeTypeForClient(clientEmail: string): I
   const items = MOCK_INVOICES.filter((invoice) => invoice.clientAccountEmail === clientEmail).flatMap(
     (invoice) => invoice.items,
   );
-  return groupItems(items);
+  return groupInvoiceItems(items);
 }
 
 /** A `CARequest` plus the VA display name the client's table shows it under. */

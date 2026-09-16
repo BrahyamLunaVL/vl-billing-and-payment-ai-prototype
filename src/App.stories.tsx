@@ -255,13 +255,13 @@ export const CreatingAnExtraHoursRequest: Story = {
     await expect(await canvas.findByText('Extra Hours Worked')).toBeVisible();
     await expect(canvas.getByText('1 Hours')).toBeVisible(); // total starts at the new day's default 1 hour
 
-    // Pushing that single day's hours to the 12/day cap surfaces the
-    // per-field warning.
-    const increaseButton = canvas.getByRole('button', { name: /increase hours/i });
-    for (let i = 0; i < 11; i += 1) {
-      await userEvent.click(increaseButton);
-    }
-    await expect(await canvas.findByText("You've reached the maximum of 12 extra hours per day")).toBeVisible();
+    // Typing directly into that day's hour input (clamped to the 12/day
+    // cap) updates the totals below.
+    const hourInput = canvasElement.querySelector<HTMLInputElement>('.ca-wizard__date-rows input[type="number"]');
+    if (!hourInput) throw new globalThis.Error('Expected the day hour input to render');
+    await userEvent.clear(hourInput);
+    await userEvent.type(hourInput, '12');
+    await expect(await canvas.findByText('12 Hours')).toBeVisible();
   },
 };
 
@@ -366,10 +366,12 @@ export const ViewingAnInvoiceFromMyAccount: Story = {
     await userEvent.click(await canvas.findByRole('button', { name: /^view$/i }));
 
     await expect(await canvas.findByText('Invoice #9')).toBeVisible();
-    await expect(canvas.getByText('Bloominari, LLC')).toBeVisible();
+    await expect(canvas.getAllByText('Bloominari, LLC').length).toBeGreaterThan(0);
     await expect(canvas.getAllByText(/invoice preview total/i).length).toBeGreaterThan(0);
 
-    await userEvent.click(canvas.getByRole('button', { name: /back to my account/i }));
+    // The full "View Invoice" page has no back button of its own (matching
+    // Figma) — the sidebar's own "My Account" nav item is the way back.
+    await userEvent.click(canvas.getByRole('button', { name: /^my account$/i }));
     await expect(await canvas.findByText('My Account', { selector: 'h1' })).toBeVisible();
   },
 };

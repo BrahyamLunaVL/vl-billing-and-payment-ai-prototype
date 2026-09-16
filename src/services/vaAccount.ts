@@ -2,12 +2,12 @@ import type { ChipTone } from '../components';
 import { MOCK_VA_PROFILES, type VAProfile } from '../mocks/vaProfiles';
 import { MOCK_AGREEMENTS, type Agreement, type AgreementStatus } from '../mocks/agreements';
 import { MOCK_CA_REQUESTS, type CARequest, type CARequestStatus } from '../mocks/caRequests';
-import { MOCK_INVOICES, type InvoiceRecord } from '../mocks/invoices';
+import { MOCK_INVOICES, groupInvoiceItems, type InvoiceRecord, type InvoiceGroupView } from '../mocks/invoices';
 
 export type { VAProfile } from '../mocks/vaProfiles';
 export type { Agreement, AgreementStatus } from '../mocks/agreements';
 export type { CARequest, CARequestStatus, CARequestDetail } from '../mocks/caRequests';
-export type { InvoiceRecord, InvoiceLineItemData } from '../mocks/invoices';
+export type { InvoiceRecord, InvoiceLineItemData, InvoiceGroupView } from '../mocks/invoices';
 
 /** Shared status -> display label/color mappings, so every screen that shows one of these statuses agrees. */
 export const AGREEMENT_STATUS_LABEL: Record<AgreementStatus, string> = {
@@ -63,4 +63,23 @@ export function getInvoicesForVA(email: string): InvoiceRecord[] {
 
 export function getInvoiceById(id: string): InvoiceRecord | undefined {
   return MOCK_INVOICES.find((invoice) => invoice.id === id);
+}
+
+export interface VAInvoiceBreakdown {
+  invoice: InvoiceRecord;
+  groups: InvoiceGroupView[];
+}
+
+/** Each of the VA's invoices, its line items split into the same Agreement/Extra Hours/Time Off groups the client's invoice screens use. */
+export function getInvoiceBreakdownForVA(email: string): VAInvoiceBreakdown[] {
+  return getInvoicesForVA(email).map((invoice) => ({
+    invoice,
+    groups: groupInvoiceItems(invoice.items),
+  }));
+}
+
+/** A single invoice's line items split into groups, for the full "View Invoice" page. */
+export function getInvoiceBreakdownById(id: string): VAInvoiceBreakdown | undefined {
+  const invoice = getInvoiceById(id);
+  return invoice ? { invoice, groups: groupInvoiceItems(invoice.items) } : undefined;
 }

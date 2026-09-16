@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { ProfileCard, AgreementCard, CACard, Invoice, Chip, Button, Icon, TabBar } from '../components'
+import { ProfileCard, AgreementCard, CACard, InvoiceCard, Chip, Button, Icon, TabBar } from '../components'
 import type { AuthenticatedUser } from '../services/auth'
 import {
   getVAProfile,
   getAgreementsForVA,
   getCARequestsForVA,
   getCARequestById,
-  getInvoicesForVA,
+  getInvoiceBreakdownForVA,
   AGREEMENT_STATUS_LABEL,
   AGREEMENT_STATUS_TONE,
   CA_STATUS_LABEL,
@@ -36,7 +36,7 @@ export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) =
   const profile = getVAProfile(user.email)
   const agreements = getAgreementsForVA(user.email)
   const caRequests = getCARequestsForVA(user.email)
-  const invoices = getInvoicesForVA(user.email)
+  const invoiceBreakdowns = getInvoiceBreakdownForVA(user.email)
   const selectedCARequest = selectedCARequestId ? getCARequestById(selectedCARequestId) : undefined
 
   return (
@@ -138,7 +138,9 @@ export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) =
             </div>
 
             <div className="my-account-screen__column">
-              <ProfileCard header={<span className="my-account-screen__section-title">Changes &amp; Approvals</span>}>
+              <ProfileCard
+                header={<span className="my-account-screen__section-title">Changes &amp; Approvals Submissions</span>}
+              >
                 <div className="my-account-screen__card-list">
                   {caRequests.map((request) => (
                     <CACard
@@ -168,11 +170,23 @@ export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) =
                 invoices prior to the NEXT pay period, which you&apos;ll be able to approve at any
                 time if the invoice shows up here.
               </p>
-              {invoices.map((invoice) => (
-                <Invoice
+              {invoiceBreakdowns.map(({ invoice, groups }) => (
+                <InvoiceCard
                   key={invoice.id}
                   title={invoice.title}
-                  items={invoice.items}
+                  sections={[
+                    {
+                      key: invoice.id,
+                      label: invoice.clientName,
+                      totalAmount: invoice.totalAmount,
+                      sections: groups.map((group) => ({
+                        key: `${invoice.id}-${group.group}`,
+                        label: group.label,
+                        totalAmount: `$${group.totalAmount.toFixed(2)}`,
+                        items: group.items,
+                      })),
+                    },
+                  ]}
                   totalLabel={invoice.totalLabel}
                   totalAmount={invoice.totalAmount}
                   warnings={invoice.warnings}

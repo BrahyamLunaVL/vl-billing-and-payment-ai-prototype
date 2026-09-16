@@ -1,4 +1,4 @@
-export type InvoiceLineItemGroup = 'agreement' | 'extra-hours';
+export type InvoiceLineItemGroup = 'agreement' | 'extra-hours' | 'time-off';
 
 export interface InvoiceLineItemData {
   key: string;
@@ -89,3 +89,41 @@ const INITIAL_INVOICES: InvoiceRecord[] = [
 
 /** Stand-in for an invoices table — see MOCK_USERS' own doc comment for the pattern. */
 export const MOCK_INVOICES: InvoiceRecord[] = INITIAL_INVOICES.map((invoice) => ({ ...invoice }));
+
+export interface InvoiceGroupView {
+  group: InvoiceLineItemGroup;
+  label: string;
+  items: InvoiceLineItemData[];
+  totalAmount: number;
+}
+
+const GROUP_LABEL: Record<InvoiceLineItemGroup, string> = {
+  agreement: 'Agreement',
+  'extra-hours': 'Extra Hours',
+  'time-off': 'Time Off',
+};
+
+const GROUP_ORDER: InvoiceLineItemGroup[] = ['agreement', 'extra-hours', 'time-off'];
+
+function parseAmount(amount: string): number {
+  return Number(amount.replace(/[^0-9.-]/g, '')) || 0;
+}
+
+/**
+ * Splits an invoice's flat line items into the "Agreement"/"Extra Hours"/
+ * "Time Off" charge-type groups the grouped/collapsible `InvoiceSummary`
+ * tree renders — shared by both the VA's and the client's invoice screens
+ * so they build the exact same breakdown from the same underlying data.
+ */
+export function groupInvoiceItems(items: InvoiceLineItemData[]): InvoiceGroupView[] {
+  return GROUP_ORDER.map((group) => {
+    const groupItemsList = items.filter((item) => item.group === group);
+    if (groupItemsList.length === 0) return null;
+    return {
+      group,
+      label: GROUP_LABEL[group],
+      items: groupItemsList,
+      totalAmount: groupItemsList.reduce((sum, item) => sum + parseAmount(item.amount), 0),
+    };
+  }).filter((group): group is InvoiceGroupView => group !== null);
+}

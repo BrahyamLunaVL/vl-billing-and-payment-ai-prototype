@@ -1,0 +1,68 @@
+.invoice-card {
+  --invoice-card-color-white: #ffffff;
+  --invoice-card-color-black: #263238;
+  --invoice-card-color-gray-200: #ececef;
+  --invoice-card-color-brand-primary: #c32059;
+  --invoice-card-color-red-500: #de1515;
+  --invoice-card-color-green-500: #21a184;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 20px;
+  background: var(--invoice-card-color-white);
+  border: 1px solid var(--invoice-card-color-gray-200);
+  border-radius: 12px;
+  box-shadow: 0 4px 3px rgba(0, 0, 0, 0.12);
+  font-family: 'Roboto', sans-serif;
+}
+
+.invoice-card__row {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.invoice-card__details {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.invoice-card__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--invoice-card-color-brand-primary);
+}
+
+.invoice-card__actions {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.invoice-card__warning {
+  margin: 0;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--invoice-card-color-red-500);
+  text-align: center;
+}
+
+.invoice-card__approved {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  color: var(--invoice-card-color-green-500);
+  font-size: 14px;
+  font-weight: 700;
+}

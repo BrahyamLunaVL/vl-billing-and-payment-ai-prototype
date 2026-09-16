@@ -1,5 +1,5 @@
-import { ProfileCard, Chip, Button, Invoice } from '../components'
-import { getInvoiceById } from '../services/vaAccount'
+import { ProfileCard, Chip, Button, InvoiceCard } from '../components'
+import { getInvoiceBreakdownById } from '../services/vaAccount'
 import './InvoicePreviewScreen.css'
 
 export interface InvoicePreviewScreenProps {
@@ -8,15 +8,16 @@ export interface InvoicePreviewScreenProps {
 }
 
 /**
- * The full invoice detail screen (Figma's "Invoices - Preview"), opened by
- * clicking "View" on an Invoice in My Account's Invoices tab. Reuses the
- * existing `Invoice` component for the line-items/total/actions block,
- * wrapped in a `ProfileCard` for the invoice metadata header and footer.
+ * The full invoice detail screen (Figma's "View Invoice"), opened by
+ * clicking "View" on an Invoice in My Account's Invoices tab. Reuses
+ * `InvoiceCard` for the grouped line-item breakdown (no action buttons
+ * here — those only appear on My Account's own invoice list), wrapped in
+ * a `ProfileCard` for the invoice metadata header.
  */
 export const InvoicePreviewScreen = ({ invoiceId, onBack }: InvoicePreviewScreenProps) => {
-  const invoice = getInvoiceById(invoiceId)
+  const breakdown = getInvoiceBreakdownById(invoiceId)
 
-  if (!invoice) {
+  if (!breakdown) {
     return (
       <div className="invoice-preview-screen">
         <Button type="tertiary" leftIcon="chevron-left" buttonText="Back" onClick={onBack} />
@@ -25,10 +26,11 @@ export const InvoicePreviewScreen = ({ invoiceId, onBack }: InvoicePreviewScreen
     )
   }
 
+  const { invoice, groups } = breakdown
+
   return (
     <div className="invoice-preview-screen">
       <div className="invoice-preview-screen__header">
-        <Button type="tertiary" leftIcon="chevron-left" buttonText="Back to My Account" onClick={onBack} />
         <h1 className="invoice-preview-screen__title">View Invoice</h1>
         <Button leftIcon="arrow-down-to-line" buttonText="Download PDF" />
       </div>
@@ -39,11 +41,6 @@ export const InvoicePreviewScreen = ({ invoiceId, onBack }: InvoicePreviewScreen
             <span className="invoice-preview-screen__invoice-number">Invoice #{invoice.invoiceNumber}</span>
             <span className="invoice-preview-screen__client-name">{invoice.clientName}</span>
           </div>
-        }
-        footer={
-          <span className="invoice-preview-screen__footer-total">
-            (1) Invoice Total: {invoice.totalAmount}
-          </span>
         }
       >
         <div className="invoice-preview-screen__meta-grid">
@@ -79,19 +76,23 @@ export const InvoicePreviewScreen = ({ invoiceId, onBack }: InvoicePreviewScreen
           </div>
         </div>
 
-        <Invoice
+        <InvoiceCard
           title={invoice.title}
-          items={invoice.items}
+          sections={[
+            {
+              key: invoice.id,
+              label: invoice.clientName,
+              totalAmount: invoice.totalAmount,
+              sections: groups.map((group) => ({
+                key: `${invoice.id}-${group.group}`,
+                label: group.label,
+                totalAmount: `$${group.totalAmount.toFixed(2)}`,
+                items: group.items,
+              })),
+            },
+          ]}
           totalLabel={invoice.totalLabel}
           totalAmount={invoice.totalAmount}
-          warnings={invoice.warnings}
-          approvedMessage={invoice.approvedMessage}
-          actions={[
-            { key: 'view', label: 'View' },
-            { key: 'approve', label: 'Approve' },
-            { key: 'upload', label: 'Upload Reports' },
-            { key: 'claim', label: 'Request Invoice Review (Claim)' },
-          ]}
         />
 
         <p className="invoice-preview-screen__disclaimer">

@@ -3,7 +3,7 @@ import {
   StepsNavigation,
   Step,
   ProfileCard,
-  CACard,
+  Chip,
   FormField,
   Input,
   Calendar,
@@ -17,8 +17,6 @@ import type { AgreementSettings } from '../services/clientAccount'
 import './NewCARequestWizard.css'
 
 type RequestType =
-  | 'boh-package'
-  | 'submit-boh'
   | 'time-off'
   | 'extra-hours'
   | 'change-base-hours'
@@ -26,8 +24,6 @@ type RequestType =
   | 'agreement-hours-per-day'
 
 const REQUEST_TYPE_OPTIONS: { value: RequestType; label: string }[] = [
-  { value: 'boh-package', label: 'Request new Bank of Hours (BOH) package' },
-  { value: 'submit-boh', label: 'Submit hours worked to Bank of Hours (BOH)' },
   { value: 'time-off', label: 'Request approval for time off' },
   { value: 'extra-hours', label: 'Request approval for extra hours' },
   { value: 'change-base-hours', label: 'Request approval for changing base hours/week worked' },
@@ -78,37 +74,6 @@ function formatFullDate(iso: string): string {
   const weekday = date.toLocaleDateString('en-US', { weekday: 'long' })
   const month = date.toLocaleDateString('en-US', { month: 'long' })
   return `${weekday}, ${month} ${formatOrdinal(date.getDate())}, ${date.getFullYear()}`
-}
-
-interface HourStepperProps {
-  value: number
-  onChange: (value: number) => void
-}
-
-function HourStepper({ value, onChange }: HourStepperProps) {
-  return (
-    <div className="hour-stepper">
-      <button
-        type="button"
-        className="hour-stepper__button"
-        onClick={() => onChange(Math.max(0, value - 1))}
-        disabled={value <= 0}
-        aria-label="Decrease hours"
-      >
-        −
-      </button>
-      <span className="hour-stepper__value">{value} Hrs</span>
-      <button
-        type="button"
-        className="hour-stepper__button"
-        onClick={() => onChange(Math.min(DAILY_MAX_HOURS, value + 1))}
-        disabled={value >= DAILY_MAX_HOURS}
-        aria-label="Increase hours"
-      >
-        +
-      </button>
-    </div>
-  )
 }
 
 export interface NewCARequestWizardProps {
@@ -191,12 +156,13 @@ export const NewCARequestWizard = ({
             {recentRequest && (
               <>
                 <h3 className="ca-wizard__subheading">Recent and Pending Changes</h3>
-                <CACard
-                  title={recentRequest.title}
-                  date={recentRequest.date}
-                  statusLabel={CA_STATUS_LABEL[recentRequest.status]}
-                  statusTone={CA_STATUS_TONE[recentRequest.status]}
-                />
+                <div className="ca-wizard__recent-card">
+                  <div className="ca-wizard__recent-card-text">
+                    <span className="ca-wizard__recent-card-date">{recentRequest.date}</span>
+                    <span className="ca-wizard__recent-card-title">{recentRequest.title}</span>
+                  </div>
+                  <Chip label={CA_STATUS_LABEL[recentRequest.status]} tone={CA_STATUS_TONE[recentRequest.status]} />
+                </div>
               </>
             )}
           </div>
@@ -283,9 +249,12 @@ export const NewCARequestWizard = ({
                         {preApprovedHours} <span>Hours</span>
                       </p>
                     </FormField>
-                    <FormField label="Current Working Hours/Day">
+                    <FormField
+                      label="Pre-approved Period"
+                      info="How far back you can report extra hours for, set by your client."
+                    >
                       <p className="ca-wizard__metric-value">
-                        8 <span>Hours</span>
+                        Last {agreementSettings.reportBackWeeks} <span>Weeks</span>
                       </p>
                     </FormField>
                     <FormField label="Current Rate per hour">
@@ -319,39 +288,42 @@ export const NewCARequestWizard = ({
 
                     <div className="ca-wizard__hours-column">
                       {selectedDates.length === 0 ? (
-                        <div className="ca-wizard__empty-state">
-                          <Icon name="calendar" size={40} />
-                          <p className="ca-wizard__empty-title">No days selected</p>
-                          <p className="ca-wizard__empty-subtitle">
-                            Select at least one date to enter the hours you worked as extra hours
-                          </p>
-                        </div>
+                        <>
+                          <h3 className="ca-wizard__subheading">Extra Hours</h3>
+                          <div className="ca-wizard__empty-state">
+                            <Icon name="calendar" size={40} />
+                            <p className="ca-wizard__empty-title">No days selected</p>
+                            <p className="ca-wizard__empty-subtitle">
+                              Select at least one date to enter the hours you worked as extra hours
+                            </p>
+                          </div>
+                        </>
                       ) : (
                         <>
                           <h3 className="ca-wizard__subheading">Extra Hours Worked</h3>
                           <p className="ca-wizard__description">
-                            Enter the number of extra hours your worked on each of the dates listed
-                            below. Please make sure to enter only the additional hours worked on
-                            each date. If the total requested hours exceed the pre-approved amount
-                            of hours, the additional hours will require the client approval.
+                            Enter the additional hours worked on each date listed below,{' '}
+                            <strong>up to {DAILY_MAX_HOURS} hours per day</strong>. If the total
+                            exceeds your pre-approved amount for any week, the entire request will
+                            be sent to your client for approval.
                           </p>
                           <div className="ca-wizard__date-rows">
                             {selectedDates.map((date) => (
-                              <FormField
-                                key={date}
-                                errorMessage={
-                                  hoursByDate[date] >= DAILY_MAX_HOURS
-                                    ? "You've reached the maximum of 12 extra hours per day"
-                                    : undefined
-                                }
-                              >
-                                <div className="ca-wizard__date-row">
-                                  <span>{formatFullDate(date)}</span>
-                                  <HourStepper
-                                    value={hoursByDate[date] ?? 0}
-                                    onChange={(value) => setHoursByDate((prev) => ({ ...prev, [date]: value }))}
-                                  />
-                                </div>
+                              <FormField key={date} label={formatFullDate(date)}>
+                                <Input
+                                  type="number"
+                                  min={0}
+                                  max={DAILY_MAX_HOURS}
+                                  leftIcon="angles-up-down"
+                                  rightText="Hrs"
+                                  value={hoursByDate[date] ?? 0}
+                                  onChange={(event) =>
+                                    setHoursByDate((prev) => ({
+                                      ...prev,
+                                      [date]: Math.min(DAILY_MAX_HOURS, Math.max(0, Number(event.target.value))),
+                                    }))
+                                  }
+                                />
                               </FormField>
                             ))}
                           </div>
@@ -384,7 +356,7 @@ export const NewCARequestWizard = ({
                 {exceededMax && (
                   <Alert
                     type="error"
-                    message="You have reached the maximum number of extra hours that can be requested in a single request. The current limit is 60 hours. If you need to report additional hours, please contact your client or SAM"
+                    message="This request exceeds the 60-hour limit for requests that require client approval. Reduce the hours or remove some dates, then submit the remaining hours as a separate request."
                   />
                 )}
 
