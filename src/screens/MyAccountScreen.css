@@ -86,6 +86,11 @@
   gap: 8px;
 }
 
+.my-account-screen__card-list--scrollable {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
 .my-account-screen__invoices-title {
   margin: 0;
 }

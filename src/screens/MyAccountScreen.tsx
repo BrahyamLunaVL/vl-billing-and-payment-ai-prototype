@@ -118,7 +118,7 @@ export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) =
                   </>
                 }
               >
-                <div className="my-account-screen__card-list">
+                <div className="my-account-screen__card-list my-account-screen__card-list--scrollable">
                   {agreements.map((agreement) => (
                     <AgreementCard
                       key={agreement.id}
