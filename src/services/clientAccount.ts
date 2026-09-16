@@ -58,6 +58,11 @@ export function getAgreementsForClient(clientEmail: string): ClientAgreementView
   return MOCK_AGREEMENTS.filter((agreement) => agreement.clientEmail === clientEmail).map(joinAgreementWithVA);
 }
 
+/** Every agreement platform-wide — the Admin table's view, unscoped to one client. */
+export function getAllAgreements(): ClientAgreementView[] {
+  return MOCK_AGREEMENTS.map(joinAgreementWithVA);
+}
+
 export function getAgreementById(id: string): ClientAgreementView | undefined {
   const agreement = MOCK_AGREEMENTS.find((candidate) => candidate.id === id);
   return agreement ? joinAgreementWithVA(agreement) : undefined;

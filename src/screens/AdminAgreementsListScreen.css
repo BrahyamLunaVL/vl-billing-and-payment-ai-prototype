@@ -1,0 +1,43 @@
+.admin-agreements-list-screen__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-agreements-list-screen__title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.admin-agreements-list-screen__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-agreements-list-screen__filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-agreements-list-screen__link {
+  font-weight: 700;
+  color: #378fce;
+}
+
+.admin-agreements-list-screen__actions-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.admin-agreements-list-screen__dropdown-wrapper {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 220px;
+  z-index: 20;
+}

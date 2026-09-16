@@ -147,12 +147,40 @@ export const AdminLoginShowsAdminSidebar: Story = {
     await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
     await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
 
-    // Admin's home page is the Agreements & Work Hrs screen itself (this
-    // agreement's own detail view), not a dashboard/home screen.
-    await expect(await canvas.findByText('LTM Innovation - Elena Ruiz (40 Hours)')).toBeVisible();
+    // Admin's home page is the Agreements & Work Hrs table — every
+    // agreement platform-wide, not a dashboard/home screen.
+    await expect(await canvas.findByText('Agreements', { selector: 'h1' })).toBeVisible();
     await expect(canvas.getByRole('button', { name: /^users$/i })).toBeVisible();
     await expect(canvas.getByRole('button', { name: /clients/i })).toBeVisible();
+    await expect(canvas.getAllByText('LTM Innovation').length).toBeGreaterThan(0);
+    await expect(canvas.getAllByText('Elena Ruiz').length).toBeGreaterThan(0);
+  },
+};
+
+export const AdminOpeningAnAgreementAndRequestingChanges: Story = {
+  play: async ({ canvas, userEvent }) => {
+    resetLoginRateLimit();
+    await userEvent.type(canvas.getByPlaceholderText('Enter your email address'), 'admin@virtuallatinos.com');
+    await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
+    await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
+
+    // Admin reaches an agreement's detail screen through the table's
+    // per-row "Select Action" menu, not a direct row click.
+    await userEvent.click((await canvas.findAllByRole('button', { name: /select action/i }))[0]);
+    await userEvent.click(await canvas.findByRole('option', { name: /^view$/i }));
+
+    await expect(await canvas.findByText('LTM Innovation - Elena Ruiz (40 Hours)')).toBeVisible();
     await expect(canvas.getByRole('button', { name: /view client details/i })).toBeVisible();
+
+    // The detail screen's "Request Changes" button opens the wizard, whose
+    // step 1 gets an Admin-only "Request on behalf of" selector Figma adds
+    // on top of the VA's own request-type list.
+    await userEvent.click(canvas.getByRole('button', { name: /^request changes$/i }));
+    await expect(await canvas.findByText('Request on behalf of')).toBeVisible();
+    await expect(canvas.getByText('Main Changes Requested from the Virtual Assistant (VA)')).toBeVisible();
+
+    await userEvent.click(canvas.getByRole('radio', { name: /^client$/i }));
+    await expect(canvas.getByText('Main Changes Requested from the Client')).toBeVisible();
   },
 };
 

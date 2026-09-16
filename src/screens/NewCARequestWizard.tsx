@@ -87,6 +87,8 @@ export interface NewCARequestWizardProps {
    * VA has no active agreement (shouldn't normally happen).
    */
   agreementSettings?: AgreementSettings
+  /** Shows the Admin-only "Request on behalf of" Client/VA selector on step 1, above the request type list. */
+  showOnBehalfOf?: boolean
   onCancel: () => void
 }
 
@@ -94,9 +96,11 @@ export interface NewCARequestWizardProps {
 export const NewCARequestWizard = ({
   recentRequest,
   agreementSettings = DEFAULT_AGREEMENT_SETTINGS,
+  showOnBehalfOf = false,
   onCancel,
 }: NewCARequestWizardProps) => {
   const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [onBehalfOf, setOnBehalfOf] = useState<'client' | 'va'>('va')
   const [requestType, setRequestType] = useState<RequestType>('extra-hours')
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [hoursByDate, setHoursByDate] = useState<Record<string, number>>({})
@@ -168,9 +172,30 @@ export const NewCARequestWizard = ({
           </div>
           <div className="ca-wizard__column ca-wizard__column--wide">
             <ProfileCard>
+              {showOnBehalfOf && (
+                <fieldset className="ca-wizard__radio-group">
+                  <legend className="ca-wizard__radio-legend">Request on behalf of</legend>
+                  <Radio
+                    name="on-behalf-of"
+                    value="client"
+                    label="Client"
+                    checked={onBehalfOf === 'client'}
+                    onChange={() => setOnBehalfOf('client')}
+                  />
+                  <Radio
+                    name="on-behalf-of"
+                    value="va"
+                    label="VA"
+                    checked={onBehalfOf === 'va'}
+                    onChange={() => setOnBehalfOf('va')}
+                  />
+                </fieldset>
+              )}
               <fieldset className="ca-wizard__radio-group">
                 <legend className="ca-wizard__radio-legend">
-                  Main Changes Requested from the Virtual Assistant (VA)
+                  {showOnBehalfOf && onBehalfOf === 'client'
+                    ? 'Main Changes Requested from the Client'
+                    : 'Main Changes Requested from the Virtual Assistant (VA)'}
                 </legend>
                 {REQUEST_TYPE_OPTIONS.map((option) => (
                   <Radio

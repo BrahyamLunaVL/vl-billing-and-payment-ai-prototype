@@ -23,6 +23,8 @@ export interface ClientAgreementScreenProps {
   onBack: () => void
   /** Omit for the Client's own view. Admin's view adds rate/details buttons to the Client card and shows one VA country row instead of three. */
   viewerRole?: 'client' | 'admin'
+  /** Admin-only: opens the "Request for Changes" wizard. Omitted for the Client's own (decorative) button. */
+  onRequestChanges?: () => void
 }
 
 const REPORT_BACK_WEEK_OPTIONS = Array.from({ length: 16 }, (_, index) => {
@@ -39,7 +41,12 @@ const MAX_PRE_APPROVED_HOURS_PER_WEEK = 60
  * the single source of truth the VA's Extra Hours wizard reads its
  * pre-approved-hours/lookback-window/auto-approval rules from.
  */
-export const ClientAgreementScreen = ({ agreementId, onBack, viewerRole = 'client' }: ClientAgreementScreenProps) => {
+export const ClientAgreementScreen = ({
+  agreementId,
+  onBack,
+  viewerRole = 'client',
+  onRequestChanges,
+}: ClientAgreementScreenProps) => {
   const [agreement, setAgreement] = useState(() => getAgreementById(agreementId))
   const [draftSettings, setDraftSettings] = useState<AgreementSettings | undefined>(agreement?.settings)
   const [changesExpanded, setChangesExpanded] = useState(true)
@@ -80,7 +87,12 @@ export const ClientAgreementScreen = ({ agreementId, onBack, viewerRole = 'clien
           <p className="client-agreement-screen__meta">HubSpot ID: {agreement.hubspotId}</p>
         </div>
         <div className="client-agreement-screen__header-actions">
-          <Button type="secondary" leftIcon="pen-to-square" buttonText="Request Changes" />
+          <Button
+            type="secondary"
+            leftIcon="pen-to-square"
+            buttonText="Request Changes"
+            onClick={onRequestChanges}
+          />
           <Button type="primary" leftIcon="arrow-u-turn-up-left" buttonText="Change History" />
           <button type="button" className="client-agreement-screen__menu-button" aria-label="More options">
             <Icon name="ellipsis-vertical" size={16} />
