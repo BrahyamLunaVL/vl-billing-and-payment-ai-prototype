@@ -1,0 +1,20 @@
+.client-agreements-list-screen__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.client-agreements-list-screen__title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.client-agreements-list-screen__card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

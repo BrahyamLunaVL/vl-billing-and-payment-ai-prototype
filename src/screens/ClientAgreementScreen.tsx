@@ -67,7 +67,6 @@ export const ClientAgreementScreen = ({ agreementId, onBack }: ClientAgreementSc
     <>
       <div className="client-agreement-screen__header">
         <div className="client-agreement-screen__header-titles">
-          <Button type="tertiary" leftIcon="chevron-left" buttonText="Back to My Account" onClick={onBack} />
           <h1 className="client-agreement-screen__title">
             {agreement.clientCompanyName} - {agreement.vaName} ({agreement.hoursPerWeek.replace(' per week', '')})
           </h1>
@@ -110,7 +109,7 @@ export const ClientAgreementScreen = ({ agreementId, onBack }: ClientAgreementSc
                 onClick={() => setChangesExpanded((value) => !value)}
                 aria-expanded={changesExpanded}
               >
-                <span>Auto-approval for Changes</span>
+                <span>Auto-approval of Request Changes</span>
                 <Icon
                   name="chevron-down"
                   variant="bold"
@@ -164,7 +163,7 @@ export const ClientAgreementScreen = ({ agreementId, onBack }: ClientAgreementSc
                 onClick={() => setExtraHoursExpanded((value) => !value)}
                 aria-expanded={extraHoursExpanded}
               >
-                <span>Auto-approval for Extra Hours</span>
+                <span>Auto-approval of Extra Hours</span>
                 <Icon
                   name="chevron-down"
                   variant="bold"
@@ -193,6 +192,7 @@ export const ClientAgreementScreen = ({ agreementId, onBack }: ClientAgreementSc
                       min={0}
                       max={MAX_PRE_APPROVED_HOURS_PER_WEEK}
                       rightText="Hours"
+                      disabled={!draftSettings.autoApproveExtraHours}
                       value={draftSettings.preApprovedHoursPerWeek}
                       onChange={(event) =>
                         setDraftSettings(
@@ -215,6 +215,7 @@ export const ClientAgreementScreen = ({ agreementId, onBack }: ClientAgreementSc
                     <Select
                       options={REPORT_BACK_WEEK_OPTIONS}
                       value={String(draftSettings.reportBackWeeks)}
+                      disabled={!draftSettings.autoApproveExtraHours}
                       onChange={(value) =>
                         setDraftSettings((prev) => prev && { ...prev, reportBackWeeks: Number(value) })
                       }

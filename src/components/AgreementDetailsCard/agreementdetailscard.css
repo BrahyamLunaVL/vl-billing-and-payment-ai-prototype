@@ -85,9 +85,16 @@
 .agreement-details-card__va-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   font-size: 14px;
   color: var(--agreement-details-card-color-black);
+}
+
+.agreement-details-card__va-row-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .agreement-details-card__va-label {

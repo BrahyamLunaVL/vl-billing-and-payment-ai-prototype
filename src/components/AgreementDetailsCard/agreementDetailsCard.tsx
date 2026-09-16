@@ -19,6 +19,8 @@ export interface AgreementDetailsCardProps {
   vaAka: string;
   onEditAgreement?: () => void;
   onRequestChanges?: () => void;
+  /** When true (the client's dedicated Agreements list page), "Request Changes" moves down next to the VA row instead of sitting beside "Edit Agreement" in the header (My Account's own layout). */
+  splitActions?: boolean;
   className?: string;
 }
 
@@ -45,6 +47,7 @@ export const AgreementDetailsCard = ({
   vaAka,
   onEditAgreement,
   onRequestChanges,
+  splitActions = false,
   className,
 }: AgreementDetailsCardProps) => {
   const classNames = ['agreement-details-card', className].filter(Boolean).join(' ');
@@ -64,13 +67,15 @@ export const AgreementDetailsCard = ({
             onClick={onEditAgreement}
             style={{ width: '150px' }}
           />
-          <Button
-            type="tertiary"
-            size="small"
-            buttonText="Request Changes"
-            onClick={onRequestChanges}
-            style={{ width: '150px' }}
-          />
+          {!splitActions && (
+            <Button
+              type="tertiary"
+              size="small"
+              buttonText="Request Changes"
+              onClick={onRequestChanges}
+              style={{ width: '150px' }}
+            />
+          )}
         </div>
       </div>
       <div className="agreement-details-card__divider" />
@@ -90,9 +95,20 @@ export const AgreementDetailsCard = ({
           </div>
         </div>
         <div className="agreement-details-card__va-row">
-          <span className="agreement-details-card__va-label">Your VA:</span>
-          <span className="agreement-details-card__va-name">{vaName}</span>
-          <Chip label={vaHiredStatus === 'hired' ? 'Hired' : 'Inactive'} tone="orange" />
+          <div className="agreement-details-card__va-row-left">
+            <span className="agreement-details-card__va-label">Your VA:</span>
+            <span className="agreement-details-card__va-name">{vaName}</span>
+            <Chip label={vaHiredStatus === 'hired' ? 'Hired' : 'Inactive'} tone="orange" />
+          </div>
+          {splitActions && (
+            <Button
+              type="tertiary"
+              size="small"
+              buttonText="Request Changes"
+              onClick={onRequestChanges}
+              style={{ width: '150px' }}
+            />
+          )}
         </div>
         <div className="agreement-details-card__meta-row">
           <div className="agreement-details-card__meta-item">

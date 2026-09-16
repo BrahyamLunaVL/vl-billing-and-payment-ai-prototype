@@ -71,7 +71,7 @@ const INITIAL_INVOICES: InvoiceRecord[] = [
       },
       {
         key: '3',
-        description: '5 Extra Hours, rate $8.50',
+        description: 'Total extra hrs - 5 hrs (Pre-approved 4 · Manually approved 1), rate $8.50/hr',
         amount: '$42.50',
         group: 'extra-hours',
       },

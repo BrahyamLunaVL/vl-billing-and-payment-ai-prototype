@@ -13,13 +13,13 @@ export type { InvoiceRecord, InvoiceLineItemData, InvoiceGroupView } from '../mo
 export const AGREEMENT_STATUS_LABEL: Record<AgreementStatus, string> = {
   active: 'Active',
   terminated: 'Terminated',
-  paused: 'Paused',
+  inactive: 'Inactive',
 };
 
 export const AGREEMENT_STATUS_TONE: Record<AgreementStatus, ChipTone> = {
   active: 'blue',
   terminated: 'red',
-  paused: 'orange',
+  inactive: 'red',
 };
 
 export const CA_STATUS_LABEL: Record<CARequestStatus, string> = {
