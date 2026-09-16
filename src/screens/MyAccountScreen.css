@@ -35,7 +35,7 @@
 .my-account-screen__profile-header {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
   color: #6f1d5d;
 }
@@ -60,7 +60,7 @@
 .my-account-screen__field-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .my-account-screen__field-row {
