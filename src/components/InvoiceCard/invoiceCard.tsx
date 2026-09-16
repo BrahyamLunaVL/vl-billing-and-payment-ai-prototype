@@ -22,6 +22,8 @@ export interface InvoiceCardProps {
   warnings?: string[];
   /** A green "Approved on: ..." confirmation line, shown once the invoice has been approved. */
   approvedMessage?: string;
+  /** Admin's "Preview" invoice state: a decorative "Revert" button next to each line item's amount. */
+  showRevertButtons?: boolean;
   className?: string;
 }
 
@@ -39,6 +41,7 @@ export const InvoiceCard = ({
   actions,
   warnings,
   approvedMessage,
+  showRevertButtons,
   className,
 }: InvoiceCardProps) => {
   const classNames = ['invoice-card', className].filter(Boolean).join(' ');
@@ -48,7 +51,12 @@ export const InvoiceCard = ({
       <div className="invoice-card__row">
         <div className="invoice-card__details">
           <p className="invoice-card__title">{title}</p>
-          <InvoiceSummary sections={sections} totalLabel={totalLabel} totalAmount={totalAmount} />
+          <InvoiceSummary
+            sections={sections}
+            totalLabel={totalLabel}
+            totalAmount={totalAmount}
+            showRevertButtons={showRevertButtons}
+          />
         </div>
         {actions && actions.length > 0 && (
           <div className="invoice-card__actions">

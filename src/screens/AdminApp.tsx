@@ -4,6 +4,7 @@ import { AdminAppShell } from './AdminAppShell'
 import { AdminAgreementsListScreen } from './AdminAgreementsListScreen'
 import { ClientAgreementScreen } from './ClientAgreementScreen'
 import { AdminNewCARequestScreen } from './AdminNewCARequestScreen'
+import { AdminInvoiceScreen } from './AdminInvoiceScreen'
 import { ClientChangesApprovalsScreen } from './ClientChangesApprovalsScreen'
 import { AdminPlaceholderScreen } from './AdminPlaceholderScreen'
 import { getAgreementById } from '../services/clientAccount'
@@ -11,6 +12,11 @@ import { getAgreementById } from '../services/clientAccount'
 export interface AdminAppProps {
   user: AuthenticatedUser
 }
+
+// The prototype's only invoice — Admin has no "VA Invoice" list screen
+// designed yet, so the sidebar item opens this one directly, same as its
+// agreement counterpart did before "All Agreements" was designed.
+const ADMIN_HOME_INVOICE_ID = 'inv-1'
 
 type AdminPage =
   | 'agreements'
@@ -30,13 +36,12 @@ type AdminPage =
   | 'resources'
 
 const PLACEHOLDER_TITLES: Record<
-  Exclude<AdminPage, 'agreements' | 'agreement' | 'ca-wizard' | 'changes-approvals-form'>,
+  Exclude<AdminPage, 'agreements' | 'agreement' | 'ca-wizard' | 'changes-approvals-form' | 'va-invoice'>,
   string
 > = {
   users: 'Users',
   vas: 'VAs',
   clients: 'Clients',
-  'va-invoice': 'VA Invoice',
   'va-invoice-claims': 'VA Invoice Claims',
   'client-invoice': 'Client Invoice',
   'client-invoice-claims': 'Client Invoice Claims',
@@ -80,10 +85,12 @@ export const AdminApp = ({ user }: AdminAppProps) => {
         <AdminNewCARequestScreen agreement={selectedAgreement} onCancel={() => setPage('agreement')} />
       )}
       {page === 'changes-approvals-form' && <ClientChangesApprovalsScreen user={user} scope="admin" />}
+      {page === 'va-invoice' && <AdminInvoiceScreen invoiceId={ADMIN_HOME_INVOICE_ID} />}
       {page !== 'agreements' &&
         page !== 'agreement' &&
         page !== 'ca-wizard' &&
-        page !== 'changes-approvals-form' && <AdminPlaceholderScreen title={PLACEHOLDER_TITLES[page]} />}
+        page !== 'changes-approvals-form' &&
+        page !== 'va-invoice' && <AdminPlaceholderScreen title={PLACEHOLDER_TITLES[page]} />}
     </AdminAppShell>
   )
 }

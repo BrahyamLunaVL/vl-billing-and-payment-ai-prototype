@@ -2,12 +2,12 @@ import type { ChipTone } from '../components';
 import { MOCK_VA_PROFILES, type VAProfile } from '../mocks/vaProfiles';
 import { MOCK_AGREEMENTS, type Agreement, type AgreementStatus } from '../mocks/agreements';
 import { MOCK_CA_REQUESTS, type CARequest, type CARequestStatus } from '../mocks/caRequests';
-import { MOCK_INVOICES, groupInvoiceItems, type InvoiceRecord, type InvoiceGroupView } from '../mocks/invoices';
+import { MOCK_INVOICES, groupInvoiceItems, type InvoiceRecord, type InvoiceGroupView, type InvoiceStatus } from '../mocks/invoices';
 
 export type { VAProfile } from '../mocks/vaProfiles';
 export type { Agreement, AgreementStatus } from '../mocks/agreements';
 export type { CARequest, CARequestStatus, CARequestDetail } from '../mocks/caRequests';
-export type { InvoiceRecord, InvoiceLineItemData, InvoiceGroupView } from '../mocks/invoices';
+export type { InvoiceRecord, InvoiceLineItemData, InvoiceGroupView, InvoiceStatus } from '../mocks/invoices';
 
 /** Shared status -> display label/color mappings, so every screen that shows one of these statuses agrees. */
 export const AGREEMENT_STATUS_LABEL: Record<AgreementStatus, string> = {
@@ -34,6 +34,19 @@ export const CA_STATUS_TONE: Record<CARequestStatus, ChipTone> = {
   approved: 'blue',
   rejected: 'red',
   expired: 'red',
+};
+
+/** Admin's "Invoice Status" chip — the VA's own View Invoice always hardcodes "Preview" instead of reading this. */
+export const INVOICE_STATUS_LABEL: Record<InvoiceStatus, string> = {
+  due: 'Due',
+  paid: 'Paid',
+  preview: 'Preview',
+};
+
+export const INVOICE_STATUS_TONE: Record<InvoiceStatus, ChipTone> = {
+  due: 'gray',
+  paid: 'blue',
+  preview: 'blue',
 };
 
 /**

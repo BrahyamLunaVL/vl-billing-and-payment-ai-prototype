@@ -1,5 +1,11 @@
 export type InvoiceLineItemGroup = 'agreement' | 'extra-hours' | 'time-off';
 
+/**
+ * Admin's "Invoice Status" chip variants (the VA's own View Invoice always
+ * shows "Preview" regardless of this field — only Admin's screen reads it).
+ */
+export type InvoiceStatus = 'due' | 'paid' | 'preview';
+
 export interface InvoiceLineItemData {
   key: string;
   description: string;
@@ -37,8 +43,12 @@ export interface InvoiceRecord {
   totalAmount: string;
   warnings?: string[];
   approvedMessage?: string;
-  /** e.g. "No reports uploaded". */
+  /** e.g. "No reports uploaded". Shown as-is when `uploadedReportName` is omitted. */
   uploadedReportsMessage: string;
+  /** e.g. "Work Report" — when present, Admin's screen shows it as a downloadable attachment instead of `uploadedReportsMessage`. */
+  uploadedReportName?: string;
+  /** Admin's "Invoice Status" chip. Defaults to 'due' for invoices that omit it. */
+  status?: InvoiceStatus;
 }
 
 const INITIAL_INVOICES: InvoiceRecord[] = [
@@ -84,6 +94,8 @@ const INITIAL_INVOICES: InvoiceRecord[] = [
       'Cannot request review outside review invoice period.',
     ],
     uploadedReportsMessage: 'No reports uploaded',
+    uploadedReportName: 'Work Report',
+    status: 'due',
   },
 ];
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Button } from '../Button';
 import { Icon } from '../Icon';
 import './invoicesummary.css';
 
@@ -21,15 +22,18 @@ export interface InvoiceSummaryProps {
   sections: InvoiceSummarySection[];
   totalLabel: string;
   totalAmount: string;
+  /** Admin's "Preview" invoice state: a decorative "Revert" button next to each line item's amount. */
+  showRevertButtons?: boolean;
   className?: string;
 }
 
 interface SectionRowProps {
   section: InvoiceSummarySection;
   depth: number;
+  showRevertButtons?: boolean;
 }
 
-function SectionRow({ section, depth }: SectionRowProps) {
+function SectionRow({ section, depth, showRevertButtons }: SectionRowProps) {
   const [expanded, setExpanded] = useState(true);
   const hasChildren = Boolean(section.sections?.length || section.items?.length);
 
@@ -63,7 +67,7 @@ function SectionRow({ section, depth }: SectionRowProps) {
       {expanded && section.sections && (
         <div className="invoice-summary__children">
           {section.sections.map((child) => (
-            <SectionRow key={child.key} section={child} depth={depth + 1} />
+            <SectionRow key={child.key} section={child} depth={depth + 1} showRevertButtons={showRevertButtons} />
           ))}
         </div>
       )}
@@ -76,7 +80,10 @@ function SectionRow({ section, depth }: SectionRowProps) {
               style={{ paddingLeft: `${20 + (depth + 2) * 20}px` }}
             >
               <span>{item.description}</span>
-              <span className="invoice-summary__amount invoice-summary__amount--regular">{item.amount}</span>
+              <span className="invoice-summary__item-end">
+                <span className="invoice-summary__amount invoice-summary__amount--regular">{item.amount}</span>
+                {showRevertButtons && <Button type="secondary" size="small" buttonText="Revert" style={{ width: 'auto' }} />}
+              </span>
             </div>
           ))}
         </div>
@@ -93,14 +100,14 @@ function SectionRow({ section, depth }: SectionRowProps) {
  * into "Agreement"/"Extra Hours" charge-type subtotals, each expanding
  * into its individual line items — plus a final grand-total bar.
  */
-export const InvoiceSummary = ({ sections, totalLabel, totalAmount, className }: InvoiceSummaryProps) => {
+export const InvoiceSummary = ({ sections, totalLabel, totalAmount, showRevertButtons, className }: InvoiceSummaryProps) => {
   const classNames = ['invoice-summary', className].filter(Boolean).join(' ');
 
   return (
     <div className={classNames}>
       <div className="invoice-summary__tree">
         {sections.map((section) => (
-          <SectionRow key={section.key} section={section} depth={0} />
+          <SectionRow key={section.key} section={section} depth={0} showRevertButtons={showRevertButtons} />
         ))}
       </div>
       <div className="invoice-summary__total-bar">

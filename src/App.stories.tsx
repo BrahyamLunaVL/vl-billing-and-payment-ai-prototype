@@ -184,6 +184,29 @@ export const AdminOpeningAnAgreementAndRequestingChanges: Story = {
   },
 };
 
+export const AdminViewingAVAInvoice: Story = {
+  play: async ({ canvas, userEvent }) => {
+    resetLoginRateLimit();
+    await userEvent.type(canvas.getByPlaceholderText('Enter your email address'), 'admin@virtuallatinos.com');
+    await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
+    await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
+
+    await userEvent.click(await canvas.findByRole('button', { name: /^va invoice$/i }));
+
+    // Admin's View Invoice adds an "Invoice Status" chip, a "Payment Data"
+    // card, and — only while the invoice is still unauthorized ("Due") —
+    // a warning banner, none of which the VA's own View Invoice shows.
+    await expect(await canvas.findByText('Invoice #9')).toBeVisible();
+    await expect(canvas.getByText('Due')).toBeVisible();
+    await expect(canvas.getByText('Payment Data')).toBeVisible();
+    await expect(canvas.getByText('Payment data not found.')).toBeVisible();
+    await expect(
+      canvas.getByText(/you cannot add payment data before invoice has been authorized for payment/i),
+    ).toBeVisible();
+    await expect(canvas.getByText('Work Report')).toBeVisible();
+  },
+};
+
 export const VaLoginShowsVaSidebar: Story = {
   play: async ({ canvas, userEvent }) => {
     resetLoginRateLimit();

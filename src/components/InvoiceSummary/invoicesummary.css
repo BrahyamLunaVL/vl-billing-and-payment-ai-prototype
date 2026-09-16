@@ -110,6 +110,12 @@
   color: var(--invoice-summary-color-black);
 }
 
+.invoice-summary__item-end {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .invoice-summary__total-bar {
   display: flex;
   align-items: center;
