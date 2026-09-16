@@ -150,6 +150,12 @@ export const NewCARequestWizard = ({
         <Step step={3} title="Preview" position="right" status={step === 3 ? 'selected' : 'default'} />
       </StepsNavigation>
 
+      {showOnBehalfOf && step > 1 && (
+        <div className="ca-wizard__on-behalf-badge-row">
+          <Chip label={`Requesting on behalf of ${onBehalfOf === 'client' ? 'Client' : 'VA'}`} tone="gray" />
+        </div>
+      )}
+
       {step === 1 && (
         <div className="ca-wizard__row">
           <div className="ca-wizard__column ca-wizard__column--narrow">

@@ -10,6 +10,11 @@
   gap: 24px;
 }
 
+.ca-wizard__on-behalf-badge-row {
+  display: flex;
+  justify-content: center;
+}
+
 .ca-wizard__column {
   display: flex;
   flex: 1 1 0;
