@@ -1,7 +1,7 @@
 .agreement-card {
   --agreement-card-color-white: #ffffff;
   --agreement-card-color-black: #263238;
-  --agreement-card-color-fucsia-50: #fdf6f8;
+  --agreement-card-color-gray-100: #f6f6f7;
   --agreement-card-color-gray-200: #ececef;
   --agreement-card-color-gray-300: #d5d7dd;
   --agreement-card-color-gray-500: #7a7a7a;
@@ -28,7 +28,7 @@ button.agreement-card {
 }
 
 button.agreement-card:hover {
-  background: var(--agreement-card-color-fucsia-50);
+  background: var(--agreement-card-color-gray-100);
 }
 
 button.agreement-card:focus-visible {
