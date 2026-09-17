@@ -21,7 +21,7 @@
   padding: 4px 12px;
   border-radius: 4px;
   font-family: 'Roboto', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   /* The page's root line-height (145%, from the original Vite scaffold)
      otherwise inherits in and inflates this pill well past Figma's ~22px

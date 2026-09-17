@@ -38,7 +38,6 @@ button.ca-card:focus-visible {
 .ca-card .chip {
   flex-shrink: 0;
   width: 100px;
-  font-size: 14px;
 }
 
 .ca-card__content {
