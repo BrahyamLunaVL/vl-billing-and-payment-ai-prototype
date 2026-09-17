@@ -50,6 +50,10 @@ export interface Agreement {
   /** Omit for an inactive agreement with no ongoing schedule. */
   week?: WeekDayData[];
   settings: AgreementSettings;
+  /** e.g. "10 - 20 hours per week @ $20.00/hr" — shown by the Company card's "View Client Rate ranges" dropdown. */
+  clientRateRanges: string[];
+  /** e.g. "10 - 20 hours per week @ $10.00/hr" — shown by the VA card's "View VA Rate ranges" dropdown. */
+  vaRateRanges: string[];
 }
 
 const FULL_TIME_WEEK: WeekDayData[] = [
@@ -91,6 +95,16 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     status: 'active',
     week: FULL_TIME_WEEK,
     settings: { ...DEFAULT_SETTINGS },
+    clientRateRanges: [
+      '10 - 20 hours per week @ $20.00/hr',
+      '21 - 30 hours per week @ $19.00/hr',
+      '31 - 40 hours per week @ $35.00/hr',
+    ],
+    vaRateRanges: [
+      '10 - 20 hours per week @ $10.00/hr',
+      '21 - 30 hours per week @ $10.50/hr',
+      '31 - 40 hours per week @ $11.00/hr',
+    ],
   },
   {
     id: 'agr-2',
@@ -111,6 +125,16 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     hubspotId: '44787728132',
     status: 'inactive',
     settings: { ...DEFAULT_SETTINGS, autoApproveExtraHours: false },
+    clientRateRanges: [
+      '10 - 20 hours per week @ $15.00/hr',
+      '21 - 30 hours per week @ $16.00/hr',
+      '31 - 40 hours per week @ $17.00/hr',
+    ],
+    vaRateRanges: [
+      '10 - 20 hours per week @ $7.00/hr',
+      '21 - 30 hours per week @ $7.50/hr',
+      '31 - 40 hours per week @ $8.00/hr',
+    ],
   },
 ];
 

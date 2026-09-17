@@ -50,6 +50,8 @@ export const ClientAgreementScreen = ({
   const [agreement, setAgreement] = useState(() => getAgreementById(agreementId))
   const [draftSettings, setDraftSettings] = useState<AgreementSettings | undefined>(agreement?.settings)
   const [expandedSection, setExpandedSection] = useState<'changes' | 'extraHours' | null>(null)
+  const [clientRateRangesOpen, setClientRateRangesOpen] = useState(false)
+  const [vaRateRangesOpen, setVaRateRangesOpen] = useState(false)
 
   if (!agreement || !draftSettings) {
     return (
@@ -117,9 +119,22 @@ export const ClientAgreementScreen = ({
               <CardRow title="Contact:" value={agreement.contactName} />
               <CardRow title="Email:" value={agreement.contactEmail} />
             </div>
-            {viewerRole === 'admin' && (
+            {viewerRole !== 'va' && (
               <div className="client-agreement-screen__va-actions">
-                <Button type="tertiary" rightIcon="chevron-down" buttonText="View Client Rate ranges" />
+                <Button
+                  type="tertiary"
+                  size="small"
+                  rightIcon={clientRateRangesOpen ? 'chevron-up' : 'chevron-down'}
+                  buttonText="View Client Rate ranges"
+                  onClick={() => setClientRateRangesOpen((value) => !value)}
+                />
+                {clientRateRangesOpen && (
+                  <div className="client-agreement-screen__rate-ranges">
+                    {agreement.clientRateRanges.map((range) => (
+                      <p key={range}>{range}</p>
+                    ))}
+                  </div>
+                )}
                 <Button type="secondary" buttonText="View Client Details" />
               </div>
             )}
@@ -294,10 +309,25 @@ export const ClientAgreementScreen = ({
               <CardRow title="Telegram:" value={agreement.vaTelegramHandle} link />
               <CardRow title="HubSpot ID:" value={agreement.vaHubspotId} />
             </div>
-            <div className="client-agreement-screen__va-actions">
-              <Button type="tertiary" rightIcon="chevron-down" buttonText="View VA Rate ranges" />
-              <Button type="secondary" buttonText="View VA Details" />
-            </div>
+            {viewerRole !== 'client' && (
+              <div className="client-agreement-screen__va-actions">
+                <Button
+                  type="tertiary"
+                  size="small"
+                  rightIcon={vaRateRangesOpen ? 'chevron-up' : 'chevron-down'}
+                  buttonText="View VA Rate ranges"
+                  onClick={() => setVaRateRangesOpen((value) => !value)}
+                />
+                {vaRateRangesOpen && (
+                  <div className="client-agreement-screen__rate-ranges">
+                    {agreement.vaRateRanges.map((range) => (
+                      <p key={range}>{range}</p>
+                    ))}
+                  </div>
+                )}
+                <Button type="secondary" buttonText="View VA Details" />
+              </div>
+            )}
           </ProfileCard>
         </div>
       </div>
