@@ -100,3 +100,7 @@
   font-size: 14px;
   color: #263238;
 }
+
+.my-account-screen__notice--bold {
+  font-weight: 700;
+}
