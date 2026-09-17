@@ -21,8 +21,8 @@ export interface ClientAgreementScreenProps {
   user: AuthenticatedUser
   agreementId: string
   onBack: () => void
-  /** Omit for the Client's own view. Admin's view adds rate/details buttons to the Client card and shows one VA country row instead of three. */
-  viewerRole?: 'client' | 'admin'
+  /** Omit for the Client's own view. Admin's view adds rate/details buttons to the Client card and shows one VA country row instead of three. VA's own view hides the Client card's rate instead. */
+  viewerRole?: 'client' | 'admin' | 'va'
   /** Admin-only: opens the "Request for Changes" wizard. Omitted for the Client's own (decorative) button. */
   onRequestChanges?: () => void
 }
@@ -104,7 +104,7 @@ export const ClientAgreementScreen = ({
         <div className="client-agreement-screen__column">
           <ProfileCard leftBorder header={<CardHeader icon="buildings" title={agreement.clientCompanyName} />}>
             <div className="client-agreement-screen__card-rows">
-              <CardRow title="Rate:" value={`${agreement.billedRate}/hr`} />
+              {viewerRole !== 'va' && <CardRow title="Rate:" value={`${agreement.billedRate}/hr`} />}
               <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
             </div>
             {viewerRole === 'admin' && (
@@ -265,7 +265,7 @@ export const ClientAgreementScreen = ({
         <div className="client-agreement-screen__column">
           <ProfileCard leftBorder header={<CardHeader icon="clipboard-user" title={agreement.vaName} />}>
             <div className="client-agreement-screen__card-rows">
-              {viewerRole === 'admin' && <CardRow title="Rate:" value={`${agreement.vaHourlyRate}/hr`} />}
+              {viewerRole !== 'client' && <CardRow title="Rate:" value={`${agreement.vaHourlyRate}/hr`} />}
               <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
               <CardRow title="Payment Method:" value={agreement.vaPaymentMethod} />
               <CardRow title="Email:" value={agreement.vaWorkEmail} />

@@ -4,18 +4,20 @@ import { VAAppShell } from './VAAppShell'
 import { MyAccountScreen } from './MyAccountScreen'
 import { ChangesApprovalsScreen } from './ChangesApprovalsScreen'
 import { InvoicePreviewScreen } from './InvoicePreviewScreen'
+import { ClientAgreementScreen } from './ClientAgreementScreen'
 
 export interface VAAppProps {
   user: AuthenticatedUser
 }
 
-type VAPage = 'my-account' | 'changes-approvals' | 'invoice-preview'
+type VAPage = 'my-account' | 'changes-approvals' | 'invoice-preview' | 'agreement'
 
 /** Owns which VA page is showing and drives the shared Sidebar's selection to match. */
 export const VAApp = ({ user }: VAAppProps) => {
   const [page, setPage] = useState<VAPage>('my-account')
   const [selectedSidebarItem, setSelectedSidebarItem] = useState('my-account')
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
+  const [selectedAgreementId, setSelectedAgreementId] = useState<string | null>(null)
 
   const handleSelectSidebarItem = (key: string) => {
     setSelectedSidebarItem(key)
@@ -29,6 +31,11 @@ export const VAApp = ({ user }: VAAppProps) => {
     setPage('invoice-preview')
   }
 
+  const handleViewAgreement = (agreementId: string) => {
+    setSelectedAgreementId(agreementId)
+    setPage('agreement')
+  }
+
   const handleBackToMyAccount = () => {
     setSelectedSidebarItem('my-account')
     setPage('my-account')
@@ -36,10 +43,20 @@ export const VAApp = ({ user }: VAAppProps) => {
 
   return (
     <VAAppShell user={user} selectedSidebarItem={selectedSidebarItem} onSelectSidebarItem={handleSelectSidebarItem}>
-      {page === 'my-account' && <MyAccountScreen user={user} onViewInvoice={handleViewInvoice} />}
+      {page === 'my-account' && (
+        <MyAccountScreen user={user} onViewInvoice={handleViewInvoice} onViewAgreement={handleViewAgreement} />
+      )}
       {page === 'changes-approvals' && <ChangesApprovalsScreen user={user} />}
       {page === 'invoice-preview' && selectedInvoiceId && (
         <InvoicePreviewScreen invoiceId={selectedInvoiceId} onBack={handleBackToMyAccount} />
+      )}
+      {page === 'agreement' && selectedAgreementId && (
+        <ClientAgreementScreen
+          user={user}
+          agreementId={selectedAgreementId}
+          onBack={handleBackToMyAccount}
+          viewerRole="va"
+        />
       )}
     </VAAppShell>
   )

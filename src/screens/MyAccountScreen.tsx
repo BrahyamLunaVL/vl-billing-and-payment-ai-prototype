@@ -18,10 +18,11 @@ import './MyAccountScreen.css'
 export interface MyAccountScreenProps {
   user: AuthenticatedUser
   onViewInvoice: (invoiceId: string) => void
+  onViewAgreement: (agreementId: string) => void
 }
 
 /** The VA's home screen after login (Figma's "My Account" — Invoice Preview state). */
-export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) => {
+export const MyAccountScreen = ({ user, onViewInvoice, onViewAgreement }: MyAccountScreenProps) => {
   const [selectedTab, setSelectedTab] = useState('preview')
   const [selectedCARequestId, setSelectedCARequestId] = useState<string | null>(null)
 
@@ -130,6 +131,7 @@ export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) =
                       dateStart={agreement.dateStart}
                       dateEnd={agreement.dateEnd}
                       week={agreement.week}
+                      onClick={() => onViewAgreement(agreement.id)}
                     />
                   ))}
                 </div>

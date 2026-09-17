@@ -15,7 +15,8 @@ export interface AgreementCardProps {
   dateEnd?: string;
   /** The agreement's working schedule. Omit to hide the Week row entirely (e.g. a terminated agreement). */
   week?: WeekDayData[];
-  onEdit?: () => void;
+  /** Opens the agreement's own detail page. Renders the whole card as a button when given, a plain row otherwise. */
+  onClick?: () => void;
   className?: string;
 }
 
@@ -34,21 +35,16 @@ export const AgreementCard = ({
   dateStart,
   dateEnd,
   week,
-  onEdit,
+  onClick,
   className,
 }: AgreementCardProps) => {
   const classNames = ['agreement-card', className].filter(Boolean).join(' ');
 
-  return (
-    <div className={classNames}>
+  const children = (
+    <>
       <p className="agreement-card__title">{title}</p>
       <div className="agreement-card__chip-row">
         <Chip label={statusLabel} tone={statusTone} />
-        {onEdit && (
-          <button type="button" className="agreement-card__edit" onClick={onEdit} aria-label="Edit agreement">
-            <Icon name="pen-to-square" size={12} />
-          </button>
-        )}
       </div>
       <div className="agreement-card__divider" />
       <div className="agreement-card__item">
@@ -70,6 +66,16 @@ export const AgreementCard = ({
         </div>
       )}
       {week && <Week days={week} />}
-    </div>
+    </>
   );
+
+  if (onClick) {
+    return (
+      <button type="button" className={classNames} onClick={onClick}>
+        {children}
+      </button>
+    );
+  }
+
+  return <div className={classNames}>{children}</div>;
 };

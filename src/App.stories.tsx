@@ -229,6 +229,27 @@ export const VaLoginShowsVaSidebar: Story = {
   },
 };
 
+export const VaOpeningAnAgreementFromMyAccount: Story = {
+  play: async ({ canvas, userEvent }) => {
+    resetLoginRateLimit();
+    await userEvent.type(canvas.getByPlaceholderText('Enter your email address'), 'va@virtuallatinos.com');
+    await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
+    await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
+
+    // Each Agreement Card is itself a button — clicking it opens that
+    // agreement's own detail screen (shared with Client/Admin, driven by
+    // viewerRole="va" here).
+    await userEvent.click(await canvas.findByRole('button', { name: /bloominari dba virtual latinos/i }));
+
+    await expect(await canvas.findByText('LTM Innovation - Elena Ruiz (40 Hours)')).toBeVisible();
+    // The VA sees their own rate on their own card...
+    await expect(canvas.getByText('$11.00/hr')).toBeVisible();
+    // ...but never the Client's rate, which only appears on the Client
+    // card for Client/Admin viewers.
+    await expect(canvas.queryByText('$8.00/hr')).not.toBeInTheDocument();
+  },
+};
+
 export const ClickingACARequestShowsItsDetails: Story = {
   play: async ({ canvas, userEvent }) => {
     resetLoginRateLimit();

@@ -58,10 +58,11 @@ export const Inactive: Story = {
   },
 };
 
-export const WithEditButton: Story = {
-  args: { onEdit: fn() },
+export const Clickable: Story = {
+  args: { onClick: fn() },
   play: async ({ canvas, args, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: /edit agreement/i }));
-    await expect(args.onEdit).toHaveBeenCalledTimes(1);
+    const card = canvas.getByRole('button', { name: /the matian firm/i });
+    await userEvent.click(card);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
 };
