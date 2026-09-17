@@ -17,7 +17,7 @@ export const AdminNewCARequestScreen = ({ agreement, onCancel }: AdminNewCAReque
     <div className="admin-ca-wizard-screen">
       <div className="admin-ca-wizard-screen__header">
         <h1 className="admin-ca-wizard-screen__title">Changes & Approvals Form</h1>
-        <Button type="secondary" buttonText="Click to see SAM Contact Info" />
+        <Button type="tertiary" buttonText="Click to see SAM Contact Info" />
       </div>
       <NewCARequestWizard
         recentRequest={recentRequest}

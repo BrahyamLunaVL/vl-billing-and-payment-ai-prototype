@@ -52,7 +52,7 @@ export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) =
         ) : (
           <h1 className="my-account-screen__title">My Account</h1>
         )}
-        <Button type="secondary" buttonText="Click to see SAM Contact Info" />
+        <Button type="tertiary" buttonText="Click to see SAM Contact Info" />
       </div>
 
       {selectedCARequest ? (

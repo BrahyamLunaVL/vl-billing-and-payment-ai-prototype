@@ -89,7 +89,7 @@ export const ChangesApprovalsScreen = ({ user }: ChangesApprovalsScreenProps) =>
     <div className="ca-screen">
       <div className="ca-screen__header">
         <h1 className="ca-screen__title">{showWizard ? '' : 'Changes & Approvals Form'}</h1>
-        <Button type="secondary" buttonText="Click to see SAM Contact Info" />
+        <Button type="tertiary" buttonText="Click to see SAM Contact Info" />
       </div>
 
       {showWizard ? (
