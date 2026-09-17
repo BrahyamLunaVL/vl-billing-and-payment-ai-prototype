@@ -171,6 +171,10 @@
   color: #bbbbbb;
 }
 
+.client-agreement-screen__threshold-input.input {
+  width: 250px;
+}
+
 .client-agreement-screen__save-row {
   display: flex;
   justify-content: flex-end;

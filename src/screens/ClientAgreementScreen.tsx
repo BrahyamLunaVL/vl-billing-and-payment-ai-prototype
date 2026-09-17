@@ -112,6 +112,7 @@ export const ClientAgreementScreen = ({
             <div className="client-agreement-screen__card-rows">
               {viewerRole !== 'va' && <CardRow title="Rate:" value={`${agreement.billedRate}/hr`} />}
               <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
+              <CardRow title="Email:" value={agreement.contactEmail} />
             </div>
             {viewerRole === 'admin' && (
               <div className="client-agreement-screen__va-actions">
@@ -127,145 +128,148 @@ export const ClientAgreementScreen = ({
             </ProfileCard>
           )}
 
-          <ProfileCard header={<h2 className="client-agreement-screen__card-title">Agreement Settings</h2>}>
-            <div className="client-agreement-screen__accordion">
-              <button
-                type="button"
-                className="client-agreement-screen__accordion-header"
-                onClick={() => setChangesExpanded((value) => !value)}
-                aria-expanded={changesExpanded}
-              >
-                <span>Auto-approval of Request Changes</span>
-                <Icon
-                  name="chevron-down"
-                  variant="bold"
-                  size={20}
-                  className={
-                    changesExpanded
-                      ? 'client-agreement-screen__chevron'
-                      : 'client-agreement-screen__chevron client-agreement-screen__chevron--collapsed'
-                  }
-                />
-              </button>
-              {changesExpanded && (
-                <div className="client-agreement-screen__accordion-body">
-                  <SwitchRow
-                    label="Auto-Approval of Change Requests initiated by VA"
-                    checked={draftSettings.autoApproveChanges}
-                    onChange={handleToggleAutoApproveChanges}
+          {viewerRole !== 'va' && (
+            <ProfileCard header={<h2 className="client-agreement-screen__card-title">Agreement Settings</h2>}>
+              <div className="client-agreement-screen__accordion">
+                <button
+                  type="button"
+                  className="client-agreement-screen__accordion-header"
+                  onClick={() => setChangesExpanded((value) => !value)}
+                  aria-expanded={changesExpanded}
+                >
+                  <span>Auto-approval of Request Changes</span>
+                  <Icon
+                    name="chevron-down"
+                    variant="bold"
+                    size={20}
+                    className={
+                      changesExpanded
+                        ? 'client-agreement-screen__chevron'
+                        : 'client-agreement-screen__chevron client-agreement-screen__chevron--collapsed'
+                    }
                   />
-                  <SwitchRow
-                    label="Notification Alerts for Requests over the threshold"
-                    description="Checkable only when auto-approval is checked."
-                    checked={draftSettings.notifyOverThreshold}
-                    disabled={!draftSettings.autoApproveChanges}
-                    onChange={(checked) => setDraftSettings((prev) => prev && { ...prev, notifyOverThreshold: checked })}
-                  />
-                  <FormField
-                    label="Any request above this amount will trigger an alert:"
-                    description="Editable only when Notification Alerts for Request over threshold is checked."
-                  >
-                    <Input
-                      type="number"
-                      min={0}
-                      leftIcon="dollar-sign"
-                      rightText="USD"
-                      disabled={!draftSettings.notifyOverThreshold}
-                      value={draftSettings.overThresholdAmount}
-                      onChange={(event) =>
-                        setDraftSettings((prev) => prev && { ...prev, overThresholdAmount: Number(event.target.value) })
-                      }
+                </button>
+                {changesExpanded && (
+                  <div className="client-agreement-screen__accordion-body">
+                    <SwitchRow
+                      label="Auto-Approval of Change Requests initiated by VA"
+                      checked={draftSettings.autoApproveChanges}
+                      onChange={handleToggleAutoApproveChanges}
                     />
-                  </FormField>
-                  <div className="client-agreement-screen__save-row">
-                    <Button buttonText="Save" onClick={handleSaveSettings} style={{ width: '200px' }} />
+                    <SwitchRow
+                      label="Notification Alerts for Requests over the threshold"
+                      description="Checkable only when auto-approval is checked."
+                      checked={draftSettings.notifyOverThreshold}
+                      disabled={!draftSettings.autoApproveChanges}
+                      onChange={(checked) => setDraftSettings((prev) => prev && { ...prev, notifyOverThreshold: checked })}
+                    />
+                    <FormField
+                      label="Any request above this amount will trigger an alert:"
+                      description="Editable only when Notification Alerts for Request over threshold is checked."
+                    >
+                      <Input
+                        className="client-agreement-screen__threshold-input"
+                        type="number"
+                        min={0}
+                        leftIcon="dollar-sign"
+                        rightText="USD"
+                        disabled={!draftSettings.notifyOverThreshold}
+                        value={draftSettings.overThresholdAmount}
+                        onChange={(event) =>
+                          setDraftSettings((prev) => prev && { ...prev, overThresholdAmount: Number(event.target.value) })
+                        }
+                      />
+                    </FormField>
+                    <div className="client-agreement-screen__save-row">
+                      <Button buttonText="Save" onClick={handleSaveSettings} style={{ width: '200px' }} />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <button
-                type="button"
-                className="client-agreement-screen__accordion-header"
-                onClick={() => setExtraHoursExpanded((value) => !value)}
-                aria-expanded={extraHoursExpanded}
-              >
-                <span>Auto-approval of Extra Hours</span>
-                <Icon
-                  name="chevron-down"
-                  variant="bold"
-                  size={20}
-                  className={
-                    extraHoursExpanded
-                      ? 'client-agreement-screen__chevron'
-                      : 'client-agreement-screen__chevron client-agreement-screen__chevron--collapsed'
-                  }
-                />
-              </button>
-              {extraHoursExpanded && (
-                <div className="client-agreement-screen__accordion-body">
-                  <SwitchRow
-                    label="Auto-Approval for Extra Hours Requests by VA"
-                    description="When button is off, all extra hours require your manual approval."
-                    checked={draftSettings.autoApproveExtraHours}
-                    onChange={(checked) => setDraftSettings((prev) => prev && { ...prev, autoApproveExtraHours: checked })}
+                <button
+                  type="button"
+                  className="client-agreement-screen__accordion-header"
+                  onClick={() => setExtraHoursExpanded((value) => !value)}
+                  aria-expanded={extraHoursExpanded}
+                >
+                  <span>Auto-approval of Extra Hours</span>
+                  <Icon
+                    name="chevron-down"
+                    variant="bold"
+                    size={20}
+                    className={
+                      extraHoursExpanded
+                        ? 'client-agreement-screen__chevron'
+                        : 'client-agreement-screen__chevron client-agreement-screen__chevron--collapsed'
+                    }
                   />
-                  <FormField
-                    label="Pre-approved hours per week"
-                    description={`Enter the amount of hours / week (max ${MAX_PRE_APPROVED_HOURS_PER_WEEK})`}
-                  >
-                    <Input
-                      type="number"
-                      min={0}
-                      max={MAX_PRE_APPROVED_HOURS_PER_WEEK}
-                      rightText="Hours"
-                      disabled={!draftSettings.autoApproveExtraHours}
-                      value={draftSettings.preApprovedHoursPerWeek}
+                </button>
+                {extraHoursExpanded && (
+                  <div className="client-agreement-screen__accordion-body">
+                    <SwitchRow
+                      label="Auto-Approval for Extra Hours Requests by VA"
+                      description="When button is off, all extra hours require your manual approval."
+                      checked={draftSettings.autoApproveExtraHours}
+                      onChange={(checked) => setDraftSettings((prev) => prev && { ...prev, autoApproveExtraHours: checked })}
+                    />
+                    <FormField
+                      label="Pre-approved hours per week"
+                      description={`Enter the amount of hours / week (max ${MAX_PRE_APPROVED_HOURS_PER_WEEK})`}
+                    >
+                      <Input
+                        type="number"
+                        min={0}
+                        max={MAX_PRE_APPROVED_HOURS_PER_WEEK}
+                        rightText="Hours"
+                        disabled={!draftSettings.autoApproveExtraHours}
+                        value={draftSettings.preApprovedHoursPerWeek}
+                        onChange={(event) =>
+                          setDraftSettings(
+                            (prev) =>
+                              prev && {
+                                ...prev,
+                                preApprovedHoursPerWeek: Math.min(
+                                  MAX_PRE_APPROVED_HOURS_PER_WEEK,
+                                  Number(event.target.value),
+                                ),
+                              },
+                          )
+                        }
+                      />
+                    </FormField>
+                    <FormField
+                      label="How far back can the VA report hours"
+                      description="Introduce the amount of weeks that the VA can go back in the past"
+                    >
+                      <Select
+                        options={REPORT_BACK_WEEK_OPTIONS}
+                        value={String(draftSettings.reportBackWeeks)}
+                        disabled={!draftSettings.autoApproveExtraHours}
+                        onChange={(value) =>
+                          setDraftSettings((prev) => prev && { ...prev, reportBackWeeks: Number(value) })
+                        }
+                      />
+                    </FormField>
+                    <Checkbox
+                      label={
+                        <>
+                          Email me when my VA reports pre-approved extra hours{' '}
+                          <span className="client-agreement-screen__optional">(Optional)</span>
+                        </>
+                      }
+                      checked={draftSettings.emailOnPreApprovedExtraHours}
                       onChange={(event) =>
-                        setDraftSettings(
-                          (prev) =>
-                            prev && {
-                              ...prev,
-                              preApprovedHoursPerWeek: Math.min(
-                                MAX_PRE_APPROVED_HOURS_PER_WEEK,
-                                Number(event.target.value),
-                              ),
-                            },
-                        )
+                        setDraftSettings((prev) => prev && { ...prev, emailOnPreApprovedExtraHours: event.target.checked })
                       }
                     />
-                  </FormField>
-                  <FormField
-                    label="How far back can the VA report hours"
-                    description="Introduce the amount of weeks that the VA can go back in the past"
-                  >
-                    <Select
-                      options={REPORT_BACK_WEEK_OPTIONS}
-                      value={String(draftSettings.reportBackWeeks)}
-                      disabled={!draftSettings.autoApproveExtraHours}
-                      onChange={(value) =>
-                        setDraftSettings((prev) => prev && { ...prev, reportBackWeeks: Number(value) })
-                      }
-                    />
-                  </FormField>
-                  <Checkbox
-                    label={
-                      <>
-                        Email me when my VA reports pre-approved extra hours{' '}
-                        <span className="client-agreement-screen__optional">(Optional)</span>
-                      </>
-                    }
-                    checked={draftSettings.emailOnPreApprovedExtraHours}
-                    onChange={(event) =>
-                      setDraftSettings((prev) => prev && { ...prev, emailOnPreApprovedExtraHours: event.target.checked })
-                    }
-                  />
-                  <div className="client-agreement-screen__save-row">
-                    <Button buttonText="Save" onClick={handleSaveSettings} style={{ width: '200px' }} />
+                    <div className="client-agreement-screen__save-row">
+                      <Button buttonText="Save" onClick={handleSaveSettings} style={{ width: '200px' }} />
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          </ProfileCard>
+                )}
+              </div>
+            </ProfileCard>
+          )}
         </div>
 
         <div className="client-agreement-screen__column">
