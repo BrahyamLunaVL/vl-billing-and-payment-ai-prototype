@@ -122,7 +122,7 @@ export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) =
                   {agreements.map((agreement) => (
                     <AgreementCard
                       key={agreement.id}
-                      title={`${agreement.clientName} @ ${agreement.vaHourlyRate} @ ${agreement.billedRate}`}
+                      title={`${agreement.clientName} @ ${agreement.vaHourlyRate}`}
                       statusLabel={AGREEMENT_STATUS_LABEL[agreement.status]}
                       statusTone={AGREEMENT_STATUS_TONE[agreement.status]}
                       hoursPerWeek={agreement.hoursPerWeek}
