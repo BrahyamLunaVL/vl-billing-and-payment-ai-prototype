@@ -1,6 +1,7 @@
 .ca-card {
   --ca-card-color-white: #ffffff;
   --ca-card-color-black: #263238;
+  --ca-card-color-gray-100: #f6f6f7;
   --ca-card-color-gray-200: #ececef;
 
   box-sizing: border-box;
@@ -19,11 +20,24 @@
 button.ca-card {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.3s ease;
+}
+
+button.ca-card:hover {
+  background: var(--ca-card-color-gray-100);
 }
 
 button.ca-card:focus-visible {
   outline: 2px solid var(--ca-card-color-black);
   outline-offset: -2px;
+}
+
+/* Every status label ("New"/"Approved"/"Rejected"/"Expired") gets the same
+   chip width, so the title/date column next to it always starts at the
+   same x position regardless of which status is shown. */
+.ca-card .chip {
+  flex-shrink: 0;
+  width: 100px;
 }
 
 .ca-card__content {
