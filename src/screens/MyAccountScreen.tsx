@@ -114,7 +114,7 @@ export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) =
                 header={
                   <>
                     <span className="my-account-screen__section-title">Agreements</span>
-                    <Button type="secondary" buttonText="Filter" size="small" />
+                    <Button type="secondary" buttonText="Filter" />
                   </>
                 }
               >
