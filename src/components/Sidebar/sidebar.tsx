@@ -142,6 +142,7 @@ export const Sidebar = ({
           text="Collapse Sidebar"
           leftIcon="chevron-left"
           leftIconVariant="bold"
+          leftIconSize={16}
           onClick={onCollapse}
         />
       </div>

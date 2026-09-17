@@ -17,6 +17,8 @@ export interface OptionProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   leftIconImage?: ReactNode;
   /** Visual weight of `leftIcon`. Defaults to 'regular'. */
   leftIconVariant?: IconVariant;
+  /** Pixel size of `leftIcon`. Defaults to 20. */
+  leftIconSize?: number;
   /**
    * `'navigation'` (the default) is a Sidebar nav item — bold text, and its
    * hover/selected states tint the whole row. `'actions'` is an item inside
@@ -48,6 +50,7 @@ export const Option = ({
   leftIcon,
   leftIconImage,
   leftIconVariant = 'regular',
+  leftIconSize = 20,
   type = 'navigation',
   selected = false,
   className,
@@ -68,7 +71,7 @@ export const Option = ({
     >
       {leftIconImage ??
         (leftIcon && (
-          <Icon name={leftIcon} variant={leftIconVariant} size={20} className="option__icon" />
+          <Icon name={leftIcon} variant={leftIconVariant} size={leftIconSize} className="option__icon" />
         ))}
       <span className="option__text">{text}</span>
     </button>
