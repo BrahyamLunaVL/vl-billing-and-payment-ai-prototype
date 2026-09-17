@@ -138,6 +138,11 @@
   padding: 20px 0;
 }
 
+.client-agreement-screen__accordion-body .input,
+.client-agreement-screen__accordion-body .select {
+  height: 42px;
+}
+
 .client-agreement-screen__switch-row {
   display: flex;
   align-items: center;
@@ -169,10 +174,6 @@
 .client-agreement-screen__optional {
   font-weight: 400;
   color: #bbbbbb;
-}
-
-.client-agreement-screen__threshold-input.input {
-  width: 250px;
 }
 
 .client-agreement-screen__save-row {

@@ -168,7 +168,6 @@ export const ClientAgreementScreen = ({
                       description="Editable only when Notification Alerts for Request over threshold is checked."
                     >
                       <Input
-                        className="client-agreement-screen__threshold-input"
                         type="number"
                         min={0}
                         leftIcon="dollar-sign"
