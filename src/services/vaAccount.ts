@@ -12,13 +12,11 @@ export type { InvoiceRecord, InvoiceLineItemData, InvoiceGroupView, InvoiceStatu
 /** Shared status -> display label/color mappings, so every screen that shows one of these statuses agrees. */
 export const AGREEMENT_STATUS_LABEL: Record<AgreementStatus, string> = {
   active: 'Active',
-  terminated: 'Terminated',
   inactive: 'Inactive',
 };
 
 export const AGREEMENT_STATUS_TONE: Record<AgreementStatus, ChipTone> = {
   active: 'blue',
-  terminated: 'red',
   inactive: 'red',
 };
 

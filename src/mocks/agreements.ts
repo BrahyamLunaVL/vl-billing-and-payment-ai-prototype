@@ -1,6 +1,6 @@
 import type { WeekDayData } from '../components';
 
-export type AgreementStatus = 'active' | 'terminated' | 'inactive';
+export type AgreementStatus = 'active' | 'inactive';
 
 /**
  * The client's controls over how their VA's requests get resolved — edited
@@ -44,7 +44,7 @@ export interface Agreement {
   /** Bare end date, e.g. "6/1/2026". Omit for an ongoing agreement. */
   endDate?: string;
   hubspotId: string;
-  /** Omit for a terminated/inactive agreement with no ongoing schedule. */
+  /** Omit for an inactive agreement with no ongoing schedule. */
   week?: WeekDayData[];
   settings: AgreementSettings;
 }
@@ -103,24 +103,8 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     startDate: '4/28/2025',
     endDate: '1/24/2025',
     hubspotId: '44787728132',
-    status: 'terminated',
-    settings: { ...DEFAULT_SETTINGS, autoApproveExtraHours: false },
-  },
-  {
-    id: 'agr-3',
-    vaEmail: 'va@virtuallatinos.com',
-    clientEmail: 'client@virtuallatinos.com',
-    clientName: 'The Matian Firm @ $8.00',
-    vaRate: 'VA Rate: $11.00',
-    billedRate: '$18.00',
-    vaHourlyRate: '$11.00',
-    hoursPerWeek: '40 Hours per week',
-    billingType: 'Post Pay',
-    dateStart: 'Date Start 2025-04-28',
-    startDate: '4/28/2025',
-    hubspotId: '44787728133',
     status: 'inactive',
-    settings: { ...DEFAULT_SETTINGS },
+    settings: { ...DEFAULT_SETTINGS, autoApproveExtraHours: false },
   },
 ];
 
