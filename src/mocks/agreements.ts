@@ -28,8 +28,8 @@ export interface Agreement {
   /** References a MOCK_USERS email — never duplicate that user's company name here. */
   clientEmail: string;
   clientName: string;
+  /** e.g. "VA Rate: $11.00" — shown on the VA's own AgreementCard (VA/Admin only, never Client). */
   vaRate: string;
-  clientRate?: string;
   /** The bare hourly rate the client is billed, e.g. "$18.00" — used in the client-facing agreement title. */
   billedRate: string;
   /** The bare hourly rate the VA is paid, e.g. "$11.00" — used on the client-facing Agreement screen's VA card. */
@@ -74,7 +74,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     id: 'agr-1',
     vaEmail: 'va@virtuallatinos.com',
     clientEmail: 'client@virtuallatinos.com',
-    clientName: 'The Matian Firm @ $8.00',
+    clientName: 'The Matian Firm @ $11.00',
     vaRate: 'VA Rate: $11.00',
     billedRate: '$18.00',
     vaHourlyRate: '$11.00',
@@ -91,9 +91,8 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     id: 'agr-2',
     vaEmail: 'va@virtuallatinos.com',
     clientEmail: 'client@virtuallatinos.com',
-    clientName: 'The Matian Firm @ $8.00',
+    clientName: 'The Matian Firm @ $11.00',
     vaRate: 'VA Rate: $11.00',
-    clientRate: 'Client Rate: $15.00',
     billedRate: '$15.00',
     vaHourlyRate: '$11.00',
     hoursPerWeek: '40 Hours per week',

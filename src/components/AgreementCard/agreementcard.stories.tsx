@@ -44,16 +44,15 @@ export const Active: Story = {
   },
 };
 
-export const Terminated: Story = {
+export const Inactive: Story = {
   args: {
-    statusLabel: 'Terminated',
+    statusLabel: 'Inactive',
     statusTone: 'red',
-    clientRate: 'Client Rate: $15.00',
     dateEnd: 'Date End: 2025-01-24',
     week: undefined,
   },
   play: async ({ canvas, canvasElement }) => {
-    await expect(canvas.getByText('Terminated')).toBeVisible();
+    await expect(canvas.getByText('Inactive')).toBeVisible();
     await expect(canvas.getByText('Date End: 2025-01-24')).toBeVisible();
     await expect(canvasElement.querySelector('.week')).toBeNull();
   },

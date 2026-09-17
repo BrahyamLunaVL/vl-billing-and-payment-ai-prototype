@@ -127,7 +127,6 @@ export const MyAccountScreen = ({ user, onViewInvoice }: MyAccountScreenProps) =
                       statusTone={AGREEMENT_STATUS_TONE[agreement.status]}
                       hoursPerWeek={agreement.hoursPerWeek}
                       vaRate={agreement.vaRate}
-                      clientRate={agreement.clientRate}
                       dateStart={agreement.dateStart}
                       dateEnd={agreement.dateEnd}
                       week={agreement.week}

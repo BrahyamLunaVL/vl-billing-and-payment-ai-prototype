@@ -223,7 +223,7 @@ export const VaLoginShowsVaSidebar: Story = {
     // The profile card, an active agreement with its weekly schedule, a
     // C&A request, and an invoice all render from the VA's own mock data.
     await expect(canvas.getAllByText('Elena Ruiz')[0]).toBeVisible();
-    await expect(canvas.getAllByText('The Matian Firm @ $8.00')[0]).toBeVisible();
+    await expect(canvas.getAllByText('The Matian Firm @ $11.00')[0]).toBeVisible();
     await expect(canvas.getByText('Request approval for short time off')).toBeVisible();
     await expect(canvas.getByText('Invoice Preview #1940-3326')).toBeVisible();
   },

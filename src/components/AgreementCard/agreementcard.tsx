@@ -9,8 +9,8 @@ export interface AgreementCardProps {
   statusLabel: string;
   statusTone?: ChipTone;
   hoursPerWeek: string;
+  /** The VA's own rate — this card is only ever shown to the VA (or Admin), never the Client, so it never shows a Client Rate. */
   vaRate: string;
-  clientRate?: string;
   dateStart: string;
   dateEnd?: string;
   /** The agreement's working schedule. Omit to hide the Week row entirely (e.g. a terminated agreement). */
@@ -31,7 +31,6 @@ export const AgreementCard = ({
   statusTone = 'blue',
   hoursPerWeek,
   vaRate,
-  clientRate,
   dateStart,
   dateEnd,
   week,
@@ -60,12 +59,6 @@ export const AgreementCard = ({
         <Icon name="circle-dollar" size={20} className="agreement-card__item-icon" />
         <span>{vaRate}</span>
       </div>
-      {clientRate && (
-        <div className="agreement-card__item">
-          <Icon name="circle-dollar" size={20} className="agreement-card__item-icon" />
-          <span>{clientRate}</span>
-        </div>
-      )}
       <div className="agreement-card__item">
         <Icon name="calendar" size={20} className="agreement-card__item-icon" />
         <span>{dateStart}</span>
