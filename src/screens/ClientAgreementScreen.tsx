@@ -72,12 +72,18 @@ export const ClientAgreementScreen = ({
     )
   }
 
+  // The VA's own agreement list names each card after `clientName` (e.g.
+  // "Bloominari dba Virtual Latinos"), not the client account's real
+  // company name — clicking into an agreement must land on that same name,
+  // not the unrelated `clientCompanyName` Client/Admin see.
+  const displayCompanyName = viewerRole === 'va' ? agreement.clientName : agreement.clientCompanyName
+
   return (
     <>
       <div className="client-agreement-screen__header">
         <div className="client-agreement-screen__header-titles">
           <h1 className="client-agreement-screen__title">
-            {agreement.clientCompanyName} - {agreement.vaName} ({agreement.hoursPerWeek.replace(' per week', '')})
+            {displayCompanyName} - {agreement.vaName} ({agreement.hoursPerWeek.replace(' per week', '')})
           </h1>
           <div className="client-agreement-screen__meta-row">
             <span className="client-agreement-screen__meta">Started on {agreement.startDate}</span>
@@ -102,7 +108,7 @@ export const ClientAgreementScreen = ({
 
       <div className="client-agreement-screen__row">
         <div className="client-agreement-screen__column">
-          <ProfileCard leftBorder header={<CardHeader icon="buildings" title={agreement.clientCompanyName} />}>
+          <ProfileCard leftBorder header={<CardHeader icon="buildings" title={displayCompanyName} />}>
             <div className="client-agreement-screen__card-rows">
               {viewerRole !== 'va' && <CardRow title="Rate:" value={`${agreement.billedRate}/hr`} />}
               <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />

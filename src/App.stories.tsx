@@ -241,7 +241,9 @@ export const VaOpeningAnAgreementFromMyAccount: Story = {
     // viewerRole="va" here).
     await userEvent.click(await canvas.findByRole('button', { name: /bloominari dba virtual latinos/i }));
 
-    await expect(await canvas.findByText('LTM Innovation - Elena Ruiz (40 Hours)')).toBeVisible();
+    // The detail page's title matches the exact name the VA clicked, not
+    // the client account's own (unrelated) company name.
+    await expect(await canvas.findByText('Bloominari dba Virtual Latinos - Elena Ruiz (40 Hours)')).toBeVisible();
     // The VA sees their own rate on their own card...
     await expect(canvas.getByText('$11.00/hr')).toBeVisible();
     // ...but never the Client's rate, which only appears on the Client
