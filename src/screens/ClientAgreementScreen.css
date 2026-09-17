@@ -70,6 +70,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  color: #6f1d5d;
 }
 
 .client-agreement-screen__card-title {
@@ -82,7 +83,7 @@
 .client-agreement-screen__card-rows {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .client-agreement-screen__va-actions {
