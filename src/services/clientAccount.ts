@@ -33,6 +33,8 @@ export interface ClientAgreementView extends Agreement {
   vaPhoneNumber: string;
   vaHubspotId: string;
   clientCompanyName: string;
+  /** The client company's own payment method — shown on the Agreement screen's Company card, Client only. */
+  clientPaymentMethod: string;
 }
 
 function joinAgreementWithVA(agreement: Agreement): ClientAgreementView {
@@ -51,6 +53,7 @@ function joinAgreementWithVA(agreement: Agreement): ClientAgreementView {
     vaPhoneNumber: vaProfile?.phoneNumber ?? '',
     vaHubspotId: vaProfile?.hubspotId ?? '',
     clientCompanyName: clientProfile?.companyName ?? agreement.clientName,
+    clientPaymentMethod: clientProfile?.paymentMethod ?? '',
   };
 }
 

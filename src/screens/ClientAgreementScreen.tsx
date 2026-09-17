@@ -110,7 +110,11 @@ export const ClientAgreementScreen = ({
           <ProfileCard leftBorder header={<CardHeader icon="buildings" title={displayCompanyName} />}>
             <div className="client-agreement-screen__card-rows">
               {viewerRole !== 'va' && <CardRow title="Rate:" value={`${agreement.billedRate}/hr`} />}
-              <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
+              {viewerRole !== 'va' && (
+                <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
+              )}
+              {viewerRole === 'client' && <CardRow title="Payment Method:" value={agreement.clientPaymentMethod} />}
+              <CardRow title="Contact:" value={agreement.contactName} />
               <CardRow title="Email:" value={agreement.contactEmail} />
             </div>
             {viewerRole === 'admin' && (

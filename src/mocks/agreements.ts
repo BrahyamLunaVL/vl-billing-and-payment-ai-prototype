@@ -29,6 +29,7 @@ export interface Agreement {
   clientEmail: string;
   clientName: string;
   /** The company's own point of contact — shown on the client-facing Agreement screen's Company card. */
+  contactName: string;
   contactEmail: string;
   /** e.g. "VA Rate: $11.00" — shown on the VA's own AgreementCard (VA/Admin only, never Client). */
   vaRate: string;
@@ -77,6 +78,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     vaEmail: 'va@virtuallatinos.com',
     clientEmail: 'client@virtuallatinos.com',
     clientName: 'Bloominari dba Virtual Latinos',
+    contactName: 'Jaime Nacach',
     contactEmail: 'jaime@virtuallatinos.com',
     vaRate: 'VA Rate: $11.00',
     billedRate: '$8.00',
@@ -95,6 +97,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     vaEmail: 'va@virtuallatinos.com',
     clientEmail: 'client@virtuallatinos.com',
     clientName: 'The Matian Firm',
+    contactName: 'Sarah Matian',
     contactEmail: 'jaime@virtuallatinos.com',
     vaRate: 'VA Rate: $8.00',
     billedRate: '$15.00',
