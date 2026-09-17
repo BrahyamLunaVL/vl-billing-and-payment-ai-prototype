@@ -140,7 +140,7 @@ export const ClientAgreementScreen = ({
                   <Icon
                     name="chevron-down"
                     variant="bold"
-                    size={20}
+                    size={16}
                     className={
                       expandedSection === 'changes'
                         ? 'client-agreement-screen__chevron'
@@ -194,7 +194,7 @@ export const ClientAgreementScreen = ({
                   <Icon
                     name="chevron-down"
                     variant="bold"
-                    size={20}
+                    size={16}
                     className={
                       expandedSection === 'extraHours'
                         ? 'client-agreement-screen__chevron'

@@ -123,7 +123,7 @@
 
 .client-agreement-screen__chevron {
   flex-shrink: 0;
-  color: inherit;
+  color: #bbbbbb;
   transition: transform 0.2s ease;
   /* Expanded (no modifier) points up; the base "chevron-down" icon needs a
      half turn to get there. */
