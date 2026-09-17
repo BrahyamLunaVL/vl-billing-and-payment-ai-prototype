@@ -52,7 +52,7 @@ function SectionRow({ section, depth, showRevertButtons }: SectionRowProps) {
             <Icon
               name="chevron-down"
               variant="bold"
-              size={24}
+              size={14}
               className={expanded ? 'invoice-summary__chevron' : 'invoice-summary__chevron invoice-summary__chevron--collapsed'}
             />
           )}
