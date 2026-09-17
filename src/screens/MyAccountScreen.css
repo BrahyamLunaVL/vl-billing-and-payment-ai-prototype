@@ -110,3 +110,9 @@
   flex-direction: column;
   gap: 20px;
 }
+
+.my-account-screen__invoice-notices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

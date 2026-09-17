@@ -165,23 +165,25 @@ export const MyAccountScreen = ({ user, onViewInvoice, onViewAgreement }: MyAcco
 
           {selectedTab === 'preview' ? (
             <>
-              <p className="my-account-screen__notice">
-                Please take a moment to review the forthcoming invoices for the upcoming payment
-                period.
-              </p>
-              <p className="my-account-screen__notice">
-                On the second week of the billing period, you have the option to approve payment for
-                the invoice between Friday, 1 PM PT and Sunday midnight PT.
-              </p>
-              <p className="my-account-screen__notice">
-                If you wish to have your invoice reviewed or require any changes prior to approval,
-                please submit your request between Monday, 6 AM PT and Thursday, 4 PM PT.
-              </p>
-              <p className="my-account-screen__notice">
-                Once you upload your report(s), please remember to also click &quot;Approve&quot; next
-                to your invoice within its approval period. Otherwise, we may not receive it and your
-                payment could be delayed.
-              </p>
+              <div className="my-account-screen__invoice-notices">
+                <p className="my-account-screen__notice my-account-screen__notice--bold">
+                  Please take a moment to review the forthcoming invoices for the upcoming payment
+                  period.
+                </p>
+                <p className="my-account-screen__notice">
+                  On the second week of the billing period, you have the option to approve payment
+                  for the invoice between Friday, 1 PM PT and Sunday midnight PT.
+                </p>
+                <p className="my-account-screen__notice">
+                  If you wish to have your invoice reviewed or require any changes prior to approval,
+                  please submit your request between Monday, 6 AM PT and Thursday, 4 PM PT.
+                </p>
+                <p className="my-account-screen__notice">
+                  Once you upload your report(s), please remember to also click &quot;Approve&quot;
+                  next to your invoice within its approval period. Otherwise, we may not receive it
+                  and your payment could be delayed.
+                </p>
+              </div>
               {invoiceBreakdowns.map(({ invoice, groups }) => (
                 <InvoiceCard
                   key={invoice.id}
