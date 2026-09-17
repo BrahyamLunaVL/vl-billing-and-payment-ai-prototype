@@ -87,7 +87,7 @@
 }
 
 .my-account-screen__card-list--scrollable {
-  max-height: 350px;
+  max-height: 312px;
   overflow-y: auto;
 }
 
