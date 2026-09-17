@@ -104,3 +104,9 @@
 .my-account-screen__notice--bold {
   font-weight: 700;
 }
+
+.my-account-screen__pending-changes {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

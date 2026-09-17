@@ -211,11 +211,13 @@ export const MyAccountScreen = ({ user, onViewInvoice, onViewAgreement }: MyAcco
                   ]}
                 />
               ))}
-              <p className="my-account-screen__notice my-account-screen__notice--bold">
-                Any invoices for which you&apos;ve requested any changes that are pending approval by
-                our admin team.
-              </p>
-              <p className="my-account-screen__notice my-account-screen__notice--bold">No changes pending yet</p>
+              <div className="my-account-screen__pending-changes">
+                <p className="my-account-screen__notice my-account-screen__notice--bold">
+                  Any invoices for which you&apos;ve requested any changes that are pending approval
+                  by our admin team.
+                </p>
+                <p className="my-account-screen__notice my-account-screen__notice--bold">No changes pending yet</p>
+              </div>
             </>
           ) : (
             <p className="my-account-screen__notice">Nothing to show here yet.</p>
