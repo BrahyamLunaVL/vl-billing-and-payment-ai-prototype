@@ -45,9 +45,9 @@ export const MyAccountScreen = ({ user, onViewInvoice, onViewAgreement }: MyAcco
       <div className="my-account-screen__header">
         {selectedCARequest ? (
           <Button
-            type="tertiary"
+            type="primary"
             leftIcon="chevron-left"
-            buttonText="Back to Changes & Approvals"
+            buttonText="Back to Your Account"
             onClick={() => setSelectedCARequestId(null)}
           />
         ) : (

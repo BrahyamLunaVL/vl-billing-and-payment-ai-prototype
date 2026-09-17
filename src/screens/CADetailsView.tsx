@@ -16,18 +16,20 @@ export const CADetailsView = ({ request }: CADetailsViewProps) => {
   return (
     <div className="ca-details-view">
       <ProfileCard className="ca-details-view__card">
-        <div className="ca-details-view__header">
-          <h1 className="ca-details-view__title">{request.title}</h1>
-          <Chip label={CA_STATUS_LABEL[request.status]} tone={CA_STATUS_TONE[request.status]} />
-        </div>
-        <p className="ca-details-view__meta">
-          Requested by <strong>{request.requestedBy}</strong> on <strong>{request.requestedDate}</strong>
-        </p>
-        {request.resolvedBy && (
+        <div className="ca-details-view__intro">
+          <div className="ca-details-view__header">
+            <h1 className="ca-details-view__title">{request.title}</h1>
+            <Chip label={CA_STATUS_LABEL[request.status]} tone={CA_STATUS_TONE[request.status]} />
+          </div>
           <p className="ca-details-view__meta">
-            Resolved by <strong>{request.resolvedBy}</strong> on <strong>{request.resolvedDate}</strong>
+            Requested by <strong>{request.requestedBy}</strong> on <strong>{request.requestedDate}</strong>
           </p>
-        )}
+          {request.resolvedBy && (
+            <p className="ca-details-view__meta">
+              Resolved by <strong>{request.resolvedBy}</strong> on <strong>{request.resolvedDate}</strong>
+            </p>
+          )}
+        </div>
         <div className="ca-details-view__grid">
           {request.details.map((detail) => (
             <div

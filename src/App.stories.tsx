@@ -270,7 +270,7 @@ export const ClickingACARequestShowsItsDetails: Story = {
     await expect(canvas.queryByText('My Account', { selector: 'h1' })).not.toBeInTheDocument();
     await expect(canvas.queryByText('Virtual Latinos Invoices')).not.toBeInTheDocument();
 
-    await userEvent.click(canvas.getByRole('button', { name: /back to changes & approvals/i }));
+    await userEvent.click(canvas.getByRole('button', { name: /back to your account/i }));
 
     await expect(await canvas.findByText('My Account', { selector: 'h1' })).toBeVisible();
     await expect(canvas.getByText('Virtual Latinos Invoices')).toBeVisible();
