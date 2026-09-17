@@ -49,8 +49,7 @@ export const ClientAgreementScreen = ({
 }: ClientAgreementScreenProps) => {
   const [agreement, setAgreement] = useState(() => getAgreementById(agreementId))
   const [draftSettings, setDraftSettings] = useState<AgreementSettings | undefined>(agreement?.settings)
-  const [changesExpanded, setChangesExpanded] = useState(true)
-  const [extraHoursExpanded, setExtraHoursExpanded] = useState(false)
+  const [expandedSection, setExpandedSection] = useState<'changes' | 'extraHours' | null>(null)
 
   if (!agreement || !draftSettings) {
     return (
@@ -134,8 +133,8 @@ export const ClientAgreementScreen = ({
                 <button
                   type="button"
                   className="client-agreement-screen__accordion-header"
-                  onClick={() => setChangesExpanded((value) => !value)}
-                  aria-expanded={changesExpanded}
+                  onClick={() => setExpandedSection((value) => (value === 'changes' ? null : 'changes'))}
+                  aria-expanded={expandedSection === 'changes'}
                 >
                   <span>Auto-approval of Request Changes</span>
                   <Icon
@@ -143,13 +142,13 @@ export const ClientAgreementScreen = ({
                     variant="bold"
                     size={20}
                     className={
-                      changesExpanded
+                      expandedSection === 'changes'
                         ? 'client-agreement-screen__chevron'
                         : 'client-agreement-screen__chevron client-agreement-screen__chevron--collapsed'
                     }
                   />
                 </button>
-                {changesExpanded && (
+                {expandedSection === 'changes' && (
                   <div className="client-agreement-screen__accordion-body">
                     <SwitchRow
                       label="Auto-Approval of Change Requests initiated by VA"
@@ -188,8 +187,8 @@ export const ClientAgreementScreen = ({
                 <button
                   type="button"
                   className="client-agreement-screen__accordion-header"
-                  onClick={() => setExtraHoursExpanded((value) => !value)}
-                  aria-expanded={extraHoursExpanded}
+                  onClick={() => setExpandedSection((value) => (value === 'extraHours' ? null : 'extraHours'))}
+                  aria-expanded={expandedSection === 'extraHours'}
                 >
                   <span>Auto-approval of Extra Hours</span>
                   <Icon
@@ -197,13 +196,13 @@ export const ClientAgreementScreen = ({
                     variant="bold"
                     size={20}
                     className={
-                      extraHoursExpanded
+                      expandedSection === 'extraHours'
                         ? 'client-agreement-screen__chevron'
                         : 'client-agreement-screen__chevron client-agreement-screen__chevron--collapsed'
                     }
                   />
                 </button>
-                {extraHoursExpanded && (
+                {expandedSection === 'extraHours' && (
                   <div className="client-agreement-screen__accordion-body">
                     <SwitchRow
                       label="Auto-Approval for Extra Hours Requests by VA"

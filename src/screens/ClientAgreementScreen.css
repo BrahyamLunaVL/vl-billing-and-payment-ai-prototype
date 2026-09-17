@@ -125,10 +125,14 @@
   flex-shrink: 0;
   color: inherit;
   transition: transform 0.2s ease;
+  /* Expanded (no modifier) points up; the base "chevron-down" icon needs a
+     half turn to get there. */
+  transform: rotate(180deg);
 }
 
 .client-agreement-screen__chevron--collapsed {
-  transform: rotate(-90deg);
+  /* Collapsed points down — the icon's own, unrotated orientation. */
+  transform: rotate(0deg);
 }
 
 .client-agreement-screen__accordion-body {
