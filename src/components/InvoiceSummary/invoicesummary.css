@@ -45,13 +45,13 @@
 
 .invoice-summary__section-header--depth-0 {
   color: var(--invoice-summary-color-brand-secondary);
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .invoice-summary__section-header--depth-1 {
   color: var(--invoice-summary-color-black);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -104,7 +104,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 20px;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.2;
   color: var(--invoice-summary-color-black);
 }
