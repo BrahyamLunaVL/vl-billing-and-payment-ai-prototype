@@ -29,8 +29,7 @@
   justify-content: space-between;
   gap: 12px;
   width: 100%;
-  padding: 20px;
-  padding-left: 20px;
+  padding: 12px 20px;
   border: none;
   border-top: 1px solid var(--invoice-summary-color-gray-200);
   background: transparent;
@@ -73,10 +72,14 @@
   flex-shrink: 0;
   color: inherit;
   transition: transform 0.2s ease;
+  /* Expanded (no modifier) points up; the base "chevron-down" icon needs a
+     half turn to get there. */
+  transform: rotate(180deg);
 }
 
 .invoice-summary__chevron--collapsed {
-  transform: rotate(-90deg);
+  /* Collapsed points down — the icon's own, unrotated orientation. */
+  transform: rotate(0deg);
 }
 
 .invoice-summary__section-total {
@@ -103,9 +106,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 20px;
-  padding-right: 20px;
-  font-size: 14px;
+  padding: 12px 20px;
+  font-size: 16px;
+  line-height: 1.2;
   color: var(--invoice-summary-color-black);
 }
 

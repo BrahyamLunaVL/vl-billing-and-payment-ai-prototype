@@ -166,10 +166,21 @@ export const MyAccountScreen = ({ user, onViewInvoice, onViewAgreement }: MyAcco
           {selectedTab === 'preview' ? (
             <>
               <p className="my-account-screen__notice">
-                Invoices listed here were not approved on time prior to payment period deadline, and
-                will NOT be paid until the next pay period. You&apos;ll still need to approve these
-                invoices prior to the NEXT pay period, which you&apos;ll be able to approve at any
-                time if the invoice shows up here.
+                Please take a moment to review the forthcoming invoices for the upcoming payment
+                period.
+              </p>
+              <p className="my-account-screen__notice">
+                On the second week of the billing period, you have the option to approve payment for
+                the invoice between Friday, 1 PM PT and Sunday midnight PT.
+              </p>
+              <p className="my-account-screen__notice">
+                If you wish to have your invoice reviewed or require any changes prior to approval,
+                please submit your request between Monday, 6 AM PT and Thursday, 4 PM PT.
+              </p>
+              <p className="my-account-screen__notice">
+                Once you upload your report(s), please remember to also click &quot;Approve&quot; next
+                to your invoice within its approval period. Otherwise, we may not receive it and your
+                payment could be delayed.
               </p>
               {invoiceBreakdowns.map(({ invoice, groups }) => (
                 <InvoiceCard
