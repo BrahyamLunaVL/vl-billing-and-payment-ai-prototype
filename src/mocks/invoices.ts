@@ -69,13 +69,13 @@ const INITIAL_INVOICES: InvoiceRecord[] = [
     items: [
       {
         key: '1',
-        description: '40hs @ $8.00 | Weekly Service from 2026-08-03 to 2026-08-09',
+        description: 'Weekly Service from 2026-08-03 to 2026-08-09, 40 hours, rate $8.00',
         amount: '$320.00',
         group: 'agreement',
       },
       {
         key: '2',
-        description: '40hs @ $8.00 | Weekly Service from 2026-08-10 to 2026-08-16',
+        description: 'Weekly Service from 2026-08-10 to 2026-08-16, 40 hours, rate $8.00',
         amount: '$320.00',
         group: 'agreement',
       },

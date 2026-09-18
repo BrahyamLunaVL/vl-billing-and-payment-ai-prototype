@@ -36,6 +36,7 @@ export const InvoicePreviewScreen = ({ invoiceId, onBack }: InvoicePreviewScreen
       </div>
 
       <ProfileCard
+        className="invoice-preview-screen__card"
         header={
           <div className="invoice-preview-screen__title-row">
             <span className="invoice-preview-screen__invoice-number">Invoice #{invoice.invoiceNumber}</span>
@@ -43,67 +44,78 @@ export const InvoicePreviewScreen = ({ invoiceId, onBack }: InvoicePreviewScreen
           </div>
         }
       >
-        <div className="invoice-preview-screen__meta-grid">
-          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline">
-            <span className="invoice-preview-screen__meta-label">Invoice Status:</span>
-            <Chip label="Preview" tone="blue" />
+        <div className="invoice-preview-screen__card-body">
+          <div className="invoice-preview-screen__meta-row">
+            <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline">
+              <span className="invoice-preview-screen__meta-label">Invoice Status:</span>
+              <Chip label="Preview" tone="blue" />
+            </div>
+            <p className="invoice-preview-screen__address invoice-preview-screen__meta-field--right">
+              Address: {invoice.clientAddress}
+            </p>
           </div>
-          <p className="invoice-preview-screen__address invoice-preview-screen__meta-field--right">
-            Address: {invoice.clientAddress}
+          <div className="invoice-preview-screen__meta-subgroup">
+            <div className="invoice-preview-screen__meta-row">
+              <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline">
+                <span className="invoice-preview-screen__meta-label">Invoice Date:</span>
+                <span>{invoice.invoiceDate}</span>
+              </div>
+              <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline invoice-preview-screen__meta-field--right">
+                <span className="invoice-preview-screen__meta-label">Email:</span>
+                <span>{invoice.clientEmail}</span>
+              </div>
+            </div>
+            <div className="invoice-preview-screen__meta-row">
+              <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline">
+                <span className="invoice-preview-screen__meta-label">Due Date:</span>
+                <span>{invoice.dueDate}</span>
+              </div>
+              <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline invoice-preview-screen__meta-field--right">
+                <span className="invoice-preview-screen__meta-label">Phone:</span>
+                <span>{invoice.clientPhone}</span>
+              </div>
+            </div>
+          </div>
+          <div className="invoice-preview-screen__divider" />
+          <div className="invoice-preview-screen__meta-row">
+            <div className="invoice-preview-screen__meta-field">
+              <span className="invoice-preview-screen__meta-label">Invoiced to</span>
+              <span>{invoice.invoicedTo}</span>
+            </div>
+            <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--right">
+              <span className="invoice-preview-screen__meta-label">Billing Period</span>
+              <span>{invoice.billingPeriod}</span>
+            </div>
+          </div>
+
+          <InvoiceCard
+            sections={[
+              {
+                key: invoice.id,
+                label: invoice.clientName,
+                totalAmount: invoice.totalAmount,
+                sections: groups.map((group) => ({
+                  key: `${invoice.id}-${group.group}`,
+                  label: group.label,
+                  totalAmount: `$${group.totalAmount.toFixed(2)}`,
+                  items: group.items,
+                })),
+              },
+            ]}
+            totalLabel={invoice.totalLabel}
+            totalAmount={invoice.totalAmount}
+          />
+
+          <p className="invoice-preview-screen__disclaimer">
+            *This is an unofficial preview copy of your invoice*.
           </p>
-          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline">
-            <span className="invoice-preview-screen__meta-label">Invoice Date:</span>
-            <span>{invoice.invoiceDate}</span>
-          </div>
-          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline invoice-preview-screen__meta-field--right">
-            <span className="invoice-preview-screen__meta-label">Email:</span>
-            <span>{invoice.clientEmail}</span>
-          </div>
-          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline">
-            <span className="invoice-preview-screen__meta-label">Due Date:</span>
-            <span>{invoice.dueDate}</span>
-          </div>
-          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline invoice-preview-screen__meta-field--right">
-            <span className="invoice-preview-screen__meta-label">Phone:</span>
-            <span>{invoice.clientPhone}</span>
-          </div>
         </div>
-        <div className="invoice-preview-screen__divider" />
-        <div className="invoice-preview-screen__meta-grid">
-          <div className="invoice-preview-screen__meta-field">
-            <span className="invoice-preview-screen__meta-label">Invoiced to</span>
-            <span>{invoice.invoicedTo}</span>
-          </div>
-          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--right">
-            <span className="invoice-preview-screen__meta-label">Billing Period</span>
-            <span>{invoice.billingPeriod}</span>
-          </div>
-        </div>
-
-        <InvoiceCard
-          sections={[
-            {
-              key: invoice.id,
-              label: invoice.clientName,
-              totalAmount: invoice.totalAmount,
-              sections: groups.map((group) => ({
-                key: `${invoice.id}-${group.group}`,
-                label: group.label,
-                totalAmount: `$${group.totalAmount.toFixed(2)}`,
-                items: group.items,
-              })),
-            },
-          ]}
-          totalLabel={invoice.totalLabel}
-          totalAmount={invoice.totalAmount}
-        />
-
-        <p className="invoice-preview-screen__disclaimer">
-          *This is an unofficial preview copy of your invoice*.
-        </p>
       </ProfileCard>
 
-      <ProfileCard header={<span className="invoice-preview-screen__section-title">Uploaded Reports</span>}>
+      <ProfileCard
+        className="invoice-preview-screen__card"
+        header={<span className="invoice-preview-screen__section-title">Uploaded Reports</span>}
+      >
         <p className="invoice-preview-screen__notice">{invoice.uploadedReportsMessage}</p>
       </ProfileCard>
     </div>
