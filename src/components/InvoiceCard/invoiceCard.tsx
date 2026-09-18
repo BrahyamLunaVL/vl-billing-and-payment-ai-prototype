@@ -11,8 +11,8 @@ export interface InvoiceCardAction {
 }
 
 export interface InvoiceCardProps {
-  /** e.g. "Invoice preview #1343-2345". */
-  title: string;
+  /** e.g. "Invoice preview #1343-2345". Omit for a page that already shows its own invoice-number title above this card (e.g. the full "View Invoice" screen). */
+  title?: string;
   sections: InvoiceSummarySection[];
   totalLabel: string;
   totalAmount: string;
@@ -50,7 +50,7 @@ export const InvoiceCard = ({
     <div className={classNames}>
       <div className="invoice-card__row">
         <div className="invoice-card__details">
-          <p className="invoice-card__title">{title}</p>
+          {title && <p className="invoice-card__title">{title}</p>}
           <InvoiceSummary
             sections={sections}
             totalLabel={totalLabel}

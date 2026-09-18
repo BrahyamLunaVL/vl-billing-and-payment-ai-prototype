@@ -44,24 +44,28 @@ export const InvoicePreviewScreen = ({ invoiceId, onBack }: InvoicePreviewScreen
         }
       >
         <div className="invoice-preview-screen__meta-grid">
-          <div className="invoice-preview-screen__meta-field">
-            <span>Invoice Status:</span>
+          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline">
+            <span className="invoice-preview-screen__meta-label">Invoice Status:</span>
             <Chip label="Preview" tone="blue" />
           </div>
-          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--right">
-            <span>Address: {invoice.clientAddress}</span>
+          <p className="invoice-preview-screen__address invoice-preview-screen__meta-field--right">
+            Address: {invoice.clientAddress}
+          </p>
+          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline">
+            <span className="invoice-preview-screen__meta-label">Invoice Date:</span>
+            <span>{invoice.invoiceDate}</span>
           </div>
-          <div className="invoice-preview-screen__meta-field">
-            <span>Invoice Date: {invoice.invoiceDate}</span>
+          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline invoice-preview-screen__meta-field--right">
+            <span className="invoice-preview-screen__meta-label">Email:</span>
+            <span>{invoice.clientEmail}</span>
           </div>
-          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--right">
-            <span>Email: {invoice.clientEmail}</span>
+          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline">
+            <span className="invoice-preview-screen__meta-label">Due Date:</span>
+            <span>{invoice.dueDate}</span>
           </div>
-          <div className="invoice-preview-screen__meta-field">
-            <span>Due Date: {invoice.dueDate}</span>
-          </div>
-          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--right">
-            <span>Phone: {invoice.clientPhone}</span>
+          <div className="invoice-preview-screen__meta-field invoice-preview-screen__meta-field--inline invoice-preview-screen__meta-field--right">
+            <span className="invoice-preview-screen__meta-label">Phone:</span>
+            <span>{invoice.clientPhone}</span>
           </div>
         </div>
         <div className="invoice-preview-screen__divider" />
@@ -77,7 +81,6 @@ export const InvoicePreviewScreen = ({ invoiceId, onBack }: InvoicePreviewScreen
         </div>
 
         <InvoiceCard
-          title={invoice.title}
           sections={[
             {
               key: invoice.id,
