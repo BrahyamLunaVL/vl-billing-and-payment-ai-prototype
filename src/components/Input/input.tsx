@@ -95,7 +95,7 @@ export const Input = ({
               disabled={disabled}
               aria-label={incrementLabel}
             >
-              <Icon name="chevron-up" variant="bold" size={10} />
+              <Icon name="chevron-up" variant="bold" size={7} />
             </button>
             <button
               type="button"
@@ -104,7 +104,7 @@ export const Input = ({
               disabled={disabled}
               aria-label={decrementLabel}
             >
-              <Icon name="chevron-down" variant="bold" size={10} />
+              <Icon name="chevron-down" variant="bold" size={7} />
             </button>
           </div>
         ) : (

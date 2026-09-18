@@ -30,6 +30,13 @@
   border-radius: var(--input-radius);
   background: #ffffff;
   color: var(--input-color-brand-black);
+  /* The page's root line-height resolves to a fixed px value at a much
+     larger base font-size and inherits unchanged into any plain element
+     here (e.g. `.input__right-text`) that doesn't get the browser's own
+     line-height reset the way a real <input> does — inflating this row
+     well past the platform's standard 42px control height. Give text here
+     its own sane, font-size-relative line-height so it doesn't happen. */
+  line-height: 1.2;
   transition:
     border-color var(--input-transition-duration) ease,
     background-color var(--input-transition-duration) ease;
@@ -99,13 +106,14 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  gap: 2px;
+  gap: 1px;
 }
 
 .input__stepper-button {
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 8px;
   border: none;
   background: none;
   padding: 0;
