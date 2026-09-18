@@ -40,6 +40,11 @@ export const ClientApp = ({ user }: ClientAppProps) => {
     setPage(agreementOrigin)
   }
 
+  const handleRequestChangesFromAgreement = () => {
+    setSelectedSidebarItem('changes-approvals-form')
+    setPage('changes-approvals-form')
+  }
+
   return (
     <ClientAppShell user={user} selectedSidebarItem={selectedSidebarItem} onSelectSidebarItem={handleSelectSidebarItem}>
       {page === 'my-account' && (
@@ -57,7 +62,12 @@ export const ClientApp = ({ user }: ClientAppProps) => {
         />
       )}
       {page === 'agreement' && selectedAgreementId && (
-        <ClientAgreementScreen user={user} agreementId={selectedAgreementId} onBack={handleBackFromAgreement} />
+        <ClientAgreementScreen
+          user={user}
+          agreementId={selectedAgreementId}
+          onBack={handleBackFromAgreement}
+          onRequestChanges={handleRequestChangesFromAgreement}
+        />
       )}
       {page === 'client-invoice' && <ClientInvoiceScreen user={user} />}
       {page === 'changes-approvals-form' && <ClientChangesApprovalsScreen user={user} />}

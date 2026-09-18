@@ -67,6 +67,11 @@ export const AdminApp = ({ user }: AdminAppProps) => {
     setPage('agreement')
   }
 
+  const handleRequestChanges = () => {
+    setSelectedSidebarItem('changes-approvals-form')
+    setPage('changes-approvals-form')
+  }
+
   const selectedAgreement = selectedAgreementId ? getAgreementById(selectedAgreementId) : undefined
 
   return (
@@ -78,7 +83,7 @@ export const AdminApp = ({ user }: AdminAppProps) => {
           agreementId={selectedAgreementId}
           onBack={() => setPage('agreements')}
           viewerRole="admin"
-          onRequestChanges={() => setPage('ca-wizard')}
+          onRequestChanges={handleRequestChanges}
         />
       )}
       {page === 'ca-wizard' && selectedAgreement && (

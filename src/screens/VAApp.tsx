@@ -41,6 +41,11 @@ export const VAApp = ({ user }: VAAppProps) => {
     setPage('my-account')
   }
 
+  const handleRequestChanges = () => {
+    setSelectedSidebarItem('changes-approvals-form')
+    setPage('changes-approvals')
+  }
+
   return (
     <VAAppShell user={user} selectedSidebarItem={selectedSidebarItem} onSelectSidebarItem={handleSelectSidebarItem}>
       {page === 'my-account' && (
@@ -56,6 +61,7 @@ export const VAApp = ({ user }: VAAppProps) => {
           agreementId={selectedAgreementId}
           onBack={handleBackToMyAccount}
           viewerRole="va"
+          onRequestChanges={handleRequestChanges}
         />
       )}
     </VAAppShell>
