@@ -303,21 +303,23 @@ export const ClientAgreementScreen = ({
           >
             <div className="client-agreement-screen__card-rows">
               {viewerRole !== 'client' && <CardRow title="Rate:" value={`${agreement.vaHourlyRate}/hr`} />}
-              <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
-              <CardRow title="Payment Method:" value={agreement.vaPaymentMethod} />
+              {viewerRole !== 'client' && (
+                <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
+              )}
+              {viewerRole !== 'client' && <CardRow title="Payment Method:" value={agreement.vaPaymentMethod} />}
               <CardRow title="Email:" value={agreement.vaWorkEmail} />
               <CardRow title="Phone Number:" value={agreement.vaPhoneNumber} />
-              {viewerRole === 'admin' ? (
-                <CardRow title="Country Residence:" value={agreement.vaCountry} />
-              ) : (
+              {viewerRole === 'va' ? (
                 <>
                   <CardRow title="Country Billing:" value={agreement.vaCountry} />
                   <CardRow title="Country Citizenship:" value={agreement.vaCountry} />
                   <CardRow title="Country Residence:" value={agreement.vaCountry} />
                 </>
+              ) : (
+                <CardRow title="Country Residence:" value={agreement.vaCountry} />
               )}
               <CardRow title="Telegram:" value={agreement.vaTelegramHandle} link />
-              <CardRow title="HubSpot ID:" value={agreement.vaHubspotId} />
+              {viewerRole === 'admin' && <CardRow title="HubSpot ID:" value={agreement.vaHubspotId} />}
             </div>
             {viewerRole !== 'client' && (
               <div className="client-agreement-screen__va-actions">
