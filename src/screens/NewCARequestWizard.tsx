@@ -178,44 +178,46 @@ export const NewCARequestWizard = ({
           </div>
           <div className="ca-wizard__column ca-wizard__column--wide">
             <ProfileCard>
-              {showOnBehalfOf && (
+              <div className="ca-wizard__card-body">
+                {showOnBehalfOf && (
+                  <fieldset className="ca-wizard__radio-group">
+                    <legend className="ca-wizard__radio-legend">Request on behalf of</legend>
+                    <Radio
+                      name="on-behalf-of"
+                      value="client"
+                      label="Client"
+                      checked={onBehalfOf === 'client'}
+                      onChange={() => setOnBehalfOf('client')}
+                    />
+                    <Radio
+                      name="on-behalf-of"
+                      value="va"
+                      label="VA"
+                      checked={onBehalfOf === 'va'}
+                      onChange={() => setOnBehalfOf('va')}
+                    />
+                  </fieldset>
+                )}
                 <fieldset className="ca-wizard__radio-group">
-                  <legend className="ca-wizard__radio-legend">Request on behalf of</legend>
-                  <Radio
-                    name="on-behalf-of"
-                    value="client"
-                    label="Client"
-                    checked={onBehalfOf === 'client'}
-                    onChange={() => setOnBehalfOf('client')}
-                  />
-                  <Radio
-                    name="on-behalf-of"
-                    value="va"
-                    label="VA"
-                    checked={onBehalfOf === 'va'}
-                    onChange={() => setOnBehalfOf('va')}
-                  />
+                  <legend className="ca-wizard__radio-legend">
+                    {showOnBehalfOf && onBehalfOf === 'client'
+                      ? 'Main Changes Requested from the Client'
+                      : 'Main Changes Requested from the Virtual Assistant (VA)'}
+                  </legend>
+                  {REQUEST_TYPE_OPTIONS.map((option) => (
+                    <Radio
+                      key={option.value}
+                      name="request-type"
+                      value={option.value}
+                      label={option.label}
+                      checked={requestType === option.value}
+                      onChange={() => setRequestType(option.value)}
+                    />
+                  ))}
                 </fieldset>
-              )}
-              <fieldset className="ca-wizard__radio-group">
-                <legend className="ca-wizard__radio-legend">
-                  {showOnBehalfOf && onBehalfOf === 'client'
-                    ? 'Main Changes Requested from the Client'
-                    : 'Main Changes Requested from the Virtual Assistant (VA)'}
-                </legend>
-                {REQUEST_TYPE_OPTIONS.map((option) => (
-                  <Radio
-                    key={option.value}
-                    name="request-type"
-                    value={option.value}
-                    label={option.label}
-                    checked={requestType === option.value}
-                    onChange={() => setRequestType(option.value)}
-                  />
-                ))}
-              </fieldset>
-              <div className="ca-wizard__actions">
-                <Button buttonText="Next" onClick={() => setStep(2)} />
+                <div className="ca-wizard__actions">
+                  <Button buttonText="Next" onClick={() => setStep(2)} />
+                </div>
               </div>
             </ProfileCard>
           </div>
