@@ -31,6 +31,11 @@
   color: #263238;
 }
 
+.client-agreement-screen__meta--regular {
+  font-size: 10px;
+  font-weight: 400;
+}
+
 .client-agreement-screen__header-actions {
   display: flex;
   flex-shrink: 0;

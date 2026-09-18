@@ -92,7 +92,9 @@ export const ClientAgreementScreen = ({
           </div>
           {agreement.endDate && <p className="client-agreement-screen__meta">Ends on {agreement.endDate}</p>}
           {viewerRole !== 'va' && (
-            <p className="client-agreement-screen__meta">Next payment on {agreement.nextPaymentDate}</p>
+            <p className="client-agreement-screen__meta client-agreement-screen__meta--regular">
+              Next payment on {agreement.nextPaymentDate}
+            </p>
           )}
           {viewerRole === 'admin' && (
             <p className="client-agreement-screen__meta">HubSpot ID: {agreement.hubspotId}</p>
