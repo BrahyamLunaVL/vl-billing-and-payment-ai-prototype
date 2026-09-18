@@ -93,7 +93,22 @@
   margin-top: 20px;
 }
 
+.profile-card.client-agreement-screen__overflow-visible-card {
+  /* Lets the floating rate-ranges dropdown escape the card's rounded-corner
+     clipping instead of being cut off at its bottom edge. */
+  overflow: visible;
+}
+
+.client-agreement-screen__rate-ranges-anchor {
+  position: relative;
+  width: 100%;
+}
+
 .client-agreement-screen__rate-ranges {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
   display: flex;
   flex-direction: column;
   align-items: center;

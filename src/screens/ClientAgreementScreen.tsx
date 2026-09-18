@@ -109,7 +109,11 @@ export const ClientAgreementScreen = ({
 
       <div className="client-agreement-screen__row">
         <div className="client-agreement-screen__column">
-          <ProfileCard leftBorder header={<CardHeader icon="buildings" title={displayCompanyName} />}>
+          <ProfileCard
+            leftBorder
+            className="client-agreement-screen__overflow-visible-card"
+            header={<CardHeader icon="buildings" title={displayCompanyName} />}
+          >
             <div className="client-agreement-screen__card-rows">
               {viewerRole !== 'va' && <CardRow title="Rate:" value={`${agreement.billedRate}/hr`} />}
               {viewerRole !== 'va' && (
@@ -121,20 +125,22 @@ export const ClientAgreementScreen = ({
             </div>
             {viewerRole !== 'va' && (
               <div className="client-agreement-screen__va-actions">
-                <Button
-                  type="tertiary"
-                  size="small"
-                  rightIcon={clientRateRangesOpen ? 'chevron-up' : 'chevron-down'}
-                  buttonText="View Client Rate ranges"
-                  onClick={() => setClientRateRangesOpen((value) => !value)}
-                />
-                {clientRateRangesOpen && (
-                  <div className="client-agreement-screen__rate-ranges">
-                    {agreement.clientRateRanges.map((range) => (
-                      <p key={range}>{range}</p>
-                    ))}
-                  </div>
-                )}
+                <div className="client-agreement-screen__rate-ranges-anchor">
+                  <Button
+                    type="tertiary"
+                    size="small"
+                    rightIcon={clientRateRangesOpen ? 'chevron-up' : 'chevron-down'}
+                    buttonText="View Client Rate ranges"
+                    onClick={() => setClientRateRangesOpen((value) => !value)}
+                  />
+                  {clientRateRangesOpen && (
+                    <div className="client-agreement-screen__rate-ranges">
+                      {agreement.clientRateRanges.map((range) => (
+                        <p key={range}>{range}</p>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <Button type="secondary" buttonText="View Client Details" />
               </div>
             )}
@@ -290,7 +296,11 @@ export const ClientAgreementScreen = ({
         </div>
 
         <div className="client-agreement-screen__column">
-          <ProfileCard leftBorder header={<CardHeader icon="clipboard-user" title={agreement.vaName} />}>
+          <ProfileCard
+            leftBorder
+            className="client-agreement-screen__overflow-visible-card"
+            header={<CardHeader icon="clipboard-user" title={agreement.vaName} />}
+          >
             <div className="client-agreement-screen__card-rows">
               {viewerRole !== 'client' && <CardRow title="Rate:" value={`${agreement.vaHourlyRate}/hr`} />}
               <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
@@ -311,20 +321,22 @@ export const ClientAgreementScreen = ({
             </div>
             {viewerRole !== 'client' && (
               <div className="client-agreement-screen__va-actions">
-                <Button
-                  type="tertiary"
-                  size="small"
-                  rightIcon={vaRateRangesOpen ? 'chevron-up' : 'chevron-down'}
-                  buttonText="View VA Rate ranges"
-                  onClick={() => setVaRateRangesOpen((value) => !value)}
-                />
-                {vaRateRangesOpen && (
-                  <div className="client-agreement-screen__rate-ranges">
-                    {agreement.vaRateRanges.map((range) => (
-                      <p key={range}>{range}</p>
-                    ))}
-                  </div>
-                )}
+                <div className="client-agreement-screen__rate-ranges-anchor">
+                  <Button
+                    type="tertiary"
+                    size="small"
+                    rightIcon={vaRateRangesOpen ? 'chevron-up' : 'chevron-down'}
+                    buttonText="View VA Rate ranges"
+                    onClick={() => setVaRateRangesOpen((value) => !value)}
+                  />
+                  {vaRateRangesOpen && (
+                    <div className="client-agreement-screen__rate-ranges">
+                      {agreement.vaRateRanges.map((range) => (
+                        <p key={range}>{range}</p>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <Button type="secondary" buttonText="View VA Details" />
               </div>
             )}
