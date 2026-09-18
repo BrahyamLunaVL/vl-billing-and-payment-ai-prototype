@@ -272,150 +272,152 @@ export const NewCARequestWizard = ({
 
             <div className="ca-wizard__column">
               <ProfileCard>
-                <h3 className="ca-wizard__heading">Request Details</h3>
+                <div className="ca-wizard__card-body">
+                  <h3 className="ca-wizard__heading">Request Details</h3>
 
-                <div className="ca-wizard__details-box">
-                  <div className="ca-wizard__metric-row">
-                    <FormField
-                      label="Pre-approved Extra Hours"
-                      info="The number of extra hours your agreement already allows without needing separate client approval."
-                    >
-                      <p className="ca-wizard__metric-value">
-                        {preApprovedHours} <span>Hours</span>
-                      </p>
-                    </FormField>
-                    <FormField
-                      label="Pre-approved Period"
-                      info="How far back you can report extra hours for, set by your client."
-                    >
-                      <p className="ca-wizard__metric-value">
-                        Last {agreementSettings.reportBackWeeks} <span>Weeks</span>
-                      </p>
-                    </FormField>
-                    <FormField label="Current Rate per hour">
-                      <p className="ca-wizard__metric-value">
-                        ${RATE_PER_HOUR.toFixed(2)} <span>USD</span>
-                      </p>
-                    </FormField>
-                  </div>
-
-                  <div className="ca-wizard__calendar-row">
-                    <div className="ca-wizard__calendar-column">
+                  <div className="ca-wizard__details-box">
+                    <div className="ca-wizard__metric-row">
                       <FormField
-                        label="Specific dates that you worked extra hours"
-                        description={`Select the dates you worked extra hours in the last ${agreementSettings.reportBackWeeks} weeks. Only past dates are eligible.`}
+                        label="Pre-approved Extra Hours"
+                        info="The number of extra hours your agreement already allows without needing separate client approval."
                       >
-                        {null}
+                        <p className="ca-wizard__metric-value">
+                          {preApprovedHours} <span>Hours</span>
+                        </p>
                       </FormField>
-                      <Calendar
-                        selectedDates={selectedDates}
-                        onToggleDate={toggleDate}
-                        minDate={minDate}
-                        maxDate={maxDate}
-                      />
-                      <Button
-                        type="secondary"
-                        buttonText="Reset"
-                        onClick={handleReset}
-                        disabled={selectedDates.length === 0}
-                      />
+                      <FormField
+                        label="Pre-approved Period"
+                        info="How far back you can report extra hours for, set by your client."
+                      >
+                        <p className="ca-wizard__metric-value">
+                          Last {agreementSettings.reportBackWeeks} <span>Weeks</span>
+                        </p>
+                      </FormField>
+                      <FormField label="Current Rate per hour">
+                        <p className="ca-wizard__metric-value">
+                          ${RATE_PER_HOUR.toFixed(2)} <span>USD</span>
+                        </p>
+                      </FormField>
                     </div>
 
-                    <div className="ca-wizard__hours-column">
-                      {selectedDates.length === 0 ? (
-                        <>
-                          <h3 className="ca-wizard__subheading">Extra Hours</h3>
-                          <div className="ca-wizard__empty-state">
-                            <Icon name="calendar" size={40} />
-                            <p className="ca-wizard__empty-title">No days selected</p>
-                            <p className="ca-wizard__empty-subtitle">
-                              Select at least one date to enter the hours you worked as extra hours
+                    <div className="ca-wizard__calendar-row">
+                      <div className="ca-wizard__calendar-column">
+                        <FormField
+                          label="Specific dates that you worked extra hours"
+                          description={`Select the dates you worked extra hours in the last ${agreementSettings.reportBackWeeks} weeks. Only past dates are eligible.`}
+                        >
+                          {null}
+                        </FormField>
+                        <Calendar
+                          selectedDates={selectedDates}
+                          onToggleDate={toggleDate}
+                          minDate={minDate}
+                          maxDate={maxDate}
+                        />
+                        <Button
+                          type="secondary"
+                          buttonText="Reset"
+                          onClick={handleReset}
+                          disabled={selectedDates.length === 0}
+                        />
+                      </div>
+
+                      <div className="ca-wizard__hours-column">
+                        {selectedDates.length === 0 ? (
+                          <>
+                            <h3 className="ca-wizard__subheading">Extra Hours</h3>
+                            <div className="ca-wizard__empty-state">
+                              <Icon name="calendar" size={40} />
+                              <p className="ca-wizard__empty-title">No days selected</p>
+                              <p className="ca-wizard__empty-subtitle">
+                                Select at least one date to enter the hours you worked as extra hours
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <h3 className="ca-wizard__subheading">Extra Hours Worked</h3>
+                            <p className="ca-wizard__description">
+                              Enter the additional hours worked on each date listed below,{' '}
+                              <strong>up to {DAILY_MAX_HOURS} hours per day</strong>. If the total
+                              exceeds your pre-approved amount for any week, the entire request will
+                              be sent to your client for approval.
                             </p>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <h3 className="ca-wizard__subheading">Extra Hours Worked</h3>
-                          <p className="ca-wizard__description">
-                            Enter the additional hours worked on each date listed below,{' '}
-                            <strong>up to {DAILY_MAX_HOURS} hours per day</strong>. If the total
-                            exceeds your pre-approved amount for any week, the entire request will
-                            be sent to your client for approval.
-                          </p>
-                          <div className="ca-wizard__date-rows">
-                            {selectedDates.map((date) => (
-                              <FormField key={date} label={formatFullDate(date)}>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  max={DAILY_MAX_HOURS}
-                                  rightText="Hrs"
-                                  value={hoursByDate[date] ?? 0}
-                                  onChange={(event) =>
-                                    setHoursByDate((prev) => ({
-                                      ...prev,
-                                      [date]: Math.min(DAILY_MAX_HOURS, Math.max(0, Number(event.target.value))),
-                                    }))
-                                  }
-                                  onIncrement={() =>
-                                    setHoursByDate((prev) => ({
-                                      ...prev,
-                                      [date]: Math.min(DAILY_MAX_HOURS, (prev[date] ?? 0) + 1),
-                                    }))
-                                  }
-                                  onDecrement={() =>
-                                    setHoursByDate((prev) => ({
-                                      ...prev,
-                                      [date]: Math.max(0, (prev[date] ?? 0) - 1),
-                                    }))
-                                  }
-                                  incrementLabel={`Increase hours for ${formatFullDate(date)}`}
-                                  decrementLabel={`Decrease hours for ${formatFullDate(date)}`}
-                                />
-                              </FormField>
-                            ))}
-                          </div>
-                        </>
-                      )}
+                            <div className="ca-wizard__date-rows">
+                              {selectedDates.map((date) => (
+                                <FormField key={date} label={formatFullDate(date)}>
+                                  <Input
+                                    type="number"
+                                    min={0}
+                                    max={DAILY_MAX_HOURS}
+                                    rightText="Hrs"
+                                    value={hoursByDate[date] ?? 0}
+                                    onChange={(event) =>
+                                      setHoursByDate((prev) => ({
+                                        ...prev,
+                                        [date]: Math.min(DAILY_MAX_HOURS, Math.max(0, Number(event.target.value))),
+                                      }))
+                                    }
+                                    onIncrement={() =>
+                                      setHoursByDate((prev) => ({
+                                        ...prev,
+                                        [date]: Math.min(DAILY_MAX_HOURS, (prev[date] ?? 0) + 1),
+                                      }))
+                                    }
+                                    onDecrement={() =>
+                                      setHoursByDate((prev) => ({
+                                        ...prev,
+                                        [date]: Math.max(0, (prev[date] ?? 0) - 1),
+                                      }))
+                                    }
+                                    incrementLabel={`Increase hours for ${formatFullDate(date)}`}
+                                    decrementLabel={`Decrease hours for ${formatFullDate(date)}`}
+                                  />
+                                </FormField>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="ca-wizard__totals">
-                  <div className="ca-wizard__totals-columns">
-                    <div className="ca-wizard__totals-column">
-                      <span className="ca-wizard__totals-label">Total extra hours worked</span>
-                      <p className="ca-wizard__totals-value">
-                        {totalHours} <span>Hours</span>
-                      </p>
+                  <div className="ca-wizard__totals">
+                    <div className="ca-wizard__totals-columns">
+                      <div className="ca-wizard__totals-column">
+                        <span className="ca-wizard__totals-label">Total extra hours worked</span>
+                        <p className="ca-wizard__totals-value">
+                          {totalHours} <span>Hours</span>
+                        </p>
+                      </div>
+                      <div className="ca-wizard__totals-column">
+                        <span className="ca-wizard__totals-label">Total amount of money you will receive</span>
+                        <p className="ca-wizard__totals-value">
+                          ${totalAmount.toFixed(2)} <span>USD</span>
+                        </p>
+                      </div>
                     </div>
-                    <div className="ca-wizard__totals-column">
-                      <span className="ca-wizard__totals-label">Total amount of money you will receive</span>
-                      <p className="ca-wizard__totals-value">
-                        ${totalAmount.toFixed(2)} <span>USD</span>
-                      </p>
-                    </div>
+                    <p className="ca-wizard__totals-caption">
+                      Calculated from number of dates and hours you worked extra hours.
+                    </p>
                   </div>
-                  <p className="ca-wizard__totals-caption">
-                    Calculated from number of dates and hours you worked extra hours.
-                  </p>
-                </div>
 
-                {exceededPreApproved && (
-                  <Alert
-                    type="warning"
-                    message="You have exceeded the total number of pre-approved extra hours. You can still request additional extra hours, but any hour exceeding the pre-approved amount must be reviewed and approved by the client"
-                  />
-                )}
-                {exceededMax && (
-                  <Alert
-                    type="error"
-                    message="This request exceeds the 60-hour limit for requests that require client approval. Reduce the hours or remove some dates, then submit the remaining hours as a separate request."
-                  />
-                )}
+                  {exceededPreApproved && (
+                    <Alert
+                      type="warning"
+                      message="You have exceeded the total number of pre-approved extra hours. You can still request additional extra hours, but any hour exceeding the pre-approved amount must be reviewed and approved by the client"
+                    />
+                  )}
+                  {exceededMax && (
+                    <Alert
+                      type="error"
+                      message="This request exceeds the 60-hour limit for requests that require client approval. Reduce the hours or remove some dates, then submit the remaining hours as a separate request."
+                    />
+                  )}
 
-                <div className="ca-wizard__actions">
-                  <Button buttonText="Next" onClick={() => setStep(3)} disabled={!canGoNext} />
+                  <div className="ca-wizard__actions">
+                    <Button buttonText="Next" onClick={() => setStep(3)} disabled={!canGoNext} />
+                  </div>
                 </div>
               </ProfileCard>
             </div>
