@@ -172,12 +172,16 @@ export const AdminOpeningAnAgreementAndRequestingChanges: Story = {
     await expect(await canvas.findByText('LTM Innovation - Elena Ruiz (40 Hours)')).toBeVisible();
     await expect(canvas.getByRole('button', { name: /view client details/i })).toBeVisible();
 
-    // The detail screen's "Request Changes" button now opens the same
-    // "Changes & Approvals Form" screen as the sidebar item, not a
-    // dedicated wizard.
+    // The detail screen's "Request Changes" button opens the wizard, whose
+    // step 1 gets an Admin-only "Request on behalf of" selector Figma adds
+    // on top of the VA's own request-type list — unlike the sidebar's own
+    // "Changes & Approvals Form" item, which opens the platform-wide table.
     await userEvent.click(canvas.getByRole('button', { name: /^request changes$/i }));
-    await expect(await canvas.findByRole('heading', { name: /^changes & approvals form$/i })).toBeVisible();
-    await expect(canvas.getByRole('button', { name: /va name/i })).toBeVisible();
+    await expect(await canvas.findByText('Request on behalf of')).toBeVisible();
+    await expect(canvas.getByText('Main Changes Requested from the Virtual Assistant (VA)')).toBeVisible();
+
+    await userEvent.click(canvas.getByRole('radio', { name: /^client$/i }));
+    await expect(canvas.getByText('Main Changes Requested from the Client')).toBeVisible();
   },
 };
 
