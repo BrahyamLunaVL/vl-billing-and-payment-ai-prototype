@@ -97,7 +97,9 @@ export const ClientAgreementScreen = ({
             </p>
           )}
           {viewerRole === 'admin' && (
-            <p className="client-agreement-screen__meta">HubSpot ID: {agreement.hubspotId}</p>
+            <p className="client-agreement-screen__meta client-agreement-screen__meta--regular">
+              HubSpot ID: {agreement.hubspotId}
+            </p>
           )}
         </div>
         <div className="client-agreement-screen__header-actions">
