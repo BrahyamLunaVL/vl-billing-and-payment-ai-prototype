@@ -87,16 +87,14 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     resolvedDate: 'August 3, 2026',
     appliedBillingPeriod: '8/17/2026 - 8/30/2026',
     details: [
-      { label: 'Approval Type', value: 'Manual' },
-      { label: 'Total Extra Hours', value: '7 Hours' },
       { label: 'Pre-approved Hours', value: '5 Hours' },
-      { label: 'Manual Approved', value: '2 Hours' },
-      { label: 'Extra Hours Dates', value: '08/05/2026\n08/07/2026\n08/11/2026' },
+      { label: 'Total Extra Hours', value: '7 Hours' },
+      { label: 'Manual Approved Hours', value: '2 Hours' },
       {
-        label: 'Extra Hours by Day',
-        value: 'On 08/05/2026: 1 Hour\nOn 08/07/2026: 2 Hours\nOn 08/11/2026: 2 Hours',
+        label: 'Days Selected (with hours/day)',
+        value: 'Wednesday 2026-08-05 (1 Hr)\nFriday 2026-08-07 (3 Hrs)\nTuesday 2026-08-11 (3 Hrs)',
       },
-      { label: 'Description', value: 'I worked 7 extra hours', fullWidth: true },
+      { label: 'Approval Type', value: 'Manual' },
       {
         label: 'Agreement',
         value: 'VL-Agreement-Bloominari dba Virtual Latinos-Juan G.-2024-05-17 07:25:51',
@@ -104,6 +102,35 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     ],
     comments:
       'I was working on the invoice project during the extra hours taken on august 5th, 7th and 11th',
+  },
+  {
+    id: 'ca-6',
+    vaEmail: 'va@virtuallatinos.com',
+    title: 'Request approval for extra hours',
+    date: 'August 3, 2026',
+    status: 'approved',
+    clientEmail: 'client@virtuallatinos.com',
+    clientName: 'LTM Innovation',
+    requestedBy: 'you',
+    requestedByRole: 'va',
+    requestedDate: 'August 3, 2026',
+    resolvedBy: 'Erick Farias VL',
+    resolvedDate: 'August 3, 2026',
+    appliedBillingPeriod: '8/17/2026 - 8/30/2026',
+    details: [
+      { label: 'Pre-approved Hours', value: '5 Hours' },
+      {
+        label: 'Days Selected (with hours/day)',
+        value: 'Wednesday 2026-08-05 (1 Hr)\nFriday 2026-08-07 (2 Hrs)\nTuesday 2026-08-11 (2 Hrs)',
+      },
+      { label: 'Approval Type', value: 'Auto Approval' },
+      { label: 'Total Extra Hours', value: '5 Hours' },
+      {
+        label: 'Agreement',
+        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Juan G.-2024-05-17 07:25:51',
+      },
+    ],
+    comments: 'Worked ahead on the client deliverable within my pre-approved weekly hours.',
   },
   {
     id: 'ca-3',

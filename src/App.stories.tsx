@@ -298,8 +298,9 @@ export const NavigatingToChangesApprovalsAndBack: Story = {
     await expect(canvas.queryByText('Virtual Latinos Invoices')).not.toBeInTheDocument();
 
     // Clicking a list card expands it in place (an accordion, not a
-    // navigation), showing its richer detail grid.
-    await userEvent.click(canvas.getByRole('button', { name: /request approval for extra hours/i }));
+    // navigation), showing its richer detail grid. There are two "extra
+    // hours" requests (manual and auto approval) — the manual one is first.
+    await userEvent.click(canvas.getAllByRole('button', { name: /request approval for extra hours/i })[0]);
     await expect(await canvas.findByText('Approval Type')).toBeVisible();
     await expect(canvas.getByText('Manual')).toBeVisible();
 
