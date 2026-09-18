@@ -2,7 +2,7 @@
   --profile-card-color-white: #ffffff;
   --profile-card-color-gray-200: #ececef;
   --profile-card-color-gray-300: #d5d7dd;
-  --profile-card-color-brand-primary: #c32059;
+  --profile-card-color-brand-secondary: #6f1d5d;
   --profile-card-shadow-color: rgba(187, 157, 181, 0.2);
 
   box-sizing: border-box;
@@ -17,7 +17,7 @@
 }
 
 .profile-card--left-border {
-  border-left: 4px solid var(--profile-card-color-brand-primary);
+  border-left: 8px solid var(--profile-card-color-brand-secondary);
 }
 
 .profile-card__body {
