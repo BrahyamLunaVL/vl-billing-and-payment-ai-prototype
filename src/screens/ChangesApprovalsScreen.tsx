@@ -23,13 +23,13 @@ interface RequestAccordionCardProps {
 
 function RequestAccordionCard({ request, expanded, onToggle }: RequestAccordionCardProps) {
   return (
-    <div className="ca-list-card">
+    <div className={expanded ? 'ca-list-card ca-list-card--expanded' : 'ca-list-card'}>
       <button type="button" className="ca-list-card__header" onClick={onToggle} aria-expanded={expanded}>
         <div className="ca-list-card__header-main">
           <p className="ca-list-card__title">{request.title}</p>
           <div className="ca-list-card__meta-row">
             <span className="ca-list-card__meta-item">
-              <Icon name="clock" size={14} />
+              <Icon name="buildings" size={14} />
               Client: <strong>{request.clientName}</strong>
             </span>
             <span className="ca-list-card__meta-item">
