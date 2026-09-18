@@ -58,6 +58,18 @@
   gap: 24px;
 }
 
+.client-agreement-screen__row--top {
+  /* Stretches the Company and VA cards to match heights, since they're
+     direct row children here instead of each sitting in its own column
+     alongside other, unrelated-height cards. */
+  align-items: stretch;
+}
+
+.client-agreement-screen__top-card {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 .client-agreement-screen__column {
   display: flex;
   flex: 1 1 0;
@@ -83,7 +95,7 @@
 .client-agreement-screen__card-rows {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .client-agreement-screen__va-actions {

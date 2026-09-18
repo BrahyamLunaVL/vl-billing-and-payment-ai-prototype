@@ -60,7 +60,7 @@
 .my-account-screen__field-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .my-account-screen__field-row {

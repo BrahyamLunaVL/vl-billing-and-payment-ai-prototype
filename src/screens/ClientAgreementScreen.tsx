@@ -107,11 +107,10 @@ export const ClientAgreementScreen = ({
         </div>
       </div>
 
-      <div className="client-agreement-screen__row">
-        <div className="client-agreement-screen__column">
+      <div className="client-agreement-screen__row client-agreement-screen__row--top">
           <ProfileCard
             leftBorder
-            className="client-agreement-screen__overflow-visible-card"
+            className="client-agreement-screen__overflow-visible-card client-agreement-screen__top-card"
             header={<CardHeader icon="buildings" title={displayCompanyName} />}
           >
             <div className="client-agreement-screen__card-rows">
@@ -146,6 +145,57 @@ export const ClientAgreementScreen = ({
             )}
           </ProfileCard>
 
+          <ProfileCard
+            leftBorder
+            className="client-agreement-screen__overflow-visible-card client-agreement-screen__top-card"
+            header={<CardHeader icon="clipboard-user" title={agreement.vaName} />}
+          >
+            <div className="client-agreement-screen__card-rows">
+              {viewerRole !== 'client' && <CardRow title="Rate:" value={`${agreement.vaHourlyRate}/hr`} />}
+              {viewerRole !== 'client' && (
+                <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
+              )}
+              {viewerRole !== 'client' && <CardRow title="Payment Method:" value={agreement.vaPaymentMethod} />}
+              <CardRow title="Email:" value={agreement.vaWorkEmail} />
+              <CardRow title="Phone Number:" value={agreement.vaPhoneNumber} />
+              {viewerRole === 'va' ? (
+                <>
+                  <CardRow title="Country Billing:" value={agreement.vaCountry} />
+                  <CardRow title="Country Citizenship:" value={agreement.vaCountry} />
+                  <CardRow title="Country Residence:" value={agreement.vaCountry} />
+                </>
+              ) : (
+                <CardRow title="Country Residence:" value={agreement.vaCountry} />
+              )}
+              <CardRow title="Telegram:" value={agreement.vaTelegramHandle} link />
+              {viewerRole === 'admin' && <CardRow title="HubSpot ID:" value={agreement.vaHubspotId} />}
+            </div>
+            {viewerRole !== 'client' && (
+              <div className="client-agreement-screen__va-actions">
+                <div className="client-agreement-screen__rate-ranges-anchor">
+                  <Button
+                    type="tertiary"
+                    size="small"
+                    rightIcon={vaRateRangesOpen ? 'chevron-up' : 'chevron-down'}
+                    buttonText="View VA Rate ranges"
+                    onClick={() => setVaRateRangesOpen((value) => !value)}
+                  />
+                  {vaRateRangesOpen && (
+                    <div className="client-agreement-screen__rate-ranges">
+                      {agreement.vaRateRanges.map((range) => (
+                        <p key={range}>{range}</p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <Button type="secondary" buttonText="View VA Details" />
+              </div>
+            )}
+          </ProfileCard>
+      </div>
+
+      <div className="client-agreement-screen__row">
+        <div className="client-agreement-screen__column">
           {agreement.week && (
             <ProfileCard header={<CardHeader icon="calendar" title="Work Hours Per Day" />}>
               <Week days={agreement.week} />
@@ -294,56 +344,7 @@ export const ClientAgreementScreen = ({
             </ProfileCard>
           )}
         </div>
-
-        <div className="client-agreement-screen__column">
-          <ProfileCard
-            leftBorder
-            className="client-agreement-screen__overflow-visible-card"
-            header={<CardHeader icon="clipboard-user" title={agreement.vaName} />}
-          >
-            <div className="client-agreement-screen__card-rows">
-              {viewerRole !== 'client' && <CardRow title="Rate:" value={`${agreement.vaHourlyRate}/hr`} />}
-              {viewerRole !== 'client' && (
-                <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
-              )}
-              {viewerRole !== 'client' && <CardRow title="Payment Method:" value={agreement.vaPaymentMethod} />}
-              <CardRow title="Email:" value={agreement.vaWorkEmail} />
-              <CardRow title="Phone Number:" value={agreement.vaPhoneNumber} />
-              {viewerRole === 'va' ? (
-                <>
-                  <CardRow title="Country Billing:" value={agreement.vaCountry} />
-                  <CardRow title="Country Citizenship:" value={agreement.vaCountry} />
-                  <CardRow title="Country Residence:" value={agreement.vaCountry} />
-                </>
-              ) : (
-                <CardRow title="Country Residence:" value={agreement.vaCountry} />
-              )}
-              <CardRow title="Telegram:" value={agreement.vaTelegramHandle} link />
-              {viewerRole === 'admin' && <CardRow title="HubSpot ID:" value={agreement.vaHubspotId} />}
-            </div>
-            {viewerRole !== 'client' && (
-              <div className="client-agreement-screen__va-actions">
-                <div className="client-agreement-screen__rate-ranges-anchor">
-                  <Button
-                    type="tertiary"
-                    size="small"
-                    rightIcon={vaRateRangesOpen ? 'chevron-up' : 'chevron-down'}
-                    buttonText="View VA Rate ranges"
-                    onClick={() => setVaRateRangesOpen((value) => !value)}
-                  />
-                  {vaRateRangesOpen && (
-                    <div className="client-agreement-screen__rate-ranges">
-                      {agreement.vaRateRanges.map((range) => (
-                        <p key={range}>{range}</p>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <Button type="secondary" buttonText="View VA Details" />
-              </div>
-            )}
-          </ProfileCard>
-        </div>
+        <div className="client-agreement-screen__column" />
       </div>
 
       <div className="client-agreement-screen__row">
