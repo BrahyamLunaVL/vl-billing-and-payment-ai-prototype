@@ -91,7 +91,12 @@ export const ClientAgreementScreen = ({
             <Chip label={AGREEMENT_STATUS_LABEL[agreement.status]} tone={AGREEMENT_STATUS_TONE[agreement.status]} />
           </div>
           {agreement.endDate && <p className="client-agreement-screen__meta">Ends on {agreement.endDate}</p>}
-          <p className="client-agreement-screen__meta">HubSpot ID: {agreement.hubspotId}</p>
+          {viewerRole !== 'va' && (
+            <p className="client-agreement-screen__meta">Next payment on {agreement.nextPaymentDate}</p>
+          )}
+          {viewerRole === 'admin' && (
+            <p className="client-agreement-screen__meta">HubSpot ID: {agreement.hubspotId}</p>
+          )}
         </div>
         <div className="client-agreement-screen__header-actions">
           <Button

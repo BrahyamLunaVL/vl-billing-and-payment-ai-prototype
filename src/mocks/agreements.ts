@@ -46,6 +46,8 @@ export interface Agreement {
   startDate: string;
   /** Bare end date, e.g. "6/1/2026". Omit for an ongoing agreement. */
   endDate?: string;
+  /** e.g. "9/13/2026" — shown in the client-facing Agreement header, Client/Admin only. */
+  nextPaymentDate: string;
   hubspotId: string;
   /** Omit for an inactive agreement with no ongoing schedule. */
   week?: WeekDayData[];
@@ -91,6 +93,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     billingType: 'Post Pay',
     dateStart: 'Date Start 2025-04-28',
     startDate: '4/28/2025',
+    nextPaymentDate: '9/13/2026',
     hubspotId: '44787728131',
     status: 'active',
     week: FULL_TIME_WEEK,
@@ -122,6 +125,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     dateEnd: 'Date End: 2025-01-24',
     startDate: '7/25/2024',
     endDate: '1/24/2025',
+    nextPaymentDate: '1/24/2025',
     hubspotId: '44787728132',
     status: 'inactive',
     settings: { ...DEFAULT_SETTINGS, autoApproveExtraHours: false },
