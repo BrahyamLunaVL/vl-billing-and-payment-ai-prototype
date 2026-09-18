@@ -104,6 +104,10 @@
   width: 100%;
 }
 
+.client-agreement-screen__rate-ranges-anchor > .button {
+  width: 100%;
+}
+
 .client-agreement-screen__rate-ranges {
   position: absolute;
   top: calc(100% + 4px);
