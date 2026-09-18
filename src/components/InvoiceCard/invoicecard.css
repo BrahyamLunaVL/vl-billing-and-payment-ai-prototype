@@ -22,7 +22,7 @@
 .invoice-card__row {
   display: flex;
   gap: 40px;
-  align-items: flex-start;
+  align-items: center;
   width: 100%;
 }
 
