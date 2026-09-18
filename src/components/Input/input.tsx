@@ -3,10 +3,23 @@ import type { InputHTMLAttributes } from 'react';
 import { Icon, type IconName, type IconVariant } from '../Icon';
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  /** Icon rendered at the start of the field, before the value/placeholder. */
+  /** Icon rendered at the start of the field, before the value/placeholder. Ignored when `onIncrement`/`onDecrement` are set. */
   leftIcon?: IconName;
   /** Variant of `leftIcon`. Defaults to 'bold'. */
   leftIconVariant?: IconVariant;
+  /**
+   * Turns the left side into a functional up/down stepper (e.g. for a
+   * numeric field) instead of a static `leftIcon`. Requires both handlers,
+   * plus `incrementLabel`/`decrementLabel` for accessibility. Also hides
+   * the browser's native `type="number"` spin buttons, since the stepper
+   * replaces them.
+   */
+  onIncrement?: () => void;
+  onDecrement?: () => void;
+  /** Accessible label for the stepper's increment button. */
+  incrementLabel?: string;
+  /** Accessible label for the stepper's decrement button. */
+  decrementLabel?: string;
   /** Icon rendered at the end of the field, after `rightText`. */
   rightIcon?: IconName;
   /** Variant of `rightIcon`. Defaults to 'bold'. */
@@ -41,6 +54,10 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 export const Input = ({
   leftIcon,
   leftIconVariant = 'bold',
+  onIncrement,
+  onDecrement,
+  incrementLabel,
+  decrementLabel,
   rightIcon,
   rightIconVariant = 'bold',
   onRightIconClick,
@@ -51,12 +68,14 @@ export const Input = ({
   className,
   ...rest
 }: InputProps) => {
-  const hasLeftContent = Boolean(leftIcon);
+  const hasStepper = Boolean(onIncrement && onDecrement);
+  const hasLeftContent = hasStepper || Boolean(leftIcon);
   const hasRightIcon = Boolean(rightIcon);
   const hasRightText = Boolean(rightText);
 
   const classNames = [
     'input',
+    hasStepper && 'input--stepper',
     error && 'input--error',
     disabled && 'input--disabled',
     className,
@@ -67,7 +86,30 @@ export const Input = ({
   return (
     <div className={classNames}>
       <div className="input__left">
-        {leftIcon && <Icon name={leftIcon} variant={leftIconVariant} size={16} className="input__icon" />}
+        {hasStepper ? (
+          <div className="input__stepper">
+            <button
+              type="button"
+              className="input__stepper-button"
+              onClick={onIncrement}
+              disabled={disabled}
+              aria-label={incrementLabel}
+            >
+              <Icon name="chevron-up" variant="bold" size={10} />
+            </button>
+            <button
+              type="button"
+              className="input__stepper-button"
+              onClick={onDecrement}
+              disabled={disabled}
+              aria-label={decrementLabel}
+            >
+              <Icon name="chevron-down" variant="bold" size={10} />
+            </button>
+          </div>
+        ) : (
+          leftIcon && <Icon name={leftIcon} variant={leftIconVariant} size={16} className="input__icon" />
+        )}
         {hasLeftContent && <span className="input__divider" />}
         <input className="input__field" disabled={disabled} {...rest} />
       </div>

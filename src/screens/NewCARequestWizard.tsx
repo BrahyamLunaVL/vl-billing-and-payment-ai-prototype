@@ -245,23 +245,25 @@ export const NewCARequestWizard = ({
           <div className="ca-wizard__row">
             <div className="ca-wizard__column ca-wizard__column--narrow">
               <ProfileCard>
-                <h3 className="ca-wizard__subheading">Request Approval for Extra Hours</h3>
-                <p className="ca-wizard__description">
-                  Fill out this section of the form if you&apos;d like to report any extra hours
-                  worked during the last {agreementSettings.reportBackWeeks} weeks, in order to
-                  receive the corresponding payment on your next invoice
-                </p>
-                <div className="ca-wizard__info-card ca-wizard__info-card--purple">
-                  <span>Current Invoice period from:</span>
-                  <strong>Aug 17 – 30, 2026</strong>
-                </div>
-                <div className="ca-wizard__info-card ca-wizard__info-card--purple">
-                  <span>Requesting for:</span>
-                  <strong>Bloominari dba Virtual Latinos</strong>
-                </div>
-                <div className="ca-wizard__info-card ca-wizard__info-card--orange">
-                  <strong>Your deadline is August 25 at 11:59 PM PT.</strong>
-                  <span>Once deadline is over, your changes will take effect on the next invoice period.</span>
+                <div className="ca-wizard__card-body">
+                  <h3 className="ca-wizard__subheading">Request Approval for Extra Hours</h3>
+                  <p className="ca-wizard__description">
+                    Fill out this section of the form if you&apos;d like to report any extra hours
+                    worked during the last {agreementSettings.reportBackWeeks} weeks, in order to
+                    receive the corresponding payment on your next invoice
+                  </p>
+                  <div className="ca-wizard__info-card ca-wizard__info-card--purple">
+                    <span>Current Invoice period from:</span>
+                    <strong>Aug 17 – 30, 2026</strong>
+                  </div>
+                  <div className="ca-wizard__info-card ca-wizard__info-card--purple">
+                    <span>Requesting for:</span>
+                    <strong>Bloominari dba Virtual Latinos</strong>
+                  </div>
+                  <div className="ca-wizard__info-card ca-wizard__info-card--orange">
+                    <strong>Your deadline is August 25 at 11:59 PM PT.</strong>
+                    <span>Once deadline is over, your changes will take effect on the next invoice period.</span>
+                  </div>
                 </div>
               </ProfileCard>
             </div>
@@ -301,7 +303,7 @@ export const NewCARequestWizard = ({
                         label="Specific dates that you worked extra hours"
                         description={`Select the dates you worked extra hours in the last ${agreementSettings.reportBackWeeks} weeks. Only past dates are eligible.`}
                       >
-                        <Input placeholder="mm/dd/yyyy" rightIcon="calendar" readOnly value="" />
+                        {null}
                       </FormField>
                       <Calendar
                         selectedDates={selectedDates}
@@ -345,7 +347,6 @@ export const NewCARequestWizard = ({
                                   type="number"
                                   min={0}
                                   max={DAILY_MAX_HOURS}
-                                  leftIcon="angles-up-down"
                                   rightText="Hrs"
                                   value={hoursByDate[date] ?? 0}
                                   onChange={(event) =>
@@ -354,6 +355,20 @@ export const NewCARequestWizard = ({
                                       [date]: Math.min(DAILY_MAX_HOURS, Math.max(0, Number(event.target.value))),
                                     }))
                                   }
+                                  onIncrement={() =>
+                                    setHoursByDate((prev) => ({
+                                      ...prev,
+                                      [date]: Math.min(DAILY_MAX_HOURS, (prev[date] ?? 0) + 1),
+                                    }))
+                                  }
+                                  onDecrement={() =>
+                                    setHoursByDate((prev) => ({
+                                      ...prev,
+                                      [date]: Math.max(0, (prev[date] ?? 0) - 1),
+                                    }))
+                                  }
+                                  incrementLabel={`Increase hours for ${formatFullDate(date)}`}
+                                  decrementLabel={`Decrease hours for ${formatFullDate(date)}`}
                                 />
                               </FormField>
                             ))}
@@ -365,13 +380,19 @@ export const NewCARequestWizard = ({
                 </div>
 
                 <div className="ca-wizard__totals">
-                  <div className="ca-wizard__totals-row">
-                    <span>Total extra hours worked</span>
-                    <strong>{totalHours} Hours</strong>
-                  </div>
-                  <div className="ca-wizard__totals-row">
-                    <span>Total amount of money you will receive</span>
-                    <strong>${totalAmount.toFixed(2)} USD</strong>
+                  <div className="ca-wizard__totals-columns">
+                    <div className="ca-wizard__totals-column">
+                      <span className="ca-wizard__totals-label">Total extra hours worked</span>
+                      <p className="ca-wizard__totals-value">
+                        {totalHours} <span>Hours</span>
+                      </p>
+                    </div>
+                    <div className="ca-wizard__totals-column">
+                      <span className="ca-wizard__totals-label">Total amount of money you will receive</span>
+                      <p className="ca-wizard__totals-value">
+                        ${totalAmount.toFixed(2)} <span>USD</span>
+                      </p>
+                    </div>
                   </div>
                   <p className="ca-wizard__totals-caption">
                     Calculated from number of dates and hours you worked extra hours.

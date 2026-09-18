@@ -117,8 +117,15 @@
 
 .ca-wizard__actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 12px;
+  width: 100%;
+}
+
+.ca-wizard__card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   width: 100%;
 }
 
@@ -171,6 +178,10 @@
   gap: 12px;
 }
 
+.ca-wizard__calendar-column .form-field__label {
+  white-space: normal;
+}
+
 .ca-wizard__hours-column {
   display: flex;
   flex: 1 1 0;
@@ -221,13 +232,35 @@
   background: #f6f6f7;
 }
 
-.ca-wizard__totals-row {
+.ca-wizard__totals-columns {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.ca-wizard__totals-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ca-wizard__totals-label {
   font-size: 14px;
+  font-weight: 700;
   color: #263238;
+}
+
+.ca-wizard__totals-value {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #c32059;
+}
+
+.ca-wizard__totals-value span {
+  font-size: 14px;
+  font-weight: 400;
+  color: #7a7a7a;
 }
 
 .ca-wizard__totals-caption {

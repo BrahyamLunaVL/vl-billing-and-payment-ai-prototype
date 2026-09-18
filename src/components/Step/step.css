@@ -18,7 +18,7 @@
   height: 60px;
   padding: 10px 40px;
   border: none;
-  background: var(--step-color-white);
+  background: var(--step-color-gray-400);
   clip-path: polygon(
     0 0,
     calc(100% - var(--step-chevron-depth)) 0,
@@ -26,9 +26,6 @@
     calc(100% - var(--step-chevron-depth)) 100%,
     0 100%
   );
-  /* clip-path can't take a stroke, so the shape's outline is faked with a
-     couple of zero-offset drop-shadows tracing its clipped silhouette. */
-  filter: drop-shadow(0 0 1px var(--step-color-gray-400)) drop-shadow(0 0 1px var(--step-color-gray-400));
   font-family: 'Roboto', sans-serif;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -47,6 +44,43 @@
 }
 
 .step--right {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, var(--step-chevron-depth) 50%);
+}
+
+/* clip-path can't take a stroke, so the shape's outline is faked by making
+   the button's own background the border color, then covering everything
+   but a 1px rim with a same-shape white fill. z-index: -1 here doesn't hide
+   this fill behind .step's own background (negative-z descendants paint in
+   front of the stacking context they escape into) — it only needs to stay
+   behind the circle/title content, which it reliably does. */
+.step::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  background: var(--step-color-white);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--step-chevron-depth)) 0,
+    100% 50%,
+    calc(100% - var(--step-chevron-depth)) 100%,
+    0 100%
+  );
+}
+
+.step--middle::before,
+.step--right::before {
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--step-chevron-depth)) 0,
+    100% 50%,
+    calc(100% - var(--step-chevron-depth)) 100%,
+    0 100%,
+    var(--step-chevron-depth) 50%
+  );
+}
+
+.step--right::before {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, var(--step-chevron-depth) 50%);
 }
 

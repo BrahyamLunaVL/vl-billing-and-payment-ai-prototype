@@ -95,6 +95,43 @@
   cursor: not-allowed;
 }
 
+.input__stepper {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 2px;
+}
+
+.input__stepper-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: var(--input-color-gray-400);
+  cursor: pointer;
+}
+
+.input__stepper-button:hover:not(:disabled) {
+  color: var(--input-color-brand-black);
+}
+
+.input__stepper-button:disabled {
+  cursor: not-allowed;
+}
+
+.input--stepper .input__field[type='number']::-webkit-outer-spin-button,
+.input--stepper .input__field[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input--stepper .input__field[type='number'] {
+  -moz-appearance: textfield;
+}
+
 .input__field {
   flex: 1 1 0;
   min-width: 0;

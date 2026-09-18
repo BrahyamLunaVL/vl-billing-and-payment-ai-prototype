@@ -331,7 +331,12 @@ export const CreatingAnExtraHoursRequest: Story = {
 
     await expect(canvas.queryByText('No days selected')).not.toBeInTheDocument();
     await expect(await canvas.findByText('Extra Hours Worked')).toBeVisible();
-    await expect(canvas.getByText('1 Hours')).toBeVisible(); // total starts at the new day's default 1 hour
+    // The total's number and unit are separate nodes (number in brand color,
+    // unit in gray), so match on the containing element's full text instead
+    // of a single text node. Total starts at the new day's default 1 hour.
+    await expect(
+      canvas.getByText((_, element) => element?.textContent === '1 Hours' && element?.tagName === 'P'),
+    ).toBeVisible();
 
     // Typing directly into that day's hour input (clamped to the 12/day
     // cap) updates the totals below.
@@ -339,7 +344,9 @@ export const CreatingAnExtraHoursRequest: Story = {
     if (!hourInput) throw new globalThis.Error('Expected the day hour input to render');
     await userEvent.clear(hourInput);
     await userEvent.type(hourInput, '12');
-    await expect(await canvas.findByText('12 Hours')).toBeVisible();
+    await expect(
+      await canvas.findByText((_, element) => element?.textContent === '12 Hours' && element?.tagName === 'P'),
+    ).toBeVisible();
   },
 };
 
