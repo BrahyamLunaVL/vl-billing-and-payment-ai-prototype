@@ -83,14 +83,14 @@
   box-sizing: border-box;
   width: 100%;
   gap: var(--button-gap-xs);
-  padding: var(--button-padding-xs) var(--button-padding-sm);
+  padding: var(--button-padding-xs) calc(var(--button-padding-sm) + 8px);
   border: 1px solid transparent;
   border-radius: var(--button-radius-md);
   transition: border-color var(--button-transition-duration) ease;
 }
 
 .button--small .button__inner {
-  padding: var(--button-padding-3xs) var(--button-padding-sm);
+  padding: var(--button-padding-3xs) calc(var(--button-padding-sm) + 8px);
 }
 
 .button__icon {
