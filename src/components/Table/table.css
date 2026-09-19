@@ -45,8 +45,13 @@
   align-items: center;
   gap: 8px;
   min-height: 54px;
-  padding: 12px 20px;
+  /* 10px (not the usual 12px) so a "small" Button in the Actions column
+     (34px tall) plus this padding lands exactly on Figma's fixed 54px row. */
+  padding: 10px 20px;
   font-size: 14px;
+  /* Without this, plain text here inherits the page's much larger root
+     line-height unscaled, growing rows past Figma's fixed 54px. */
+  line-height: 1.2;
   color: var(--table-color-black);
 }
 
@@ -81,14 +86,38 @@ button.table__cell--header:disabled {
 }
 
 .table__checkbox {
+  /* The native OS checkbox rendering ignores author border/border-radius
+     entirely — appearance: none is required for those to actually apply.
+     That also drops the native checkmark glyph, so the checked state below
+     draws its own via ::after instead of relying on accent-color. */
+  appearance: none;
+  -webkit-appearance: none;
   box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 18px;
   height: 18px;
   margin: 0;
   border: 1px solid var(--table-color-gray-300);
   border-radius: 4px;
-  accent-color: var(--table-color-brand-primary);
+  background: var(--table-color-white);
   cursor: pointer;
+}
+
+.table__checkbox:checked {
+  background: var(--table-color-brand-primary);
+  border-color: var(--table-color-brand-primary);
+}
+
+.table__checkbox:checked::after {
+  content: '';
+  width: 4px;
+  height: 8px;
+  margin-bottom: 2px;
+  border: solid var(--table-color-white);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .table__checkbox:disabled {

@@ -198,8 +198,16 @@ export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientC
       )}
 
       <div className="client-ca-screen__filters">
-        <Input placeholder="Filter by Date" rightIcon="calendar" readOnly value="" style={{ width: '200px' }} />
-        <Button type="secondary" buttonText="Filters" />
+        <Input
+          placeholder="Filter by Date"
+          leftIcon="calendar"
+          leftIconVariant="regular"
+          rightIcon="chevron-down"
+          readOnly
+          value=""
+          style={{ width: '200px' }}
+        />
+        <Button type="secondary" leftIcon="bars-filter" buttonText="Filters" />
         <Button type="tertiary" buttonText="Reset Filters" disabled />
       </div>
 
