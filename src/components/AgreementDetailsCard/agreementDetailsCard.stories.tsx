@@ -34,7 +34,7 @@ export const Terminated: Story = {
 export const ClickingActionsInvokesHandlers: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name: 'Edit Agreement' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'View Agreement' }));
     await expect(args.onEditAgreement).toHaveBeenCalledTimes(1);
 
     await userEvent.click(canvas.getByRole('button', { name: 'Request Changes' }));

@@ -6,12 +6,14 @@ import { ClientAgreementsListScreen } from './ClientAgreementsListScreen'
 import { ClientAgreementScreen } from './ClientAgreementScreen'
 import { ClientInvoiceScreen } from './ClientInvoiceScreen'
 import { ClientChangesApprovalsScreen } from './ClientChangesApprovalsScreen'
+import { ClientNewCARequestScreen } from './ClientNewCARequestScreen'
+import { getAgreementById } from '../services/clientAccount'
 
 export interface ClientAppProps {
   user: AuthenticatedUser
 }
 
-type ClientPage = 'my-account' | 'agreements' | 'agreement' | 'client-invoice' | 'changes-approvals-form'
+type ClientPage = 'my-account' | 'agreements' | 'agreement' | 'ca-wizard' | 'client-invoice' | 'changes-approvals-form'
 
 /** Owns which Client page is showing and drives the shared Sidebar's selection to match. */
 export const ClientApp = ({ user }: ClientAppProps) => {
@@ -40,10 +42,13 @@ export const ClientApp = ({ user }: ClientAppProps) => {
     setPage(agreementOrigin)
   }
 
-  const handleRequestChangesFromAgreement = () => {
+  const handleRequestChangesForAgreement = (agreementId: string) => {
+    setSelectedAgreementId(agreementId)
     setSelectedSidebarItem('changes-approvals-form')
-    setPage('changes-approvals-form')
+    setPage('ca-wizard')
   }
+
+  const selectedAgreement = selectedAgreementId ? getAgreementById(selectedAgreementId) : undefined
 
   return (
     <ClientAppShell user={user} selectedSidebarItem={selectedSidebarItem} onSelectSidebarItem={handleSelectSidebarItem}>
@@ -51,14 +56,14 @@ export const ClientApp = ({ user }: ClientAppProps) => {
         <ClientMyAccountScreen
           user={user}
           onEditAgreement={handleViewAgreement}
-          onRequestChanges={handleViewAgreement}
+          onRequestChanges={handleRequestChangesForAgreement}
         />
       )}
       {page === 'agreements' && (
         <ClientAgreementsListScreen
           user={user}
           onEditAgreement={handleViewAgreement}
-          onRequestChanges={handleViewAgreement}
+          onRequestChanges={handleRequestChangesForAgreement}
         />
       )}
       {page === 'agreement' && selectedAgreementId && (
@@ -66,8 +71,11 @@ export const ClientApp = ({ user }: ClientAppProps) => {
           user={user}
           agreementId={selectedAgreementId}
           onBack={handleBackFromAgreement}
-          onRequestChanges={handleRequestChangesFromAgreement}
+          onRequestChanges={() => handleRequestChangesForAgreement(selectedAgreementId)}
         />
+      )}
+      {page === 'ca-wizard' && selectedAgreement && (
+        <ClientNewCARequestScreen agreement={selectedAgreement} onCancel={() => setPage('agreement')} />
       )}
       {page === 'client-invoice' && <ClientInvoiceScreen user={user} />}
       {page === 'changes-approvals-form' && <ClientChangesApprovalsScreen user={user} />}

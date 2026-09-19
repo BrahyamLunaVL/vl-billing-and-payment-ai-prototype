@@ -19,7 +19,7 @@ export interface AgreementDetailsCardProps {
   vaAka: string;
   onEditAgreement?: () => void;
   onRequestChanges?: () => void;
-  /** When true (the client's dedicated Agreements list page), "Request Changes" moves down next to the VA row instead of sitting beside "Edit Agreement" in the header (My Account's own layout). */
+  /** When true (the client's dedicated Agreements list page), "Request Changes" moves down next to the VA row instead of sitting beside "View Agreement" in the header (My Account's own layout). */
   splitActions?: boolean;
   className?: string;
 }
@@ -27,7 +27,7 @@ export interface AgreementDetailsCardProps {
 /**
  * A client's agreement summary (Figma's "Agreement Details Card") — the
  * wide, two-tier card shown in the client's My Account agreements list:
- * a header row with the agreement title/status and Edit/Request Changes
+ * a header row with the agreement title/status and View/Request Changes
  * actions, then a shaded details row with schedule facts plus the VA's
  * name/hired status/Telegram/country/AKA. Unlike `AgreementCard` (the VA's
  * own compact view of their agreement), this is the client's wider,
@@ -63,7 +63,7 @@ export const AgreementDetailsCard = ({
           <Button
             type="tertiary"
             size="small"
-            buttonText="Edit Agreement"
+            buttonText="View Agreement"
             onClick={onEditAgreement}
             style={{ width: '150px' }}
           />

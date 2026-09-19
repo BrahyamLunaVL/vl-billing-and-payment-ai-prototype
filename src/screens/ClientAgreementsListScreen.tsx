@@ -15,7 +15,7 @@ export interface ClientAgreementsListScreenProps {
  * Agreements"), reached from the sidebar's "Agreements & Work Hrs" item —
  * the same agreement cards shown inline on My Account, but full-page and
  * with "Request Changes" split down next to the VA row instead of sitting
- * beside "Edit Agreement".
+ * beside "View Agreement".
  */
 export const ClientAgreementsListScreen = ({
   user,

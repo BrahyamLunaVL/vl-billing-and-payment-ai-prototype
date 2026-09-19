@@ -67,6 +67,10 @@ export const ClientAgreementScreen = ({
     setAgreement(getAgreementById(agreementId))
   }
 
+  // Clients can see their Agreement Settings but not change them — only
+  // Admin can edit these on the client's behalf.
+  const readOnly = viewerRole === 'client'
+
   const handleToggleAutoApproveChanges = (checked: boolean) => {
     setDraftSettings((prev) =>
       prev && { ...prev, autoApproveChanges: checked, notifyOverThreshold: checked ? prev.notifyOverThreshold : false },
@@ -237,13 +241,14 @@ export const ClientAgreementScreen = ({
                     <SwitchRow
                       label="Auto-Approval of Change Requests initiated by VA"
                       checked={draftSettings.autoApproveChanges}
+                      disabled={readOnly}
                       onChange={handleToggleAutoApproveChanges}
                     />
                     <SwitchRow
                       label="Notification Alerts for Requests over the threshold"
                       description="Checkable only when auto-approval is checked."
                       checked={draftSettings.notifyOverThreshold}
-                      disabled={!draftSettings.autoApproveChanges}
+                      disabled={readOnly || !draftSettings.autoApproveChanges}
                       onChange={(checked) => setDraftSettings((prev) => prev && { ...prev, notifyOverThreshold: checked })}
                     />
                     <FormField
@@ -255,16 +260,18 @@ export const ClientAgreementScreen = ({
                         min={0}
                         leftIcon="dollar-sign"
                         rightText="USD"
-                        disabled={!draftSettings.notifyOverThreshold}
+                        disabled={readOnly || !draftSettings.notifyOverThreshold}
                         value={draftSettings.overThresholdAmount}
                         onChange={(event) =>
                           setDraftSettings((prev) => prev && { ...prev, overThresholdAmount: Number(event.target.value) })
                         }
                       />
                     </FormField>
-                    <div className="client-agreement-screen__save-row">
-                      <Button buttonText="Save" onClick={handleSaveSettings} style={{ width: '200px' }} />
-                    </div>
+                    {!readOnly && (
+                      <div className="client-agreement-screen__save-row">
+                        <Button buttonText="Save" onClick={handleSaveSettings} style={{ width: '200px' }} />
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -292,6 +299,7 @@ export const ClientAgreementScreen = ({
                       label="Auto-Approval for Extra Hours Requests by VA"
                       description="When button is off, all extra hours require your manual approval."
                       checked={draftSettings.autoApproveExtraHours}
+                      disabled={readOnly}
                       onChange={(checked) => setDraftSettings((prev) => prev && { ...prev, autoApproveExtraHours: checked })}
                     />
                     <FormField
@@ -303,7 +311,7 @@ export const ClientAgreementScreen = ({
                         min={0}
                         max={MAX_PRE_APPROVED_HOURS_PER_WEEK}
                         rightText="Hours"
-                        disabled={!draftSettings.autoApproveExtraHours}
+                        disabled={readOnly || !draftSettings.autoApproveExtraHours}
                         value={draftSettings.preApprovedHoursPerWeek}
                         onChange={(event) =>
                           setDraftSettings(
@@ -326,7 +334,7 @@ export const ClientAgreementScreen = ({
                       <Select
                         options={REPORT_BACK_WEEK_OPTIONS}
                         value={String(draftSettings.reportBackWeeks)}
-                        disabled={!draftSettings.autoApproveExtraHours}
+                        disabled={readOnly || !draftSettings.autoApproveExtraHours}
                         onChange={(value) =>
                           setDraftSettings((prev) => prev && { ...prev, reportBackWeeks: Number(value) })
                         }
@@ -340,13 +348,16 @@ export const ClientAgreementScreen = ({
                         </>
                       }
                       checked={draftSettings.emailOnPreApprovedExtraHours}
+                      disabled={readOnly}
                       onChange={(event) =>
                         setDraftSettings((prev) => prev && { ...prev, emailOnPreApprovedExtraHours: event.target.checked })
                       }
                     />
-                    <div className="client-agreement-screen__save-row">
-                      <Button buttonText="Save" onClick={handleSaveSettings} style={{ width: '200px' }} />
-                    </div>
+                    {!readOnly && (
+                      <div className="client-agreement-screen__save-row">
+                        <Button buttonText="Save" onClick={handleSaveSettings} style={{ width: '200px' }} />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
