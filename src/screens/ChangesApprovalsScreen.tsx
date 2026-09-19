@@ -13,6 +13,8 @@ import './ChangesApprovalsScreen.css'
 
 export interface ChangesApprovalsScreenProps {
   user: AuthenticatedUser
+  /** Skips the request list and opens the "New Request" wizard directly, e.g. from the Agreement screen's "Request Changes" button. */
+  openWizard?: boolean
 }
 
 interface RequestAccordionCardProps {
@@ -78,9 +80,9 @@ function RequestAccordionCard({ request, expanded, onToggle }: RequestAccordionC
 }
 
 /** Figma's "Changes & Approvals Form" — the list of past requests plus the "New Request" wizard. */
-export const ChangesApprovalsScreen = ({ user }: ChangesApprovalsScreenProps) => {
+export const ChangesApprovalsScreen = ({ user, openWizard = false }: ChangesApprovalsScreenProps) => {
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [showWizard, setShowWizard] = useState(false)
+  const [showWizard, setShowWizard] = useState(openWizard)
 
   const requests = getCARequestsForVA(user.email)
   const activeAgreement = getAgreementsForVA(user.email).find((agreement) => agreement.status === 'active')

@@ -18,11 +18,16 @@ export const VAApp = ({ user }: VAAppProps) => {
   const [selectedSidebarItem, setSelectedSidebarItem] = useState('my-account')
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
   const [selectedAgreementId, setSelectedAgreementId] = useState<string | null>(null)
+  /** Skips the Changes & Approvals list and opens the "New Request" wizard directly — set by the Agreement screen's "Request Changes" button. */
+  const [openWizardDirectly, setOpenWizardDirectly] = useState(false)
 
   const handleSelectSidebarItem = (key: string) => {
     setSelectedSidebarItem(key)
     if (key === 'my-account') setPage('my-account')
-    else if (key === 'changes-approvals-form') setPage('changes-approvals')
+    else if (key === 'changes-approvals-form') {
+      setOpenWizardDirectly(false)
+      setPage('changes-approvals')
+    }
   }
 
   const handleViewInvoice = (invoiceId: string) => {
@@ -43,6 +48,7 @@ export const VAApp = ({ user }: VAAppProps) => {
 
   const handleRequestChanges = () => {
     setSelectedSidebarItem('changes-approvals-form')
+    setOpenWizardDirectly(true)
     setPage('changes-approvals')
   }
 
@@ -51,7 +57,7 @@ export const VAApp = ({ user }: VAAppProps) => {
       {page === 'my-account' && (
         <MyAccountScreen user={user} onViewInvoice={handleViewInvoice} onViewAgreement={handleViewAgreement} />
       )}
-      {page === 'changes-approvals' && <ChangesApprovalsScreen user={user} />}
+      {page === 'changes-approvals' && <ChangesApprovalsScreen user={user} openWizard={openWizardDirectly} />}
       {page === 'invoice-preview' && selectedInvoiceId && (
         <InvoicePreviewScreen invoiceId={selectedInvoiceId} onBack={handleBackToMyAccount} />
       )}
