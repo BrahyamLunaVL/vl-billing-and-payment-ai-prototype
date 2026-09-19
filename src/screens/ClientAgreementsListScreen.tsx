@@ -13,9 +13,7 @@ export interface ClientAgreementsListScreenProps {
 /**
  * The client's dedicated "Client Agreements" list (Figma's "Client -
  * Agreements"), reached from the sidebar's "Agreements & Work Hrs" item —
- * the same agreement cards shown inline on My Account, but full-page and
- * with "Request Changes" split down next to the VA row instead of sitting
- * beside "View Agreement".
+ * the same agreement cards, same layout, shown inline on My Account.
  */
 export const ClientAgreementsListScreen = ({
   user,
@@ -45,7 +43,6 @@ export const ClientAgreementsListScreen = ({
             vaTelegramHandle={agreement.vaTelegramHandle}
             vaCountry={agreement.vaCountry}
             vaAka={agreement.vaAka}
-            splitActions
             onEditAgreement={() => onEditAgreement(agreement.id)}
             onRequestChanges={() => onRequestChanges(agreement.id)}
           />
