@@ -171,10 +171,9 @@ export const NewCARequestWizard = ({
         <Step
           step={3}
           title="Comments"
-          position="middle"
+          position="right"
           status={step === 3 ? 'selected' : step > 3 ? 'completed' : 'default'}
         />
-        <Step step={4} title="Preview" position="right" status={step === 4 ? 'selected' : 'default'} />
       </StepsNavigation>
 
       {showOnBehalfOf && step > 1 && (
