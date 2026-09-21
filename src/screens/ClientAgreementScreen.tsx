@@ -27,10 +27,10 @@ export interface ClientAgreementScreenProps {
   onRequestChanges?: () => void
 }
 
-const REPORT_BACK_WEEK_OPTIONS = Array.from({ length: 16 }, (_, index) => {
-  const weeks = index + 1
-  return { value: String(weeks), label: `${weeks} week${weeks === 1 ? '' : 's'}` }
-})
+const REPORT_BACK_WEEK_OPTIONS = [4, 8, 12].map((weeks) => ({
+  value: String(weeks),
+  label: `${weeks} weeks`,
+}))
 
 const MAX_PRE_APPROVED_HOURS_PER_WEEK = 60
 
