@@ -90,3 +90,7 @@
   max-height: 312px;
   overflow-y: auto;
 }
+
+.my-account-screen__invoices-title {
+  margin: 0;
+}

@@ -9,11 +9,13 @@ export interface VAInvoicesPanelProps {
 }
 
 /**
- * The VA's "Virtual Latinos Invoices" section (Figma's My Account — Invoice
- * Preview state): the Invoice Preview/Approved/Pending/... tabs and the
- * grouped `InvoiceCard` breakdown. Shared between My Account's own Invoices
- * section and the full-page Invoices screen — same data, same behavior,
- * just embedded in a different page around it.
+ * The Invoice Preview/Approved/Pending/... tabs and the grouped
+ * `InvoiceCard` breakdown (Figma's My Account — Invoice Preview state).
+ * Shared between My Account's own Invoices section and the full-page
+ * Invoices screen — same data, same behavior, just embedded in a different
+ * page around it. Doesn't render its own heading — each caller owns
+ * whatever title fits its page (My Account's "Virtual Latinos Invoices",
+ * the standalone page's own "Invoices" title, or none at all).
  */
 export const VAInvoicesPanel = ({ userEmail, onViewInvoice }: VAInvoicesPanelProps) => {
   const [selectedTab, setSelectedTab] = useState('preview')
@@ -30,7 +32,6 @@ export const VAInvoicesPanel = ({ userEmail, onViewInvoice }: VAInvoicesPanelPro
 
   return (
     <>
-      <h2 className="va-invoices-panel__title">Virtual Latinos Invoices</h2>
       <TabBar tabs={invoiceTabs} selectedKey={selectedTab} onSelectTab={setSelectedTab} />
 
       {selectedTab === 'preview' ? (

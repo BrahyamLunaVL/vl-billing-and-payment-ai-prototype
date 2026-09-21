@@ -148,6 +148,9 @@ export const MyAccountScreen = ({ user, onViewInvoice, onViewAgreement }: MyAcco
             </div>
           </div>
 
+          <h2 className="my-account-screen__section-title my-account-screen__invoices-title">
+            Virtual Latinos Invoices
+          </h2>
           <VAInvoicesPanel userEmail={user.email} onViewInvoice={onViewInvoice} />
         </>
       )}
