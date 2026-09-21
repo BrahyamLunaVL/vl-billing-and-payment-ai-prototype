@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, waitFor } from 'storybook/test';
+import { expect, screen, waitFor } from 'storybook/test';
 import App from './App';
 import { resetLoginRateLimit, resetMockUsers } from './services/auth';
 import {
@@ -165,9 +165,12 @@ export const AdminOpeningAnAgreementAndRequestingChanges: Story = {
     await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
 
     // Admin reaches an agreement's detail screen through the table's
-    // per-row "Select Action" menu, not a direct row click.
+    // per-row "Select Action" menu, not a direct row click. The menu itself
+    // is portaled to document.body (so it isn't clipped by the table's own
+    // overflow: hidden), so it's outside canvasElement — query it via the
+    // global `screen` instead of `canvas`.
     await userEvent.click((await canvas.findAllByRole('button', { name: /select action/i }))[0]);
-    await userEvent.click(await canvas.findByRole('option', { name: /^view$/i }));
+    await userEvent.click(await screen.findByRole('option', { name: /^view$/i }));
 
     await expect(await canvas.findByText('LTM Innovation - Elena Ruiz (40 Hours)')).toBeVisible();
     await expect(canvas.getByRole('button', { name: /view client details/i })).toBeVisible();

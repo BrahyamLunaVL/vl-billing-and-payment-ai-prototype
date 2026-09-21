@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Table, type TableColumn, Chip, Button, Input, TabBar, Dropdown, DropdownOption } from '../components'
 import { getAllAgreements, type ClientAgreementView } from '../services/clientAccount'
 import { AGREEMENT_STATUS_LABEL, AGREEMENT_STATUS_TONE } from '../services/vaAccount'
@@ -19,19 +20,53 @@ interface AgreementActionsMenuProps {
   onView: () => void
 }
 
-/** The per-row "Select Action" dropdown (Figma's "Admin - Agreements - All Agreements - Actions"): View, plus decorative Edit/Request for Changes since neither has a designed destination of its own yet. */
+/**
+ * The per-row "Select Action" dropdown (Figma's "Admin - Agreements - All
+ * Agreements - Actions"): View, plus decorative Edit/Request for Changes
+ * since neither has a designed destination of its own yet.
+ *
+ * The menu itself is portaled to `document.body` and positioned with
+ * `position: fixed` from the trigger's own `getBoundingClientRect()`,
+ * rather than living inside the table's DOM — the table scrolls both axes
+ * (`overflow: hidden` / `overflow-x: auto`), which clips anything
+ * `position: absolute` that extends past its bounds, no matter the
+ * z-index. That's exactly what happens for a short table or a dropdown
+ * opened from one of the last rows.
+ */
 function AgreementActionsMenu({ onView }: AgreementActionsMenuProps) {
   const [open, setOpen] = useState(false)
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!open) return
     const handlePointerDown = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) setOpen(false)
+      const target = event.target as Node
+      const inTrigger = containerRef.current?.contains(target)
+      const inMenu = menuRef.current?.contains(target)
+      if (!inTrigger && !inMenu) setOpen(false)
     }
     document.addEventListener('mousedown', handlePointerDown)
     return () => document.removeEventListener('mousedown', handlePointerDown)
   }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    // The menu's fixed position is only computed once, on open — rather
+    // than track it, just close on any scroll so it never goes stale.
+    const handleScroll = () => setOpen(false)
+    window.addEventListener('scroll', handleScroll, true)
+    return () => window.removeEventListener('scroll', handleScroll, true)
+  }, [open])
+
+  const handleToggle = () => {
+    if (!open && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect()
+      setMenuPosition({ top: rect.bottom + 4, left: rect.left })
+    }
+    setOpen((value) => !value)
+  }
 
   return (
     <div className="admin-agreements-list-screen__actions-menu" ref={containerRef}>
@@ -40,25 +75,32 @@ function AgreementActionsMenu({ onView }: AgreementActionsMenuProps) {
         size="small"
         rightIcon="chevron-down"
         buttonText="Select Action"
-        onClick={() => setOpen((value) => !value)}
+        onClick={handleToggle}
         style={{ width: 'auto' }}
       />
-      {open && (
-        <div className="admin-agreements-list-screen__dropdown-wrapper">
-          <Dropdown>
-            <DropdownOption
-              text="View"
-              leftIcon="eye"
-              onClick={() => {
-                setOpen(false)
-                onView()
-              }}
-            />
-            <DropdownOption text="Edit" leftIcon="pencil" onClick={() => setOpen(false)} />
-            <DropdownOption text="Request for Changes" leftIcon="pen-to-square" onClick={() => setOpen(false)} />
-          </Dropdown>
-        </div>
-      )}
+      {open &&
+        menuPosition &&
+        createPortal(
+          <div
+            ref={menuRef}
+            className="admin-agreements-list-screen__dropdown-wrapper"
+            style={{ top: menuPosition.top, left: menuPosition.left }}
+          >
+            <Dropdown>
+              <DropdownOption
+                text="View"
+                leftIcon="eye"
+                onClick={() => {
+                  setOpen(false)
+                  onView()
+                }}
+              />
+              <DropdownOption text="Edit" leftIcon="pencil" onClick={() => setOpen(false)} />
+              <DropdownOption text="Request for Changes" leftIcon="pen-to-square" onClick={() => setOpen(false)} />
+            </Dropdown>
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }

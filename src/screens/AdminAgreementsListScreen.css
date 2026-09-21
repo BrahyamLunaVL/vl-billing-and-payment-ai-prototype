@@ -35,9 +35,10 @@
 }
 
 .admin-agreements-list-screen__dropdown-wrapper {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
+  /* Portaled to document.body and positioned from the trigger's own
+     getBoundingClientRect() (see AgreementActionsMenu) — position: fixed
+     here, not absolute, since it's no longer nested inside the table. */
+  position: fixed;
   width: 220px;
-  z-index: 20;
+  z-index: 1000;
 }
