@@ -212,13 +212,19 @@ export const ClientAgreementScreen = ({
           )}
 
           {viewerRole !== 'va' && (
-            <ProfileCard header={<h2 className="client-agreement-screen__card-title">Agreement Settings</h2>}>
-              <p className="client-agreement-screen__settings-description">
-                Auto-approval of Request Changes and Auto-approval of Extra Hours are independent
-                settings — turning one on or off does not affect the other. Request Changes covers
-                changes to the agreement itself (hours, rate, etc.), while Extra Hours covers
-                one-off hours worked beyond the regular schedule.
-              </p>
+            <ProfileCard
+              header={
+                <div className="client-agreement-screen__settings-header">
+                  <h2 className="client-agreement-screen__card-title">Agreement Settings</h2>
+                  <p className="client-agreement-screen__settings-description">
+                    Auto-approval of Request Changes and Auto-approval of Extra Hours are
+                    independent settings — turning one on or off does not affect the other.
+                    Request Changes covers changes to the agreement itself (hours, rate, etc.),
+                    while Extra Hours covers one-off hours worked beyond the regular schedule.
+                  </p>
+                </div>
+              }
+            >
               <div className="client-agreement-screen__accordion">
                 <button
                   type="button"
