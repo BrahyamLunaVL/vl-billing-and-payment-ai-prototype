@@ -138,8 +138,10 @@ button.table__cell--header:disabled {
 
 .table__pagination-left {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 12px;
+  white-space: nowrap;
 }
 
 .table__pagination-divider {
@@ -158,8 +160,10 @@ button.table__cell--header:disabled {
 
 .table__pagination-right {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 12px;
+  white-space: nowrap;
 }
 
 .table__page-nav {
