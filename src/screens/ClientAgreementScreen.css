@@ -97,6 +97,12 @@
   color: #263238;
 }
 
+.client-agreement-screen__settings-description {
+  margin: 0;
+  font-size: 14px;
+  color: #7a7a7a;
+}
+
 .client-agreement-screen__card-rows {
   display: flex;
   flex-direction: column;
