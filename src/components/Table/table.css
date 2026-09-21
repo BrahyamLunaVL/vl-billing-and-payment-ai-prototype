@@ -34,6 +34,13 @@
 }
 
 .table__row--header {
+  /* .table__scroll can end up height-constrained (a short viewport, a
+     small table in a tight layout), giving it its own vertical scrollbar
+     alongside its horizontal one — without this, the header row is just
+     a normal sibling of the data rows and scrolls away with them. */
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background: var(--table-color-brand-secondary);
   border-bottom: none;
 }
