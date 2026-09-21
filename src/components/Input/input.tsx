@@ -66,6 +66,7 @@ export const Input = ({
   error = false,
   disabled,
   className,
+  style,
   ...rest
 }: InputProps) => {
   const hasStepper = Boolean(onIncrement && onDecrement);
@@ -84,7 +85,7 @@ export const Input = ({
     .join(' ');
 
   return (
-    <div className={classNames}>
+    <div className={classNames} style={style}>
       <div className="input__left">
         {hasStepper ? (
           <div className="input__stepper">
