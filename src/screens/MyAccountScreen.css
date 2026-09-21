@@ -90,29 +90,3 @@
   max-height: 312px;
   overflow-y: auto;
 }
-
-.my-account-screen__invoices-title {
-  margin: 0;
-}
-
-.my-account-screen__notice {
-  margin: 0;
-  font-size: 14px;
-  color: #263238;
-}
-
-.my-account-screen__notice--bold {
-  font-weight: 700;
-}
-
-.my-account-screen__pending-changes {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.my-account-screen__invoice-notices {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}

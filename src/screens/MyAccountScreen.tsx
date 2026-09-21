@@ -1,18 +1,18 @@
 import { useState } from 'react'
-import { ProfileCard, AgreementCard, CACard, InvoiceCard, Chip, Button, Icon, TabBar } from '../components'
+import { ProfileCard, AgreementCard, CACard, Chip, Button, Icon } from '../components'
 import type { AuthenticatedUser } from '../services/auth'
 import {
   getVAProfile,
   getAgreementsForVA,
   getCARequestsForVA,
   getCARequestById,
-  getInvoiceBreakdownForVA,
   AGREEMENT_STATUS_LABEL,
   AGREEMENT_STATUS_TONE,
   CA_STATUS_LABEL,
   CA_STATUS_TONE,
 } from '../services/vaAccount'
 import { CADetailsView } from './CADetailsView'
+import { VAInvoicesPanel } from './VAInvoicesPanel'
 import './MyAccountScreen.css'
 
 export interface MyAccountScreenProps {
@@ -23,22 +23,12 @@ export interface MyAccountScreenProps {
 
 /** The VA's home screen after login (Figma's "My Account" — Invoice Preview state). */
 export const MyAccountScreen = ({ user, onViewInvoice, onViewAgreement }: MyAccountScreenProps) => {
-  const [selectedTab, setSelectedTab] = useState('preview')
   const [selectedCARequestId, setSelectedCARequestId] = useState<string | null>(null)
 
   const profile = getVAProfile(user.email)
   const agreements = getAgreementsForVA(user.email)
   const caRequests = getCARequestsForVA(user.email)
-  const invoiceBreakdowns = getInvoiceBreakdownForVA(user.email)
   const selectedCARequest = selectedCARequestId ? getCARequestById(selectedCARequestId) : undefined
-
-  const invoiceTabs = [
-    { key: 'preview', label: 'Invoice Preview', counter: String(invoiceBreakdowns.length) },
-    { key: 'approved', label: 'Approved Invoices', counter: '0' },
-    { key: 'pending', label: 'Pending Approval', counter: '0' },
-    { key: 'previously-approved', label: 'Previously Approved', counter: '0' },
-    { key: 'past', label: 'Past', counter: '0' },
-  ]
 
   return (
     <>
@@ -158,72 +148,7 @@ export const MyAccountScreen = ({ user, onViewInvoice, onViewAgreement }: MyAcco
             </div>
           </div>
 
-          <h2 className="my-account-screen__section-title my-account-screen__invoices-title">
-            Virtual Latinos Invoices
-          </h2>
-          <TabBar tabs={invoiceTabs} selectedKey={selectedTab} onSelectTab={setSelectedTab} />
-
-          {selectedTab === 'preview' ? (
-            <>
-              <div className="my-account-screen__invoice-notices">
-                <p className="my-account-screen__notice my-account-screen__notice--bold">
-                  Please take a moment to review the forthcoming invoices for the upcoming payment
-                  period.
-                </p>
-                <p className="my-account-screen__notice">
-                  On the second week of the billing period, you have the option to approve payment
-                  for the invoice between Friday, 1 PM PT and Sunday midnight PT.
-                </p>
-                <p className="my-account-screen__notice">
-                  If you wish to have your invoice reviewed or require any changes prior to approval,
-                  please submit your request between Monday, 6 AM PT and Thursday, 4 PM PT.
-                </p>
-                <p className="my-account-screen__notice">
-                  Once you upload your report(s), please remember to also click &quot;Approve&quot;
-                  next to your invoice within its approval period. Otherwise, we may not receive it
-                  and your payment could be delayed.
-                </p>
-              </div>
-              {invoiceBreakdowns.map(({ invoice, groups }) => (
-                <InvoiceCard
-                  key={invoice.id}
-                  title={invoice.title}
-                  sections={[
-                    {
-                      key: invoice.id,
-                      label: invoice.clientName,
-                      totalAmount: invoice.totalAmount,
-                      sections: groups.map((group) => ({
-                        key: `${invoice.id}-${group.group}`,
-                        label: group.label,
-                        totalAmount: `$${group.totalAmount.toFixed(2)}`,
-                        items: group.items,
-                      })),
-                    },
-                  ]}
-                  totalLabel={invoice.totalLabel}
-                  totalAmount={invoice.totalAmount}
-                  warnings={invoice.warnings}
-                  approvedMessage={invoice.approvedMessage}
-                  actions={[
-                    { key: 'view', label: 'View', onClick: () => onViewInvoice(invoice.id) },
-                    { key: 'approve', label: 'Approve' },
-                    { key: 'upload', label: 'Upload Reports' },
-                    { key: 'claim', label: 'Request Invoice Review (Claim)' },
-                  ]}
-                />
-              ))}
-              <div className="my-account-screen__pending-changes">
-                <p className="my-account-screen__notice my-account-screen__notice--bold">
-                  Any invoices for which you&apos;ve requested any changes that are pending approval
-                  by our admin team.
-                </p>
-                <p className="my-account-screen__notice my-account-screen__notice--bold">No changes pending yet</p>
-              </div>
-            </>
-          ) : (
-            <p className="my-account-screen__notice">Nothing to show here yet.</p>
-          )}
+          <VAInvoicesPanel userEmail={user.email} onViewInvoice={onViewInvoice} />
         </>
       )}
     </>
