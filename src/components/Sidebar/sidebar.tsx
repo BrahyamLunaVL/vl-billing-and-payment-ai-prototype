@@ -34,7 +34,8 @@ const NAV_ITEMS: Record<SidebarUser, SidebarNavItem[]> = {
     { key: 'my-va', label: 'My VA', icon: 'clipboard-user' },
     { key: 'agreements', label: 'Agreements & Work Hrs', icon: 'clipboard-list-check' },
     { key: 'client-invoice', label: 'Client Invoice', icon: 'circle-dollar' },
-    { key: 'changes-approvals-form', label: 'Changes & Approvals Form', icon: 'pen-to-square' },
+    // No "Changes & Approvals Form" item — that flow isn't defined for the
+    // client role yet (VA and Admin both have it).
     { key: 'resources', label: 'Resources', icon: 'circle-info' },
   ],
   va: [

@@ -8,7 +8,8 @@ import './ClientMyAccountScreen.css'
 export interface ClientMyAccountScreenProps {
   user: AuthenticatedUser
   onEditAgreement: (agreementId: string) => void
-  onRequestChanges: (agreementId: string) => void
+  /** Omitted for now — the Changes & Approvals flow isn't defined for the client role yet, so the button is inert. */
+  onRequestChanges?: (agreementId: string) => void
 }
 
 /** The client's home screen after login (Figma's "My Account" — client "Enabled" state). */
@@ -79,7 +80,7 @@ export const ClientMyAccountScreen = ({ user, onEditAgreement, onRequestChanges 
               vaCountry={agreement.vaCountry}
               vaAka={agreement.vaAka}
               onEditAgreement={() => onEditAgreement(agreement.id)}
-              onRequestChanges={() => onRequestChanges(agreement.id)}
+              onRequestChanges={onRequestChanges && (() => onRequestChanges(agreement.id))}
             />
           ))}
         </div>

@@ -7,7 +7,8 @@ import './ClientAgreementsListScreen.css'
 export interface ClientAgreementsListScreenProps {
   user: AuthenticatedUser
   onEditAgreement: (agreementId: string) => void
-  onRequestChanges: (agreementId: string) => void
+  /** Omitted for now — the Changes & Approvals flow isn't defined for the client role yet, so the button is inert. */
+  onRequestChanges?: (agreementId: string) => void
 }
 
 /**
@@ -44,7 +45,7 @@ export const ClientAgreementsListScreen = ({
             vaCountry={agreement.vaCountry}
             vaAka={agreement.vaAka}
             onEditAgreement={() => onEditAgreement(agreement.id)}
-            onRequestChanges={() => onRequestChanges(agreement.id)}
+            onRequestChanges={onRequestChanges && (() => onRequestChanges(agreement.id))}
           />
         ))}
       </div>

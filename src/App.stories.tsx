@@ -378,18 +378,22 @@ export const ClientAgreementSettingsDriveTheVAWizard: Story = {
   },
 };
 
-async function loginAsClient(canvas: any, userEvent: any) {
+async function loginAsAdmin(canvas: any, userEvent: any) {
   resetLoginRateLimit();
-  await userEvent.type(canvas.getByPlaceholderText('Enter your email address'), 'client@virtuallatinos.com');
+  await userEvent.type(canvas.getByPlaceholderText('Enter your email address'), 'admin@virtuallatinos.com');
   await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
   await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
-  await canvas.findByText('My Account', { selector: 'h1' });
+  await canvas.findByText('Agreements', { selector: 'h1' });
 }
 
-export const ClientReviewingASingleRequest: Story = {
+// The Changes & Approvals table/review flow isn't defined for the client
+// role yet (no sidebar item, "Request Changes" is inert) — Admin has the
+// exact same table/modal (`ClientChangesApprovalsScreen` with
+// `scope="admin"`), so these exercise it through Admin instead.
+export const AdminReviewingASingleRequest: Story = {
   play: async ({ canvas, userEvent }) => {
     try {
-      await loginAsClient(canvas, userEvent);
+      await loginAsAdmin(canvas, userEvent);
       await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
 
       await expect(await canvas.findByText('Changes & Approvals Form', { selector: 'h1' })).toBeVisible();
@@ -413,10 +417,10 @@ export const ClientReviewingASingleRequest: Story = {
   },
 };
 
-export const ClientBulkApprovingSelectedRequests: Story = {
+export const AdminBulkApprovingSelectedRequests: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     try {
-      await loginAsClient(canvas, userEvent);
+      await loginAsAdmin(canvas, userEvent);
       await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
       await canvas.findByText('Changes & Approvals Form', { selector: 'h1' });
 
