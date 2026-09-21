@@ -1,6 +1,7 @@
 import './select.css';
 import type { KeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Icon, type IconName, type IconVariant } from '../Icon';
 import { Dropdown } from '../Dropdown';
 import { DropdownOption } from '../DropdownOption';
@@ -47,6 +48,13 @@ export interface SelectProps {
  * that loses focus once the dropdown option is clicked). "Disabled" comes
  * from the native `disabled` attribute. "Error" is an explicit prop, same as
  * `Input`.
+ *
+ * The dropdown itself is portaled to `document.body` and positioned with
+ * `position: fixed` from the trigger's own `getBoundingClientRect()`,
+ * rather than living next to the trigger in the DOM — a Select can be used
+ * anywhere, including inside containers with `overflow: hidden`/`auto`
+ * (e.g. a `Table`'s own pagination row, or a `ProfileCard`), which would
+ * otherwise clip the dropdown regardless of z-index.
  */
 export const Select = ({
   options,
@@ -60,8 +68,10 @@ export const Select = ({
   className,
 }: SelectProps) => {
   const [open, setOpen] = useState(false);
+  const [menuRect, setMenuRect] = useState<{ top: number; left: number; width: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((option) => option.value === value) ?? null;
 
@@ -69,14 +79,23 @@ export const Select = ({
     if (!open) return;
 
     const handlePointerDown = (event: MouseEvent) => {
-      if (!containerRef.current) return;
-      if (!containerRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
+      const target = event.target as Node;
+      const inContainer = containerRef.current?.contains(target);
+      const inMenu = menuRef.current?.contains(target);
+      if (!inContainer && !inMenu) setOpen(false);
     };
 
     document.addEventListener('mousedown', handlePointerDown);
     return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    // The menu's fixed position is only computed once, on open — rather
+    // than track it, just close on any scroll so it never goes stale.
+    const handleScroll = () => setOpen(false);
+    window.addEventListener('scroll', handleScroll, true);
+    return () => window.removeEventListener('scroll', handleScroll, true);
   }, [open]);
 
   const handleTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -91,6 +110,14 @@ export const Select = ({
     onChange(optionValue);
     setOpen(false);
     triggerRef.current?.focus();
+  };
+
+  const handleTriggerClick = () => {
+    if (!open && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setMenuRect({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    }
+    setOpen((prev) => !prev);
   };
 
   const classNames = [
@@ -112,7 +139,7 @@ export const Select = ({
         disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={handleTriggerClick}
         onKeyDown={handleTriggerKeyDown}
       >
         <span className="select__left">
@@ -127,22 +154,29 @@ export const Select = ({
           <Icon name="chevron-down" variant="bold" size={12} className="select__chevron" />
         </span>
       </button>
-      {open && (
-        <div className="select__dropdown-wrapper">
-          <Dropdown>
-            {options.map((option) => (
-              <DropdownOption
-                key={option.value}
-                text={option.label}
-                leftIcon={option.leftIcon}
-                rightIcon={option.rightIcon}
-                selected={option.value === value}
-                onClick={() => handleOptionClick(option.value)}
-              />
-            ))}
-          </Dropdown>
-        </div>
-      )}
+      {open &&
+        menuRect &&
+        createPortal(
+          <div
+            ref={menuRef}
+            className="select__dropdown-wrapper"
+            style={{ top: menuRect.top, left: menuRect.left, width: menuRect.width }}
+          >
+            <Dropdown>
+              {options.map((option) => (
+                <DropdownOption
+                  key={option.value}
+                  text={option.label}
+                  leftIcon={option.leftIcon}
+                  rightIcon={option.rightIcon}
+                  selected={option.value === value}
+                  onClick={() => handleOptionClick(option.value)}
+                />
+              ))}
+            </Dropdown>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };

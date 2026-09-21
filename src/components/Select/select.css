@@ -124,9 +124,9 @@
 }
 
 .select__dropdown-wrapper {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  width: 100%;
-  z-index: 20;
+  /* Portaled to document.body and positioned from the trigger's own
+     getBoundingClientRect() (see select.tsx) — position: fixed here, not
+     absolute, since it's no longer nested inside .select-container. */
+  position: fixed;
+  z-index: 1000;
 }

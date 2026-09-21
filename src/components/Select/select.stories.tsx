@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { expect, fn } from 'storybook/test';
+import { expect, fn, screen } from 'storybook/test';
 import { Select, type SelectOption } from './select';
 import { FormField } from '../FormField';
 
@@ -79,7 +79,8 @@ export const ControlledSelecting: Story = {
     const trigger = canvas.getByRole('button', { name: /choose a country/i });
     await userEvent.click(trigger);
 
-    const option = await canvas.findByText('Colombia');
+    // The dropdown is portaled to document.body, outside canvasElement.
+    const option = await screen.findByText('Colombia');
     await userEvent.click(option);
 
     await expect(await canvas.findByRole('button', { name: /colombia/i })).toBeInTheDocument();
@@ -109,10 +110,11 @@ export const ClickingTriggerOpensDropdownWithOptions: Story = {
     await userEvent.click(trigger);
 
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    await expect(await canvas.findByText('Mexico')).toBeInTheDocument();
-    await expect(await canvas.findByText('Colombia')).toBeInTheDocument();
-    await expect(await canvas.findByText('Argentina')).toBeInTheDocument();
-    await expect(await canvas.findByText('Brazil')).toBeInTheDocument();
+    // The dropdown is portaled to document.body, outside canvasElement.
+    await expect(await screen.findByText('Mexico')).toBeInTheDocument();
+    await expect(await screen.findByText('Colombia')).toBeInTheDocument();
+    await expect(await screen.findByText('Argentina')).toBeInTheDocument();
+    await expect(await screen.findByText('Brazil')).toBeInTheDocument();
   },
 };
 
@@ -122,7 +124,8 @@ export const ClickingOptionCallsOnChangeAndCloses: Story = {
     const trigger = canvas.getByRole('button', { name: /select an option/i });
     await userEvent.click(trigger);
 
-    const option = await canvas.findByText('Argentina');
+    // The dropdown is portaled to document.body, outside canvasElement.
+    const option = await screen.findByText('Argentina');
     await userEvent.click(option);
 
     await expect(args.onChange).toHaveBeenCalledTimes(1);
@@ -136,12 +139,13 @@ export const EscapeKeyClosesDropdown: Story = {
   play: async ({ canvas, userEvent }) => {
     const trigger = canvas.getByRole('button', { name: /choose a country/i });
     await userEvent.click(trigger);
-    await expect(await canvas.findByText('Mexico')).toBeInTheDocument();
+    // The dropdown is portaled to document.body, outside canvasElement.
+    await expect(await screen.findByText('Mexico')).toBeInTheDocument();
 
     await userEvent.keyboard('{Escape}');
 
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    await expect(canvas.queryByText('Mexico')).not.toBeInTheDocument();
+    await expect(screen.queryByText('Mexico')).not.toBeInTheDocument();
     await expect(trigger).toHaveFocus();
   },
 };
@@ -156,12 +160,13 @@ export const ClickingOutsideClosesDropdown: Story = {
   play: async ({ canvas, userEvent }) => {
     const trigger = canvas.getByRole('button', { name: /choose a country/i });
     await userEvent.click(trigger);
-    await expect(await canvas.findByText('Mexico')).toBeInTheDocument();
+    // The dropdown is portaled to document.body, outside canvasElement.
+    await expect(await screen.findByText('Mexico')).toBeInTheDocument();
 
     const outside = canvas.getByRole('button', { name: /outside element/i });
     await userEvent.click(outside);
 
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    await expect(canvas.queryByText('Mexico')).not.toBeInTheDocument();
+    await expect(screen.queryByText('Mexico')).not.toBeInTheDocument();
   },
 };
