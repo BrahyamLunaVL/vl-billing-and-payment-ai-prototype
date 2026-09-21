@@ -15,6 +15,8 @@ export interface ChangesApprovalsScreenProps {
   user: AuthenticatedUser
   /** Skips the request list and opens the "New Request" wizard directly, e.g. from the Agreement screen's "Request Changes" button. */
   openWizard?: boolean
+  /** Called when the wizard's final step's primary button is clicked — sends the VA back to My Account. */
+  onFinishWizard: () => void
 }
 
 interface RequestAccordionCardProps {
@@ -80,25 +82,32 @@ function RequestAccordionCard({ request, expanded, onToggle }: RequestAccordionC
 }
 
 /** Figma's "Changes & Approvals Form" — the list of past requests plus the "New Request" wizard. */
-export const ChangesApprovalsScreen = ({ user, openWizard = false }: ChangesApprovalsScreenProps) => {
+export const ChangesApprovalsScreen = ({ user, openWizard = false, onFinishWizard }: ChangesApprovalsScreenProps) => {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [showWizard, setShowWizard] = useState(openWizard)
+  const [wizardStep, setWizardStep] = useState<1 | 2 | 3 | 4>(1)
 
   const requests = getCARequestsForVA(user.email)
   const activeAgreement = getAgreementsForVA(user.email).find((agreement) => agreement.status === 'active')
 
+  const showSuccessHeader = showWizard && wizardStep === 4
+
   return (
     <div className="ca-screen">
       <div className="ca-screen__header">
-        <h1 className="ca-screen__title">{showWizard ? '' : 'Changes & Approvals Form'}</h1>
-        <Button type="tertiary" buttonText="Click to see SAM Contact Info" />
+        <h1 className="ca-screen__title">
+          {showSuccessHeader ? 'Success' : showWizard ? '' : 'Changes & Approvals Form'}
+        </h1>
+        {!showSuccessHeader && <Button type="tertiary" buttonText="Click to see SAM Contact Info" />}
       </div>
 
       {showWizard ? (
         <NewCARequestWizard
           recentRequest={requests[0]}
           agreementSettings={activeAgreement?.settings}
-          onCancel={() => setShowWizard(false)}
+          onStepChange={setWizardStep}
+          finishButtonLabel="Go My Account"
+          onFinish={onFinishWizard}
         />
       ) : (
         <>

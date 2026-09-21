@@ -48,6 +48,11 @@ export const ClientApp = ({ user }: ClientAppProps) => {
     setPage('ca-wizard')
   }
 
+  const handleFinishWizard = () => {
+    setSelectedSidebarItem('changes-approvals-form')
+    setPage('changes-approvals-form')
+  }
+
   const selectedAgreement = selectedAgreementId ? getAgreementById(selectedAgreementId) : undefined
 
   return (
@@ -75,7 +80,7 @@ export const ClientApp = ({ user }: ClientAppProps) => {
         />
       )}
       {page === 'ca-wizard' && selectedAgreement && (
-        <ClientNewCARequestScreen agreement={selectedAgreement} onCancel={() => setPage('agreement')} />
+        <ClientNewCARequestScreen agreement={selectedAgreement} onFinish={handleFinishWizard} />
       )}
       {page === 'client-invoice' && <ClientInvoiceScreen user={user} />}
       {page === 'changes-approvals-form' && <ClientChangesApprovalsScreen user={user} />}

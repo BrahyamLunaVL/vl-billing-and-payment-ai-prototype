@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   StepsNavigation,
   Step,
@@ -6,6 +6,7 @@ import {
   Chip,
   FormField,
   Input,
+  TextArea,
   Calendar,
   Alert,
   Icon,
@@ -89,21 +90,33 @@ export interface NewCARequestWizardProps {
   agreementSettings?: AgreementSettings
   /** Shows the Admin-only "Request on behalf of" Client/VA selector on step 1, above the request type list. */
   showOnBehalfOf?: boolean
-  onCancel: () => void
+  /** Label for step 4's primary button — where it goes differs per viewer role (e.g. "Go My Account" for a VA, "Go to C&A Table" for a Client/Admin). */
+  finishButtonLabel: string
+  /** Called when step 4's primary button is clicked — navigates the viewer to their role's home for this flow. */
+  onFinish: () => void
+  /** Called whenever the current step changes, so the parent screen can swap its own header (e.g. to "Success" on step 4). */
+  onStepChange?: (step: 1 | 2 | 3 | 4) => void
 }
 
-/** The 3-step "New Request for Changes" wizard (Figma's "Changes & Approvals Form" flow). */
+/** The 4-step "New Request for Changes" wizard (Figma's "Changes & Approvals Form" flow). */
 export const NewCARequestWizard = ({
   recentRequest,
   agreementSettings = DEFAULT_AGREEMENT_SETTINGS,
   showOnBehalfOf = false,
-  onCancel,
+  finishButtonLabel,
+  onFinish,
+  onStepChange,
 }: NewCARequestWizardProps) => {
-  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [onBehalfOf, setOnBehalfOf] = useState<'client' | 'va'>('va')
   const [requestType, setRequestType] = useState<RequestType>('extra-hours')
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [hoursByDate, setHoursByDate] = useState<Record<string, number>>({})
+  const [comments, setComments] = useState('')
+
+  useEffect(() => {
+    onStepChange?.(step)
+  }, [step, onStepChange])
 
   const preApprovedHours = agreementSettings.preApprovedHoursPerWeek
 
@@ -137,6 +150,14 @@ export const NewCARequestWizard = ({
     setHoursByDate({})
   }
 
+  const handleRequestMore = () => {
+    setRequestType('extra-hours')
+    setSelectedDates([])
+    setHoursByDate({})
+    setComments('')
+    setStep(1)
+  }
+
   return (
     <div className="ca-wizard">
       <StepsNavigation>
@@ -147,7 +168,13 @@ export const NewCARequestWizard = ({
           position="middle"
           status={step === 2 ? 'selected' : step > 2 ? 'completed' : 'default'}
         />
-        <Step step={3} title="Preview" position="right" status={step === 3 ? 'selected' : 'default'} />
+        <Step
+          step={3}
+          title="Comments"
+          position="middle"
+          status={step === 3 ? 'selected' : step > 3 ? 'completed' : 'default'}
+        />
+        <Step step={4} title="Preview" position="right" status={step === 4 ? 'selected' : 'default'} />
       </StepsNavigation>
 
       {showOnBehalfOf && step > 1 && (
@@ -426,17 +453,53 @@ export const NewCARequestWizard = ({
       )}
 
       {step === 3 && (
-        <ProfileCard className="ca-wizard__submitted-card">
-          <div className="ca-wizard__submitted-content">
-            <Icon name="circle-check" variant="bold" size={40} className="ca-wizard__submitted-icon" />
-            <h2 className="ca-wizard__heading">Your request has been submitted</h2>
+        <div className="ca-wizard__row">
+          <div className="ca-wizard__column ca-wizard__column--narrow">
+            <h2 className="ca-wizard__heading">Anything else you&apos;d like to tell us?</h2>
             <p className="ca-wizard__description">
-              We&apos;ll let you know once it&apos;s been reviewed. You can track its status from the
-              Changes &amp; Approvals list.
+              Let us know if there&apos;s anything else you&apos;d like the Virtual Latinos team to know.
             </p>
-            <Button buttonText="Back to Changes & Approvals" onClick={onCancel} />
           </div>
-        </ProfileCard>
+          <div className="ca-wizard__column ca-wizard__column--wide">
+            <ProfileCard>
+              <div className="ca-wizard__card-body">
+                <FormField label="Comments, Questions, Requests, Etc">
+                  <TextArea
+                    placeholder="Enter your comment, question or request"
+                    value={comments}
+                    onChange={(event) => setComments(event.target.value)}
+                  />
+                </FormField>
+                <p className="ca-wizard__important-note">
+                  <strong>IMPORTANT NOTE:</strong> After submitting this form, no changes can be made to
+                  this request. Thus, please double check everything you&apos;re submitting is correct.
+                </p>
+                <div className="ca-wizard__actions ca-wizard__actions--end">
+                  <Button buttonText="Submit form" onClick={() => setStep(4)} />
+                </div>
+              </div>
+            </ProfileCard>
+          </div>
+        </div>
+      )}
+
+      {step === 4 && (
+        <>
+          <ProfileCard className="ca-wizard__success-card">
+            <div className="ca-wizard__success-content">
+              <Icon name="memo-circle-check" variant="bold" size={40} className="ca-wizard__success-icon" />
+              <h2 className="ca-wizard__heading">Request Submitted Successfully</h2>
+              <p className="ca-wizard__description">
+                The request has been created and is now available in your Changes and Approvals section,
+                where you can track its status and view related updates.
+              </p>
+            </div>
+          </ProfileCard>
+          <div className="ca-wizard__finish-actions">
+            <Button type="secondary" buttonText="Request More Changes" onClick={handleRequestMore} />
+            <Button buttonText={finishButtonLabel} onClick={onFinish} />
+          </div>
+        </>
       )}
     </div>
   )

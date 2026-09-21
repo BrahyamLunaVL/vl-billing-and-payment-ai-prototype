@@ -57,7 +57,9 @@ export const VAApp = ({ user }: VAAppProps) => {
       {page === 'my-account' && (
         <MyAccountScreen user={user} onViewInvoice={handleViewInvoice} onViewAgreement={handleViewAgreement} />
       )}
-      {page === 'changes-approvals' && <ChangesApprovalsScreen user={user} openWizard={openWizardDirectly} />}
+      {page === 'changes-approvals' && (
+        <ChangesApprovalsScreen user={user} openWizard={openWizardDirectly} onFinishWizard={handleBackToMyAccount} />
+      )}
       {page === 'invoice-preview' && selectedInvoiceId && (
         <InvoicePreviewScreen invoiceId={selectedInvoiceId} onBack={handleBackToMyAccount} />
       )}

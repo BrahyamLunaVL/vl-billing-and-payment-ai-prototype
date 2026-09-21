@@ -67,6 +67,11 @@ export const AdminApp = ({ user }: AdminAppProps) => {
     setPage('agreement')
   }
 
+  const handleFinishWizard = () => {
+    setSelectedSidebarItem('changes-approvals-form')
+    setPage('changes-approvals-form')
+  }
+
   const selectedAgreement = selectedAgreementId ? getAgreementById(selectedAgreementId) : undefined
 
   return (
@@ -82,7 +87,7 @@ export const AdminApp = ({ user }: AdminAppProps) => {
         />
       )}
       {page === 'ca-wizard' && selectedAgreement && (
-        <AdminNewCARequestScreen agreement={selectedAgreement} onCancel={() => setPage('agreement')} />
+        <AdminNewCARequestScreen agreement={selectedAgreement} onFinish={handleFinishWizard} />
       )}
       {page === 'changes-approvals-form' && <ClientChangesApprovalsScreen user={user} scope="admin" />}
       {page === 'va-invoice' && <AdminInvoiceScreen invoiceId={ADMIN_HOME_INVOICE_ID} />}
