@@ -39,6 +39,7 @@ export const AdminInvoiceScreen = ({ invoiceId }: AdminInvoiceScreenProps) => {
       </div>
 
       <ProfileCard
+        className="admin-invoice-screen__card"
         header={
           <div className="admin-invoice-screen__title-row">
             <span className="admin-invoice-screen__invoice-number">Invoice #{invoice.invoiceNumber}</span>
@@ -46,29 +47,39 @@ export const AdminInvoiceScreen = ({ invoiceId }: AdminInvoiceScreenProps) => {
           </div>
         }
       >
-        <div className="admin-invoice-screen__meta-grid">
-          <div className="admin-invoice-screen__meta-field">
-            <span>Invoice Status:</span>
+        <div className="admin-invoice-screen__meta-row">
+          <div className="admin-invoice-screen__meta-field admin-invoice-screen__meta-field--inline">
+            <span className="admin-invoice-screen__meta-label">Invoice Status:</span>
             <Chip label={INVOICE_STATUS_LABEL[status]} tone={INVOICE_STATUS_TONE[status]} />
           </div>
-          <div className="admin-invoice-screen__meta-field admin-invoice-screen__meta-field--right">
-            <span>Address: {invoice.clientAddress}</span>
+          <p className="admin-invoice-screen__address admin-invoice-screen__meta-field--right">
+            Address: {invoice.clientAddress}
+          </p>
+        </div>
+        <div className="admin-invoice-screen__meta-subgroup">
+          <div className="admin-invoice-screen__meta-row">
+            <div className="admin-invoice-screen__meta-field admin-invoice-screen__meta-field--inline">
+              <span className="admin-invoice-screen__meta-label">Invoice Date:</span>
+              <span>{invoice.invoiceDate}</span>
+            </div>
+            <div className="admin-invoice-screen__meta-field admin-invoice-screen__meta-field--inline admin-invoice-screen__meta-field--right">
+              <span className="admin-invoice-screen__meta-label">Email:</span>
+              <span>{invoice.clientEmail}</span>
+            </div>
           </div>
-          <div className="admin-invoice-screen__meta-field">
-            <span>Invoice Date: {invoice.invoiceDate}</span>
-          </div>
-          <div className="admin-invoice-screen__meta-field admin-invoice-screen__meta-field--right">
-            <span>Email: {invoice.clientEmail}</span>
-          </div>
-          <div className="admin-invoice-screen__meta-field">
-            <span>Due Date: {invoice.dueDate}</span>
-          </div>
-          <div className="admin-invoice-screen__meta-field admin-invoice-screen__meta-field--right">
-            <span>Phone: {invoice.clientPhone}</span>
+          <div className="admin-invoice-screen__meta-row">
+            <div className="admin-invoice-screen__meta-field admin-invoice-screen__meta-field--inline">
+              <span className="admin-invoice-screen__meta-label">Due Date:</span>
+              <span>{invoice.dueDate}</span>
+            </div>
+            <div className="admin-invoice-screen__meta-field admin-invoice-screen__meta-field--inline admin-invoice-screen__meta-field--right">
+              <span className="admin-invoice-screen__meta-label">Phone:</span>
+              <span>{invoice.clientPhone}</span>
+            </div>
           </div>
         </div>
         <div className="admin-invoice-screen__divider" />
-        <div className="admin-invoice-screen__meta-grid">
+        <div className="admin-invoice-screen__meta-row">
           <div className="admin-invoice-screen__meta-field">
             <span className="admin-invoice-screen__meta-label">Invoiced to</span>
             <span>{invoice.invoicedTo}</span>
@@ -122,7 +133,10 @@ export const AdminInvoiceScreen = ({ invoiceId }: AdminInvoiceScreenProps) => {
         <p className="admin-invoice-screen__disclaimer">*This is an unofficial preview copy of your invoice*.</p>
       </ProfileCard>
 
-      <ProfileCard header={<span className="admin-invoice-screen__section-title">Uploaded Reports</span>}>
+      <ProfileCard
+        className="admin-invoice-screen__card"
+        header={<span className="admin-invoice-screen__section-title">Uploaded Reports</span>}
+      >
         {invoice.uploadedReportName ? (
           <div className="admin-invoice-screen__report-row">
             <span className="admin-invoice-screen__report-name">
@@ -140,7 +154,10 @@ export const AdminInvoiceScreen = ({ invoiceId }: AdminInvoiceScreenProps) => {
       </ProfileCard>
 
       {!isPreview && (
-        <ProfileCard header={<span className="admin-invoice-screen__section-title">Payment Data</span>}>
+        <ProfileCard
+          className="admin-invoice-screen__card"
+          header={<span className="admin-invoice-screen__section-title">Payment Data</span>}
+        >
           <p className="admin-invoice-screen__notice">Payment data not found.</p>
         </ProfileCard>
       )}
