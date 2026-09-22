@@ -223,6 +223,28 @@
   gap: 12px;
 }
 
+.ca-wizard__week-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ca-wizard__week-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #ececef;
+  border-radius: 8px;
+}
+
+.ca-wizard__week-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #263238;
+}
+
 .ca-wizard__totals {
   display: flex;
   flex-direction: column;

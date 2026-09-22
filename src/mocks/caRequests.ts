@@ -30,6 +30,13 @@ export interface CARequest {
   /** The request-specific fields shown in its details view, 2 per row unless `fullWidth`. */
   details: CARequestDetail[];
   comments?: string;
+  /**
+   * Structured per-date hours for extra-hours requests, used to compute
+   * already-taken hours per week. The free-text "Days Selected" detail line
+   * above stays as-is for the details view — this is a parallel, typed
+   * source for the per-week pre-approved-hours math.
+   */
+  extraHoursByDate?: { date: string; hours: number }[];
 }
 
 const INITIAL_CA_REQUESTS: CARequest[] = [
@@ -102,6 +109,11 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     ],
     comments:
       'I was working on the invoice project during the extra hours taken on august 5th, 7th and 11th',
+    extraHoursByDate: [
+      { date: '2026-08-05', hours: 1 },
+      { date: '2026-08-07', hours: 3 },
+      { date: '2026-08-11', hours: 3 },
+    ],
   },
   {
     id: 'ca-6',
@@ -131,6 +143,11 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       },
     ],
     comments: 'Worked ahead on the client deliverable within my pre-approved weekly hours.',
+    extraHoursByDate: [
+      { date: '2026-08-05', hours: 1 },
+      { date: '2026-08-07', hours: 2 },
+      { date: '2026-08-11', hours: 2 },
+    ],
   },
   {
     id: 'ca-3',

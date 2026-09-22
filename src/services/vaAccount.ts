@@ -68,6 +68,37 @@ export function getCARequestById(id: string): CARequest | undefined {
   return MOCK_CA_REQUESTS.find((request) => request.id === id);
 }
 
+/** The Monday–Sunday week containing an ISO date, matching Calendar's own Monday-first grid. */
+export function getWeekRange(dateISO: string): { start: string; end: string } {
+  const [year, month, day] = dateISO.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  const daysSinceMonday = (date.getDay() + 6) % 7;
+  const start = new Date(date);
+  start.setDate(start.getDate() - daysSinceMonday);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+
+  const toISO = (value: Date) =>
+    `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+
+  return { start: toISO(start), end: toISO(end) };
+}
+
+/**
+ * Hours already taken in [weekStartISO, weekEndISO] from this VA's
+ * *approved* extra-hours requests (`extraHoursByDate`). Scoped to the VA,
+ * not a specific agreement — this prototype's mock data only has one VA/one
+ * active agreement in play, so this is a reasonable simplification.
+ * Rejected/expired/pending ("new") requests don't count — they never
+ * consumed the allowance.
+ */
+export function getExtraHoursTakenForWeek(vaEmail: string, weekStartISO: string, weekEndISO: string): number {
+  return MOCK_CA_REQUESTS.filter((request) => request.vaEmail === vaEmail && request.status === 'approved')
+    .flatMap((request) => request.extraHoursByDate ?? [])
+    .filter((entry) => entry.date >= weekStartISO && entry.date <= weekEndISO)
+    .reduce((sum, entry) => sum + entry.hours, 0);
+}
+
 export function getInvoicesForVA(email: string): InvoiceRecord[] {
   return MOCK_INVOICES.filter((invoice) => invoice.vaEmail === email);
 }

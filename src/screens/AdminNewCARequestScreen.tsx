@@ -23,6 +23,7 @@ export const AdminNewCARequestScreen = ({ agreement, onFinish }: AdminNewCAReque
         {wizardStep !== 4 && <Button type="tertiary" buttonText="Click to see SAM Contact Info" />}
       </div>
       <NewCARequestWizard
+        vaEmail={agreement.vaEmail}
         recentRequest={recentRequest}
         agreementSettings={agreement.settings}
         showOnBehalfOf
