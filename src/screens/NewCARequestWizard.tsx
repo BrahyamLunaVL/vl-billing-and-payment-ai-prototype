@@ -206,6 +206,10 @@ export const NewCARequestWizard = ({
   const exceededMax = totalHours > TOTAL_MAX_HOURS
   const canGoNext = requestType === 'extra-hours' ? selectedDates.length > 0 && totalHours > 0 && !exceededMax : true
   const weekGroups = buildWeekGroups(selectedDates, hoursByDate, vaEmail, preApprovedHours)
+  // Auto-approval is an all-or-nothing switch for the whole request, not
+  // per week — if any single week's hours exceed what's remaining, the
+  // entire request (every week, every date) goes to manual approval.
+  const requiresManualApproval = weekGroups.some((week) => week.enteredHours > week.remainingHours)
 
   const handleReset = () => {
     setSelectedDates([])
@@ -428,9 +432,9 @@ export const NewCARequestWizard = ({
                             <p className="ca-wizard__description">
                               Enter the additional hours worked on each date below,{' '}
                               <strong>up to {DAILY_MAX_HOURS} hours per day</strong>. Dates are
-                              grouped by week — your pre-approved hours reset every Monday. If a
-                              week&apos;s hours exceed what&apos;s remaining for that week, that
-                              week&apos;s request will be sent to your client for approval.
+                              grouped by week — your pre-approved hours reset every Monday. If any
+                              week&apos;s hours exceed what&apos;s remaining for that week, this
+                              entire request will be sent to your client for manual approval.
                             </p>
                             <div className="ca-wizard__week-groups">
                               {weekGroups.map((week) => (
@@ -491,12 +495,6 @@ export const NewCARequestWizard = ({
                                       </FormField>
                                     ))}
                                   </div>
-                                  {week.enteredHours > week.remainingHours && (
-                                    <Alert
-                                      type="warning"
-                                      message="Hours entered for this week exceed your remaining pre-approved amount — this request will notify your client for approval."
-                                    />
-                                  )}
                                 </div>
                               ))}
                             </div>
@@ -526,6 +524,12 @@ export const NewCARequestWizard = ({
                     </p>
                   </div>
 
+                  {requiresManualApproval && (
+                    <Alert
+                      type="warning"
+                      message="Hours entered exceed the pre-approved amount for one or more weeks. Because of this, this entire request — not just those hours — will be sent to your client for manual approval."
+                    />
+                  )}
                   {exceededMax && (
                     <Alert
                       type="error"
