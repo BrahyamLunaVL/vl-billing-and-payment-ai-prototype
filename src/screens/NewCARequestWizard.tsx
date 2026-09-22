@@ -370,8 +370,8 @@ export const NewCARequestWizard = ({
                   <div className="ca-wizard__details-box">
                     <div className="ca-wizard__metric-row">
                       <FormField
-                        label="Pre-approved Extra Hours"
-                        info="The number of extra hours your agreement already allows without needing separate client approval."
+                        label="Pre-approved Hours per Week"
+                        info="The number of extra hours your agreement allows each week without needing separate client approval. Resets every Monday."
                       >
                         <p className="ca-wizard__metric-value">
                           {preApprovedHours} <span>Hours</span>
@@ -443,17 +443,17 @@ export const NewCARequestWizard = ({
                                     Week of {formatWeekRange(week.start, week.end)}
                                   </h4>
                                   <div className="ca-wizard__metric-row">
-                                    <FormField label="Total">
+                                    <FormField label="Weekly Limit">
                                       <p className="ca-wizard__metric-value">
                                         {preApprovedHours} <span>Hours</span>
                                       </p>
                                     </FormField>
-                                    <FormField label="Taken">
+                                    <FormField label="Used This Week">
                                       <p className="ca-wizard__metric-value">
                                         {week.takenHours} <span>Hours</span>
                                       </p>
                                     </FormField>
-                                    <FormField label="Remaining">
+                                    <FormField label="Remaining This Week">
                                       <p className="ca-wizard__metric-value">
                                         {week.remainingHours} <span>Hours</span>
                                       </p>
