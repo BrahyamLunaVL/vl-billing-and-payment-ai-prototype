@@ -151,6 +151,15 @@
   align-items: flex-start;
 }
 
+.ca-wizard__metric-row .form-field__info {
+  /* flex-start above puts the icon flush with the top of the label's
+     line box, but the label's line-height (23.2px for its 14px text)
+     leaves visible leading space above the glyphs themselves — without
+     this the icon reads as floating above the first line instead of
+     sitting next to it. */
+  margin-top: 5px;
+}
+
 .ca-wizard__metric-value {
   margin: 0;
   font-size: 16px;
