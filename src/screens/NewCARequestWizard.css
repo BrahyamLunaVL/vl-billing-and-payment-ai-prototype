@@ -238,9 +238,13 @@
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  background: #f9e9ee;
-  border: 1px solid #f0c7d5;
+  border: 1px solid #ececef;
   border-radius: 8px;
+}
+
+.ca-wizard__week-group .ca-wizard__metric-row {
+  background: #f9e9ee;
+  border-color: #f0c7d5;
 }
 
 .ca-wizard__week-title {
