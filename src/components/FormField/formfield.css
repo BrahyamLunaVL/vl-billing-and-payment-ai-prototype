@@ -79,7 +79,7 @@
 
 .form-field__info-trigger {
   display: inline-flex;
-  color: var(--form-field-color-gray-400);
+  color: var(--form-field-color-blue);
 }
 
 .form-field__tooltip {
