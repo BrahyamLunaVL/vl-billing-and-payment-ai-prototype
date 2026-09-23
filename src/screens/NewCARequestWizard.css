@@ -157,7 +157,7 @@
      leaves visible leading space above the glyphs themselves — without
      this the icon reads as floating above the first line instead of
      sitting next to it. */
-  margin-top: 5px;
+  margin-top: 6px;
 }
 
 .ca-wizard__metric-value {
