@@ -20,6 +20,8 @@ const INITIAL_USERS: MockUser[] = [
   { email: 'client@virtuallatinos.com', password: 'VL-Testing-2026', name: 'Sofia Martinez', role: 'client', photo: clientPhoto },
   { email: 'va@virtuallatinos.com', password: 'VL-Testing-2026', name: 'Elena Ruiz', role: 'va', photo: vaPhoto },
   { email: 'va2@virtuallatinos.com', password: 'VL-Testing-2026', name: 'Laura Gomez', role: 'va', photo: vaPhoto, disabled: true },
+  { email: 'va-no-hours@virtuallatinos.com', password: 'VL-Testing-2026', name: 'Camila Torres', role: 'va', photo: vaPhoto },
+  { email: 'va-requested@virtuallatinos.com', password: 'VL-Testing-2026', name: 'Andres Rojas', role: 'va', photo: vaPhoto },
 ];
 
 /**

@@ -187,6 +187,39 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     ],
     comments: 'Request expired without a response from the client.',
   },
+  {
+    id: 'ca-7',
+    vaEmail: 'va-requested@virtuallatinos.com',
+    title: 'Request approval for extra hours',
+    date: 'September 20, 2026',
+    status: 'approved',
+    clientEmail: 'client@virtuallatinos.com',
+    clientName: 'LTM Innovation',
+    requestedBy: 'you',
+    requestedByRole: 'va',
+    requestedDate: 'September 20, 2026',
+    resolvedBy: 'Erick Farias VL',
+    resolvedDate: 'September 20, 2026',
+    appliedBillingPeriod: '9/14/2026 - 9/27/2026',
+    details: [
+      { label: 'Pre-approved Hours', value: '5 Hours' },
+      { label: 'Total Extra Hours', value: '8 Hours' },
+      {
+        label: 'Days Selected (with hours/day)',
+        value: 'Tuesday 2026-09-08 (5 Hrs)\nWednesday 2026-09-16 (3 Hrs)',
+      },
+      { label: 'Approval Type', value: 'Auto Approval' },
+      {
+        label: 'Agreement',
+        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Andres R.-2026-02-18',
+      },
+    ],
+    comments: 'Reporting extra hours from two different weeks — 5 hours the week of Sep 7 and 3 hours the week of Sep 14.',
+    extraHoursByDate: [
+      { date: '2026-09-08', hours: 5 },
+      { date: '2026-09-16', hours: 3 },
+    ],
+  },
 ];
 
 /** Stand-in for a Changes & Approvals requests table — see MOCK_USERS' own doc comment for the pattern. */
