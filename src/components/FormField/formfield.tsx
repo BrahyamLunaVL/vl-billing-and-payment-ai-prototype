@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Icon } from '../Icon';
 import './formfield.css';
 
@@ -52,6 +53,27 @@ export const FormField = ({
 }: FormFieldProps) => {
   const tooltipId = useId();
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | null>(null);
+  const infoTriggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!tooltipOpen) return;
+    // The tooltip's fixed position is only computed once, on open — rather
+    // than track it, just close on any scroll so it never goes stale.
+    const handleScroll = () => setTooltipOpen(false);
+    window.addEventListener('scroll', handleScroll, true);
+    return () => window.removeEventListener('scroll', handleScroll, true);
+  }, [tooltipOpen]);
+
+  const handleTooltipOpen = () => {
+    if (infoTriggerRef.current) {
+      const rect = infoTriggerRef.current.getBoundingClientRect();
+      setTooltipPosition({ top: rect.top - 6, left: rect.left + rect.width / 2 });
+    }
+    setTooltipOpen(true);
+  };
+
+  const handleTooltipClose = () => setTooltipOpen(false);
 
   return (
     <div className={className ? `form-field ${className}` : 'form-field'}>
@@ -63,22 +85,33 @@ export const FormField = ({
             {info && (
               <span
                 className="form-field__info"
-                onMouseEnter={() => setTooltipOpen(true)}
-                onMouseLeave={() => setTooltipOpen(false)}
-                onFocus={() => setTooltipOpen(true)}
-                onBlur={() => setTooltipOpen(false)}
+                onMouseEnter={handleTooltipOpen}
+                onMouseLeave={handleTooltipClose}
               >
                 <button
+                  ref={infoTriggerRef}
                   type="button"
                   className="form-field__info-trigger"
                   aria-describedby={tooltipId}
                   tabIndex={0}
+                  onFocus={handleTooltipOpen}
+                  onBlur={handleTooltipClose}
                 >
                   <Icon name="circle-info" variant="bold" size={12} />
                 </button>
-                <span role="tooltip" id={tooltipId} className="form-field__tooltip" hidden={!tooltipOpen}>
-                  {info}
-                </span>
+                {tooltipOpen &&
+                  tooltipPosition &&
+                  createPortal(
+                    <span
+                      role="tooltip"
+                      id={tooltipId}
+                      className="form-field__tooltip"
+                      style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
+                    >
+                      {info}
+                    </span>,
+                    document.body,
+                  )}
               </span>
             )}
             {linkText && (

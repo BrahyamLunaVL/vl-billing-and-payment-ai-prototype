@@ -83,18 +83,27 @@
 }
 
 .form-field__tooltip {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--form-field-color-black);
-  color: white;
-  font-size: var(--form-field-font-size-xs);
+  /* Portaled to document.body and positioned from the trigger's own
+     getBoundingClientRect() (see formfield.tsx) — position: fixed here,
+     not absolute, since a FormField can be used anywhere, including
+     inside containers with overflow: hidden/auto, which would otherwise
+     clip it regardless of z-index. Self-contained values below (not the
+     --form-field-* custom properties) since the portaled node is no
+     longer a descendant of .form-field, so those wouldn't cascade to it. */
+  position: fixed;
+  transform: translate(-50%, -100%);
+  max-width: 280px;
+  background: #ffffff;
+  color: #263238;
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
   font-weight: 400;
-  padding: 6px 10px;
-  border-radius: 6px;
-  white-space: nowrap;
-  z-index: 10;
+  padding: 20px;
+  border: 1px solid #ececef;
+  border-radius: 8px;
+  box-shadow: 2px 10px 50px rgba(187, 157, 181, 0.2);
+  white-space: normal;
+  z-index: 1000;
   pointer-events: none;
 }
 
