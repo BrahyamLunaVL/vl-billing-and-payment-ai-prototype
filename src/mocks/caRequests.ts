@@ -52,8 +52,8 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     requestedByRole: 'va',
     requestedDate: 'December 10, 2025',
     details: [
-      { label: 'Time Off Dates', value: '2025-12-10' },
-      { label: 'Hours Off by Day', value: 'On 2025-12-10: 8 Hours' },
+      { label: 'Time Off Dates', value: 'Wednesday 2025-12-10' },
+      { label: 'Hours Off by Day', value: 'Wednesday 2025-12-10 (8 Hrs)' },
       { label: 'Description', value: 'I took a time off on Wednesday, December 10 as a Sick day' },
       { label: 'Total Days Off', value: '1' },
       { label: 'Total Hours Off', value: '8 hours', fullWidth: true },
@@ -73,8 +73,8 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     requestedByRole: 'va',
     requestedDate: 'September 15, 2026',
     details: [
-      { label: 'Time Off Dates', value: '2026-09-18' },
-      { label: 'Hours Off by Day', value: 'On 2026-09-18: 8 Hours' },
+      { label: 'Time Off Dates', value: 'Friday 2026-09-18' },
+      { label: 'Hours Off by Day', value: 'Friday 2026-09-18 (8 Hrs)' },
       { label: 'Description', value: 'Taking Friday off for a family event' },
       { label: 'Total Days Off', value: '1' },
       { label: 'Total Hours Off', value: '8 hours', fullWidth: true },
@@ -93,8 +93,8 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     requestedByRole: 'va',
     requestedDate: 'September 10, 2026',
     details: [
-      { label: 'Time Off Dates', value: '2026-09-14' },
-      { label: 'Hours Off by Day', value: 'On 2026-09-14: 4 Hours' },
+      { label: 'Time Off Dates', value: 'Monday 2026-09-14' },
+      { label: 'Hours Off by Day', value: 'Monday 2026-09-14 (4 Hrs)' },
       { label: 'Description', value: 'Half day off for a doctor appointment' },
       { label: 'Total Days Off', value: '1' },
       { label: 'Total Hours Off', value: '4 hours', fullWidth: true },
@@ -113,8 +113,8 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     requestedByRole: 'va',
     requestedDate: 'September 12, 2026',
     details: [
-      { label: 'Time Off Dates', value: '2026-09-17' },
-      { label: 'Hours Off by Day', value: 'On 2026-09-17: 8 Hours' },
+      { label: 'Time Off Dates', value: 'Thursday 2026-09-17' },
+      { label: 'Hours Off by Day', value: 'Thursday 2026-09-17 (8 Hrs)' },
       { label: 'Description', value: 'Moving to a new apartment' },
       { label: 'Total Days Off', value: '1' },
       { label: 'Total Hours Off', value: '8 hours', fullWidth: true },
