@@ -527,7 +527,7 @@ export const NewCARequestWizard = ({
                   {requiresManualApproval && (
                     <Alert
                       type="warning"
-                      message="Hours entered exceed the pre-approved amount for one or more weeks. Because of this, this entire request — not just those hours — will be sent to your client for manual approval."
+                      message="You have exceeded the total number of pre-approved extra hours. You can still request additional extra hours, but any hour exceeding the pre-approved amount must be reviewed and approved by the client"
                     />
                   )}
                   {exceededMax && (
