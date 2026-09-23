@@ -143,6 +143,14 @@
   white-space: normal;
 }
 
+.ca-wizard__metric-row .form-field__label-details {
+  /* The label can wrap to multiple lines at narrow widths (see the
+     white-space: normal override above) — align the info icon to the
+     top instead of centering it across the whole wrapped block, so it
+     reads as sitting next to the label's first line. */
+  align-items: flex-start;
+}
+
 .ca-wizard__metric-value {
   margin: 0;
   font-size: 16px;
