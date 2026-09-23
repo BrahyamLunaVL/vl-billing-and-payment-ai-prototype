@@ -400,7 +400,9 @@ export const AdminReviewingASingleRequest: Story = {
       await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
 
       await expect(await canvas.findByText('Changes & Approvals Form', { selector: 'h1' })).toBeVisible();
-      await expect(canvas.getByText('Request approval for short time off')).toBeVisible();
+      // Every VA has its own pending "short time off" request, so this
+      // title appears once per VA — assert on the first match.
+      await expect(canvas.getAllByText('Request approval for short time off')[0]).toBeVisible();
 
       // The pending ("New") request's View modal offers Reject/Approve —
       // approving it updates the table in place, from the same underlying
