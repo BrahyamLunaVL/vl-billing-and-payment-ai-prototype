@@ -415,7 +415,7 @@ export const CannotSubmitASecondActiveExtraHoursRequest: Story = {
     await userEvent.click(canvas.getByRole('button', { name: /^next$/i }));
 
     await expect(
-      await canvas.findByText(/actualmente tienes una solicitud de extra hours activa/i),
+      await canvas.findByText(/you currently have an active extra hours request/i),
     ).toBeVisible();
 
     const enabledDay = canvasElement.querySelector<HTMLButtonElement>(

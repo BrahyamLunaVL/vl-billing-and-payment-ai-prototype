@@ -341,7 +341,7 @@ export const NewCARequestWizard = ({
           {hasActivePendingExtraHoursRequest && (
             <Alert
               type="error"
-              message="Actualmente tienes una solicitud de extra hours activa, por favor espera a que se genere un resultado para tu solicitud y vuelve a intentar."
+              message="You currently have an active extra hours request. Please wait for a decision on your request before trying again."
             />
           )}
 
