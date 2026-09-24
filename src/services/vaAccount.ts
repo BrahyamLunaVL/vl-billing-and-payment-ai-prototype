@@ -220,42 +220,37 @@ function slashDateToISO(mdy: string): string {
 }
 
 /**
- * "Remaining Pre-approved Hours" broken out per week, oldest first, for the
- * `reportBackWeeks` weeks ending the week before the one this request was
- * submitted in (the current week is always blocked in the calendar, so it's
- * never "selectable" from the submitter's point of view either). A frozen
- * snapshot computed once at submission time, like every other `details`
- * field — it does not update if resolved later or if other requests
- * change the VA's balance afterward.
+ * "Remaining Pre-approved Hours" broken out per week — one line per week
+ * this request's own selected dates actually fall into (not every week in
+ * the lookback window), oldest first. A frozen snapshot computed once at
+ * submission time, like every other `details` field — it does not update
+ * if resolved later or if other requests change the VA's balance afterward.
  */
 function buildRemainingPreApprovedHoursBreakdown(
   vaEmail: string,
   preApprovedHours: number,
-  reportBackWeeks: number,
-  submittedOn: Date,
+  selectedDates: string[],
   hoursByDate: Record<string, number>,
   countOwnHours: boolean,
 ): string {
-  const submittedWeekStart = parseISODate(getWeekRange(toISODate(submittedOn)).start);
-  const mostRecentWeekStart = addDays(submittedWeekStart, -7);
+  const weekStarts = [...new Set(selectedDates.map((date) => getWeekRange(date).start))].sort();
 
-  const lines: string[] = [];
-  for (let i = 0; i < reportBackWeeks; i++) {
-    const weekStart = addDays(mostRecentWeekStart, -(reportBackWeeks - 1 - i) * 7);
-    const weekEnd = addDays(weekStart, 6);
-    const weekStartISO = toISODate(weekStart);
-    const weekEndISO = toISODate(weekEnd);
+  return weekStarts
+    .map((weekStartISO, index) => {
+      const weekStart = parseISODate(weekStartISO);
+      const weekEnd = addDays(weekStart, 6);
+      const weekEndISO = toISODate(weekEnd);
 
-    let taken = getExtraHoursTakenForWeek(vaEmail, weekStartISO, weekEndISO);
-    if (countOwnHours) {
-      taken += Object.entries(hoursByDate)
-        .filter(([date]) => date >= weekStartISO && date <= weekEndISO)
-        .reduce((sum, [, hours]) => sum + hours, 0);
-    }
-    const remaining = Math.max(0, preApprovedHours - taken);
-    lines.push(`Week ${i + 1} (${formatShortDate(weekStart)} to ${formatShortDate(weekEnd)}): ${remaining} Hours`);
-  }
-  return lines.join('\n');
+      let taken = getExtraHoursTakenForWeek(vaEmail, weekStartISO, weekEndISO);
+      if (countOwnHours) {
+        taken += Object.entries(hoursByDate)
+          .filter(([date]) => date >= weekStartISO && date <= weekEndISO)
+          .reduce((sum, [, hours]) => sum + hours, 0);
+      }
+      const remaining = Math.max(0, preApprovedHours - taken);
+      return `Week ${index + 1} (${formatShortDate(weekStart)} to ${formatShortDate(weekEnd)}): ${remaining} Hours`;
+    })
+    .join('\n');
 }
 
 export interface CreateExtraHoursRequestInput {
@@ -297,8 +292,7 @@ export function createExtraHoursCARequest(input: CreateExtraHoursRequestInput): 
   const remainingBreakdown = buildRemainingPreApprovedHoursBreakdown(
     vaEmail,
     preApprovedHours,
-    agreement?.settings.reportBackWeeks ?? 4,
-    new Date(),
+    selectedDates,
     hoursByDate,
     !needsManualApproval,
   );
