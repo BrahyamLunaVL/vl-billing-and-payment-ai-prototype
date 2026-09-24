@@ -240,15 +240,19 @@ export function createExtraHoursCARequest(input: CreateExtraHoursRequestInput): 
   const todayLong = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   const todayNumeric = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
 
+  const preApprovedHours = agreement?.settings.preApprovedHoursPerWeek ?? 0;
+  const remainingPreApprovedHours = Math.max(0, preApprovedHours - totalHours);
+
   const details: CARequestDetail[] = [
-    { label: 'Pre-approved Hours', value: `${agreement?.settings.preApprovedHoursPerWeek ?? 0} Hours` },
+    { label: 'Pre-approved Hours', value: `${preApprovedHours} Hours` },
+    { label: 'Remaining Pre-approved Hours', value: `${remainingPreApprovedHours} Hours` },
     { label: 'Total Extra Hours', value: `${totalHours} Hours` },
     {
       label: 'Days Selected (with hours/day)',
       value: selectedDates.map((date) => `${formatWeekdayISO(date)} (${hoursByDate[date] ?? 0} Hrs)`).join('\n'),
     },
+    { label: 'Approval Type', value: needsManualApproval ? 'Manual' : 'Auto Approval' },
   ];
-  if (!needsManualApproval) details.push({ label: 'Approval Type', value: 'Auto Approval' });
   if (agreement && vaUser) {
     details.push({
       label: 'Agreement',

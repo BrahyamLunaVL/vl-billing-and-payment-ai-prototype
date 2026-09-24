@@ -7,6 +7,7 @@ import {
   getAgreementById,
   resetMockAgreements,
   resetMockCARequests,
+  resolveCARequest,
 } from './services/clientAccount';
 
 const meta = {
@@ -360,6 +361,11 @@ export const CreatingAnExtraHoursRequest: Story = {
 export const SubmittingAnExtraHoursRequestPersistsIt: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     try {
+      // va@ always has a pending extra-hours request in the seed data
+      // (ca-3) — only one can be active at a time, so resolve it first to
+      // clear the way for this story's own submission.
+      resolveCARequest('ca-3', 'approved');
+
       await loginAsVA(canvas, userEvent);
       await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
       await userEvent.click(await canvas.findByRole('button', { name: /^new request for changes$/i }));
@@ -395,6 +401,30 @@ export const SubmittingAnExtraHoursRequestPersistsIt: Story = {
     } finally {
       resetMockCARequests();
     }
+  },
+};
+
+export const CannotSubmitASecondActiveExtraHoursRequest: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // va@'s seed data already has a pending ("New") extra-hours request
+    // (ca-3) — only one can be active at a time, so the wizard should
+    // block a second submission until that one is resolved.
+    await loginAsVA(canvas, userEvent);
+    await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
+    await userEvent.click(await canvas.findByRole('button', { name: /^new request for changes$/i }));
+    await userEvent.click(canvas.getByRole('button', { name: /^next$/i }));
+
+    await expect(
+      await canvas.findByText(/actualmente tienes una solicitud de extra hours activa/i),
+    ).toBeVisible();
+
+    const enabledDay = canvasElement.querySelector<HTMLButtonElement>(
+      '.calendar__day:not(:disabled):not(.calendar__day--outside)',
+    );
+    if (!enabledDay) throw new globalThis.Error('Expected at least one enabled calendar day');
+    await userEvent.click(enabledDay);
+
+    await expect(canvas.getByRole('button', { name: /^next$/i })).toBeDisabled();
   },
 };
 

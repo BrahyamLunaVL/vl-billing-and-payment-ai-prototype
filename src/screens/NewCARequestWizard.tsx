@@ -17,6 +17,7 @@ import {
   CA_STATUS_LABEL,
   CA_STATUS_TONE,
   getWeekRange,
+  getCARequestsForVA,
   buildWeekGroups,
   createExtraHoursCARequest,
   type CARequest,
@@ -171,7 +172,16 @@ export const NewCARequestWizard = ({
   const totalHours = selectedDates.reduce((sum, date) => sum + (hoursByDate[date] ?? 0), 0)
   const totalAmount = totalHours * RATE_PER_HOUR
   const exceededMax = totalHours > TOTAL_MAX_HOURS
-  const canGoNext = requestType === 'extra-hours' ? selectedDates.length > 0 && totalHours > 0 && !exceededMax : true
+  // Only one extra-hours request can be outstanding at a time — otherwise
+  // a second draft's "already taken this week" math could double-count
+  // hours that are still only pending, not yet actually approved.
+  const hasActivePendingExtraHoursRequest = getCARequestsForVA(vaEmail).some(
+    (request) => request.title === 'Request approval for extra hours' && request.status === 'new',
+  )
+  const canGoNext =
+    requestType === 'extra-hours'
+      ? selectedDates.length > 0 && totalHours > 0 && !exceededMax && !hasActivePendingExtraHoursRequest
+      : true
   const weekGroups = buildWeekGroups(
     selectedDates,
     hoursByDate,
@@ -327,6 +337,13 @@ export const NewCARequestWizard = ({
             Please provide the details of the extra hours you worked, including date, number of
             hours and relevant information required for the approval
           </p>
+
+          {hasActivePendingExtraHoursRequest && (
+            <Alert
+              type="error"
+              message="Actualmente tienes una solicitud de extra hours activa, por favor espera a que se genere un resultado para tu solicitud y vuelve a intentar."
+            />
+          )}
 
           <div className="ca-wizard__row">
             <div className="ca-wizard__column ca-wizard__column--narrow">

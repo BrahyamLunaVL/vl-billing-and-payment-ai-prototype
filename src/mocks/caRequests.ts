@@ -56,6 +56,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     appliedBillingPeriod: '4/27/2026 - 5/10/2026',
     details: [
       { label: 'Pre-approved Hours', value: '5 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '15 Hours' },
       { label: 'Manual Approved Hours', value: '10 Hours' },
       {
@@ -90,6 +91,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     appliedBillingPeriod: '4/20/2026 - 5/3/2026',
     details: [
       { label: 'Pre-approved Hours', value: '5 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '7 Hours' },
       {
         label: 'Days Selected (with hours/day)',
@@ -120,8 +122,10 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     requestedDate: 'May 4, 2026',
     details: [
       { label: 'Pre-approved Hours', value: '5 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '6 Hours' },
       { label: 'Days Selected (with hours/day)', value: 'Wednesday 2026-04-29 (6 Hrs)' },
+      { label: 'Approval Type', value: 'Manual' },
       {
         label: 'Agreement',
         value: 'VL-Agreement-Bloominari dba Virtual Latinos-Elena R.-2025-04-28',
@@ -146,6 +150,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     appliedBillingPeriod: '5/25/2026 - 6/7/2026',
     details: [
       { label: 'Pre-approved Hours', value: '5 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '15 Hours' },
       { label: 'Manual Approved Hours', value: '10 Hours' },
       {
@@ -180,6 +185,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     appliedBillingPeriod: '5/18/2026 - 5/31/2026',
     details: [
       { label: 'Pre-approved Hours', value: '5 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '7 Hours' },
       {
         label: 'Days Selected (with hours/day)',
@@ -210,8 +216,10 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     requestedDate: 'June 1, 2026',
     details: [
       { label: 'Pre-approved Hours', value: '5 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '8 Hours' },
       { label: 'Days Selected (with hours/day)', value: 'Thursday 2026-05-28 (8 Hrs)' },
+      { label: 'Approval Type', value: 'Manual' },
       {
         label: 'Agreement',
         value: 'VL-Agreement-Bloominari dba Virtual Latinos-Laura G.-2024-03-04',
@@ -236,6 +244,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     appliedBillingPeriod: '2/23/2026 - 3/8/2026',
     details: [
       { label: 'Pre-approved Hours', value: '0 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '15 Hours' },
       { label: 'Manual Approved Hours', value: '15 Hours' },
       {
@@ -270,6 +279,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     appliedBillingPeriod: '2/16/2026 - 3/1/2026',
     details: [
       { label: 'Pre-approved Hours', value: '0 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '7 Hours' },
       { label: 'Manual Approved Hours', value: '7 Hours' },
       {
@@ -301,8 +311,10 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     requestedDate: 'March 2, 2026',
     details: [
       { label: 'Pre-approved Hours', value: '0 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '6 Hours' },
       { label: 'Days Selected (with hours/day)', value: 'Wednesday 2026-02-25 (6 Hrs)' },
+      { label: 'Approval Type', value: 'Manual' },
       {
         label: 'Agreement',
         value: 'VL-Agreement-Bloominari dba Virtual Latinos-Camila T.-2026-01-12',
@@ -327,6 +339,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     appliedBillingPeriod: '3/23/2026 - 4/5/2026',
     details: [
       { label: 'Pre-approved Hours', value: '5 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '15 Hours' },
       { label: 'Manual Approved Hours', value: '10 Hours' },
       {
@@ -361,6 +374,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     appliedBillingPeriod: '3/16/2026 - 3/29/2026',
     details: [
       { label: 'Pre-approved Hours', value: '5 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '7 Hours' },
       {
         label: 'Days Selected (with hours/day)',
@@ -391,8 +405,10 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     requestedDate: 'March 30, 2026',
     details: [
       { label: 'Pre-approved Hours', value: '5 Hours' },
+      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '7 Hours' },
       { label: 'Days Selected (with hours/day)', value: 'Thursday 2026-03-26 (7 Hrs)' },
+      { label: 'Approval Type', value: 'Manual' },
       {
         label: 'Agreement',
         value: 'VL-Agreement-Bloominari dba Virtual Latinos-Andres R.-2026-02-18',
