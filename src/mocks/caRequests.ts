@@ -39,13 +39,19 @@ export interface CARequest {
   extraHoursByDate?: { date: string; hours: number }[];
 }
 
+/**
+ * Every VA starts with exactly 2 resolved extra-hours requests (one
+ * approved, one rejected) — no pending ("new") ones. Pending requests are
+ * created live through the wizard (`createExtraHoursCARequest`) as part of
+ * whatever's being tested, since only one can be active per VA at a time.
+ */
 const INITIAL_CA_REQUESTS: CARequest[] = [
   {
     id: 'ca-1',
     vaEmail: 'va@virtuallatinos.com',
     title: 'Request approval for extra hours',
     date: 'April 27, 2026',
-    status: 'approved',
+    status: 'rejected',
     clientEmail: 'client@virtuallatinos.com',
     clientName: 'LTM Innovation',
     requestedBy: 'you',
@@ -58,7 +64,6 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours', value: '5 Hours' },
       { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '15 Hours' },
-      { label: 'Manual Approved Hours', value: '10 Hours' },
       {
         label: 'Days Selected (with hours/day)',
         value: 'Tuesday 2026-04-21 (8 Hrs)\nThursday 2026-04-23 (7 Hrs)',
@@ -111,35 +116,10 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
   },
   {
     id: 'ca-3',
-    vaEmail: 'va@virtuallatinos.com',
-    title: 'Request approval for extra hours',
-    date: 'May 4, 2026',
-    status: 'new',
-    clientEmail: 'client@virtuallatinos.com',
-    clientName: 'LTM Innovation',
-    requestedBy: 'you',
-    requestedByRole: 'va',
-    requestedDate: 'May 4, 2026',
-    details: [
-      { label: 'Pre-approved Hours', value: '5 Hours' },
-      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
-      { label: 'Total Extra Hours', value: '6 Hours' },
-      { label: 'Days Selected (with hours/day)', value: 'Wednesday 2026-04-29 (6 Hrs)' },
-      { label: 'Approval Type', value: 'Manual' },
-      {
-        label: 'Agreement',
-        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Elena R.-2025-04-28',
-      },
-    ],
-    comments: 'One-off deadline push — submitting for review since it goes over my pre-approved amount.',
-    extraHoursByDate: [{ date: '2026-04-29', hours: 6 }],
-  },
-  {
-    id: 'ca-4',
     vaEmail: 'va2@virtuallatinos.com',
     title: 'Request approval for extra hours',
     date: 'May 25, 2026',
-    status: 'approved',
+    status: 'rejected',
     clientEmail: 'client@virtuallatinos.com',
     clientName: 'LTM Innovation',
     requestedBy: 'you',
@@ -152,7 +132,6 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours', value: '5 Hours' },
       { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '15 Hours' },
-      { label: 'Manual Approved Hours', value: '10 Hours' },
       {
         label: 'Days Selected (with hours/day)',
         value: 'Monday 2026-05-18 (9 Hrs)\nWednesday 2026-05-20 (6 Hrs)',
@@ -170,7 +149,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     ],
   },
   {
-    id: 'ca-5',
+    id: 'ca-4',
     vaEmail: 'va2@virtuallatinos.com',
     title: 'Request approval for extra hours',
     date: 'May 18, 2026',
@@ -204,32 +183,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     ],
   },
   {
-    id: 'ca-6',
-    vaEmail: 'va2@virtuallatinos.com',
-    title: 'Request approval for extra hours',
-    date: 'June 1, 2026',
-    status: 'new',
-    clientEmail: 'client@virtuallatinos.com',
-    clientName: 'LTM Innovation',
-    requestedBy: 'you',
-    requestedByRole: 'va',
-    requestedDate: 'June 1, 2026',
-    details: [
-      { label: 'Pre-approved Hours', value: '5 Hours' },
-      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
-      { label: 'Total Extra Hours', value: '8 Hours' },
-      { label: 'Days Selected (with hours/day)', value: 'Thursday 2026-05-28 (8 Hrs)' },
-      { label: 'Approval Type', value: 'Manual' },
-      {
-        label: 'Agreement',
-        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Laura G.-2024-03-04',
-      },
-    ],
-    comments: 'Requested for an unplanned data migration — submitting for review since it goes over my pre-approved amount.',
-    extraHoursByDate: [{ date: '2026-05-28', hours: 8 }],
-  },
-  {
-    id: 'ca-7',
+    id: 'ca-5',
     vaEmail: 'va-no-hours@virtuallatinos.com',
     title: 'Request approval for extra hours',
     date: 'February 23, 2026',
@@ -264,11 +218,11 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     ],
   },
   {
-    id: 'ca-8',
+    id: 'ca-6',
     vaEmail: 'va-no-hours@virtuallatinos.com',
     title: 'Request approval for extra hours',
     date: 'February 16, 2026',
-    status: 'approved',
+    status: 'rejected',
     clientEmail: 'client@virtuallatinos.com',
     clientName: 'LTM Innovation',
     requestedBy: 'you',
@@ -281,7 +235,6 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours', value: '0 Hours' },
       { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '7 Hours' },
-      { label: 'Manual Approved Hours', value: '7 Hours' },
       {
         label: 'Days Selected (with hours/day)',
         value: 'Wednesday 2026-02-04 (4 Hrs)\nThursday 2026-02-12 (3 Hrs)',
@@ -299,36 +252,11 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     ],
   },
   {
-    id: 'ca-9',
-    vaEmail: 'va-no-hours@virtuallatinos.com',
-    title: 'Request approval for extra hours',
-    date: 'March 2, 2026',
-    status: 'new',
-    clientEmail: 'client@virtuallatinos.com',
-    clientName: 'LTM Innovation',
-    requestedBy: 'you',
-    requestedByRole: 'va',
-    requestedDate: 'March 2, 2026',
-    details: [
-      { label: 'Pre-approved Hours', value: '0 Hours' },
-      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
-      { label: 'Total Extra Hours', value: '6 Hours' },
-      { label: 'Days Selected (with hours/day)', value: 'Wednesday 2026-02-25 (6 Hrs)' },
-      { label: 'Approval Type', value: 'Manual' },
-      {
-        label: 'Agreement',
-        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Camila T.-2026-01-12',
-      },
-    ],
-    comments: "Submitting for review since this agreement doesn't have pre-approved hours set up yet.",
-    extraHoursByDate: [{ date: '2026-02-25', hours: 6 }],
-  },
-  {
-    id: 'ca-10',
+    id: 'ca-7',
     vaEmail: 'va-requested@virtuallatinos.com',
     title: 'Request approval for extra hours',
     date: 'March 23, 2026',
-    status: 'approved',
+    status: 'rejected',
     clientEmail: 'client@virtuallatinos.com',
     clientName: 'LTM Innovation',
     requestedBy: 'you',
@@ -341,7 +269,6 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours', value: '5 Hours' },
       { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
       { label: 'Total Extra Hours', value: '15 Hours' },
-      { label: 'Manual Approved Hours', value: '10 Hours' },
       {
         label: 'Days Selected (with hours/day)',
         value: 'Monday 2026-03-16 (9 Hrs)\nWednesday 2026-03-18 (6 Hrs)',
@@ -359,7 +286,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     ],
   },
   {
-    id: 'ca-11',
+    id: 'ca-8',
     vaEmail: 'va-requested@virtuallatinos.com',
     title: 'Request approval for extra hours',
     date: 'March 16, 2026',
@@ -391,31 +318,6 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { date: '2026-03-03', hours: 2 },
       { date: '2026-03-11', hours: 5 },
     ],
-  },
-  {
-    id: 'ca-12',
-    vaEmail: 'va-requested@virtuallatinos.com',
-    title: 'Request approval for extra hours',
-    date: 'March 30, 2026',
-    status: 'new',
-    clientEmail: 'client@virtuallatinos.com',
-    clientName: 'LTM Innovation',
-    requestedBy: 'you',
-    requestedByRole: 'va',
-    requestedDate: 'March 30, 2026',
-    details: [
-      { label: 'Pre-approved Hours', value: '5 Hours' },
-      { label: 'Remaining Pre-approved Hours', value: '0 Hours' },
-      { label: 'Total Extra Hours', value: '7 Hours' },
-      { label: 'Days Selected (with hours/day)', value: 'Thursday 2026-03-26 (7 Hrs)' },
-      { label: 'Approval Type', value: 'Manual' },
-      {
-        label: 'Agreement',
-        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Andres R.-2026-02-18',
-      },
-    ],
-    comments: 'Picked up extra hours to help meet a deadline — submitting for review.',
-    extraHoursByDate: [{ date: '2026-03-26', hours: 7 }],
   },
 ];
 
