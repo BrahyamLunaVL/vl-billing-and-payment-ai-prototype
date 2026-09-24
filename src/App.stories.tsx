@@ -291,7 +291,7 @@ export const ClickingACARequestShowsItsDetails: Story = {
     // Figma's "My Account - C&A Details" — and the page title is hidden,
     // matching that frame exactly.
     await expect(await canvas.findByText('Days Selected (with hours/day)')).toBeVisible();
-    await expect(canvas.getByText('Pre-approved Hours')).toBeVisible();
+    await expect(canvas.getByText('Pre-approved Hours per week')).toBeVisible();
     await expect(canvas.getByText(/requested by/i)).toBeVisible();
     await expect(canvas.queryByText('My Account', { selector: 'h1' })).not.toBeInTheDocument();
     await expect(canvas.queryByText('Virtual Latinos Invoices')).not.toBeInTheDocument();
