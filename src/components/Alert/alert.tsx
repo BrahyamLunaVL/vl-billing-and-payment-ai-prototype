@@ -1,7 +1,7 @@
 import { Icon } from '../Icon';
 import './alert.css';
 
-export type AlertType = 'success' | 'warning' | 'error';
+export type AlertType = 'success' | 'warning' | 'error' | 'info';
 
 export interface AlertProps {
   /** Which color treatment to use. Defaults to 'success'. */

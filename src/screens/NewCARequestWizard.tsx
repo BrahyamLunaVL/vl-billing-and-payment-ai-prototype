@@ -521,7 +521,7 @@ export const NewCARequestWizard = ({
                                     week.takenHours > 0 &&
                                     week.takenHours < preApprovedHours && (
                                       <Alert
-                                        type="warning"
+                                        type="info"
                                         message={`You have already requested ${week.takenHours} hours for this period.`}
                                       />
                                     )}

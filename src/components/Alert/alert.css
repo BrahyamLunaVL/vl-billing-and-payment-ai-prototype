@@ -6,6 +6,8 @@
   --alert-color-red-bg: #fdf1f1;
   --alert-color-red-text: #de1515;
   --alert-color-red-border: #f7c5c5;
+  --alert-color-blue-bg: #ebfbfc;
+  --alert-color-blue-text: #378fce;
 
   box-sizing: border-box;
   display: flex;
@@ -35,6 +37,11 @@
   background: var(--alert-color-red-bg);
   color: var(--alert-color-red-text);
   border-color: var(--alert-color-red-border);
+}
+
+.alert--info {
+  background: var(--alert-color-blue-bg);
+  color: var(--alert-color-blue-text);
 }
 
 .alert__icon {
