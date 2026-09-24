@@ -1,7 +1,8 @@
 import type { ChipTone } from '../components';
 import { MOCK_VA_PROFILES, type VAProfile } from '../mocks/vaProfiles';
 import { MOCK_AGREEMENTS, type Agreement, type AgreementStatus } from '../mocks/agreements';
-import { MOCK_CA_REQUESTS, type CARequest, type CARequestStatus } from '../mocks/caRequests';
+import { MOCK_CA_REQUESTS, type CARequest, type CARequestStatus, type CARequestDetail } from '../mocks/caRequests';
+import { MOCK_USERS } from '../mocks/users';
 import { MOCK_INVOICES, groupInvoiceItems, type InvoiceRecord, type InvoiceGroupView, type InvoiceStatus } from '../mocks/invoices';
 
 export type { VAProfile } from '../mocks/vaProfiles';
@@ -60,8 +61,24 @@ export function getAgreementsForVA(email: string): Agreement[] {
   return MOCK_AGREEMENTS.filter((agreement) => agreement.vaEmail === email);
 }
 
+function parseRequestedDate(request: CARequest): number {
+  const parsed = Date.parse(request.requestedDate);
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+/**
+ * Newest-first by creation date (`requestedDate`) — resolving a request
+ * (approve/reject) never changes its position, only creating one does.
+ * Same-day ties keep their relative array order (stable sort), which is why
+ * `createExtraHoursCARequest` unshifts new requests onto the front of
+ * `MOCK_CA_REQUESTS` instead of pushing them.
+ */
+export function sortCARequestsByRecency<T extends CARequest>(requests: T[]): T[] {
+  return [...requests].sort((a, b) => parseRequestedDate(b) - parseRequestedDate(a));
+}
+
 export function getCARequestsForVA(email: string): CARequest[] {
-  return MOCK_CA_REQUESTS.filter((request) => request.vaEmail === email);
+  return sortCARequestsByRecency(MOCK_CA_REQUESTS.filter((request) => request.vaEmail === email));
 }
 
 export function getCARequestById(id: string): CARequest | undefined {
@@ -97,6 +114,167 @@ export function getExtraHoursTakenForWeek(vaEmail: string, weekStartISO: string,
     .flatMap((request) => request.extraHoursByDate ?? [])
     .filter((entry) => entry.date >= weekStartISO && entry.date <= weekEndISO)
     .reduce((sum, entry) => sum + entry.hours, 0);
+}
+
+function parseISODate(iso: string): Date {
+  const [year, month, day] = iso.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+export interface WeekGroup {
+  start: string;
+  end: string;
+  dates: string[];
+  enteredHours: number;
+  takenHours: number;
+  remainingHours: number;
+  /** True once this week falls further back than the agreement's own
+   *  auto-approval period (`reportBackWeeks`) — still selectable up to the
+   *  wizard's own lookback ceiling, just no longer auto-approvable. */
+  isOutsidePeriod: boolean;
+}
+
+/**
+ * Buckets a set of selected extra-hours dates into Monday–Sunday weeks, each
+ * with its own pre-approved-hours math — the allowance resets every week, so
+ * "taken" (from prior approved requests) and "remaining" only make sense per
+ * week, not as a single total across a multi-week selection. Shared by the
+ * wizard (to render its per-week cards/alerts) and `createExtraHoursCARequest`
+ * (to decide auto- vs manual-approval on submit), so both always agree.
+ */
+export function buildWeekGroups(
+  selectedDates: string[],
+  hoursByDate: Record<string, number>,
+  vaEmail: string,
+  preApprovedHours: number,
+  reportBackWeeks: number,
+  maxDate: string,
+): WeekGroup[] {
+  const byWeekStart = new Map<string, WeekGroup>();
+  const currentWeekStart = getWeekRange(maxDate).start;
+
+  for (const date of selectedDates) {
+    const { start, end } = getWeekRange(date);
+    let group = byWeekStart.get(start);
+    if (!group) {
+      const takenHours = getExtraHoursTakenForWeek(vaEmail, start, end);
+      const weeksAgo = Math.round(
+        (parseISODate(currentWeekStart).getTime() - parseISODate(start).getTime()) / (7 * 24 * 60 * 60 * 1000),
+      );
+      group = {
+        start,
+        end,
+        dates: [],
+        enteredHours: 0,
+        takenHours,
+        remainingHours: Math.max(0, preApprovedHours - takenHours),
+        isOutsidePeriod: weeksAgo >= reportBackWeeks,
+      };
+      byWeekStart.set(start, group);
+    }
+    group.dates.push(date);
+    group.enteredHours += hoursByDate[date] ?? 0;
+  }
+
+  return [...byWeekStart.values()].sort((a, b) => a.start.localeCompare(b.start));
+}
+
+function nextCARequestId(): string {
+  const maxNum = MOCK_CA_REQUESTS.reduce((max, request) => {
+    const match = /^ca-(\d+)$/.exec(request.id);
+    return match ? Math.max(max, Number(match[1])) : max;
+  }, 0);
+  return `ca-${maxNum + 1}`;
+}
+
+function formatWeekdayISO(dateISO: string): string {
+  const weekday = parseISODate(dateISO).toLocaleDateString('en-US', { weekday: 'long' });
+  return `${weekday} ${dateISO}`;
+}
+
+/** "Elena Ruiz" -> "Elena R." — matches the short-name style already used in the "Agreement" detail line. */
+function shortenVAName(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length < 2) return fullName;
+  return `${parts[0]} ${parts[parts.length - 1].charAt(0)}.`;
+}
+
+/** "4/28/2025" -> "2025-04-28", matching the ISO suffix on existing "Agreement" detail values. */
+function slashDateToISO(mdy: string): string {
+  const [month, day, year] = mdy.split('/').map(Number);
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+export interface CreateExtraHoursRequestInput {
+  vaEmail: string;
+  agreementId: string;
+  selectedDates: string[];
+  hoursByDate: Record<string, number>;
+  comments: string;
+  /** Who's submitting — drives `requestedByRole`, which Admin/Client's table reads as its "Req By" column. */
+  requesterRole: 'va' | 'client';
+  /** Reuse the wizard's own per-week math instead of recomputing it, so the submitted request and the alerts the VA just saw always agree. */
+  anyWeekOverHours: boolean;
+  anyWeekOutsidePeriod: boolean;
+}
+
+/**
+ * Actually persists a "Request approval for extra hours" submission — until
+ * this existed, the wizard's "Submit form" button only advanced its own
+ * step, so a submitted request never showed up anywhere (not on the VA's My
+ * Account, not in `getExtraHoursTakenForWeek` for the *next* request).
+ * Mirrors the client's own auto-approval rule: when the request doesn't need
+ * manual review, it's created already `approved` (so its hours immediately
+ * count toward future weeks' "taken" total) instead of sitting as `new`
+ * until someone manually approves it.
+ */
+export function createExtraHoursCARequest(input: CreateExtraHoursRequestInput): CARequest {
+  const { vaEmail, agreementId, selectedDates, hoursByDate, comments, requesterRole, anyWeekOverHours, anyWeekOutsidePeriod } =
+    input;
+  const agreement = MOCK_AGREEMENTS.find((candidate) => candidate.id === agreementId);
+  const vaUser = MOCK_USERS.find((user) => user.email === vaEmail);
+
+  const totalHours = selectedDates.reduce((sum, date) => sum + (hoursByDate[date] ?? 0), 0);
+  const needsManualApproval = !agreement?.settings.autoApproveExtraHours || anyWeekOverHours || anyWeekOutsidePeriod;
+
+  const todayLong = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const todayNumeric = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+
+  const details: CARequestDetail[] = [
+    { label: 'Pre-approved Hours', value: `${agreement?.settings.preApprovedHoursPerWeek ?? 0} Hours` },
+    { label: 'Total Extra Hours', value: `${totalHours} Hours` },
+    {
+      label: 'Days Selected (with hours/day)',
+      value: selectedDates.map((date) => `${formatWeekdayISO(date)} (${hoursByDate[date] ?? 0} Hrs)`).join('\n'),
+    },
+  ];
+  if (!needsManualApproval) details.push({ label: 'Approval Type', value: 'Auto Approval' });
+  if (agreement && vaUser) {
+    details.push({
+      label: 'Agreement',
+      value: `VL-Agreement-${agreement.clientName}-${shortenVAName(vaUser.name)}-${slashDateToISO(agreement.startDate)}`,
+    });
+  }
+
+  const request: CARequest = {
+    id: nextCARequestId(),
+    vaEmail,
+    clientEmail: agreement?.clientEmail ?? '',
+    title: 'Request approval for extra hours',
+    date: todayLong,
+    status: needsManualApproval ? 'new' : 'approved',
+    clientName: 'LTM Innovation',
+    requestedBy: 'you',
+    requestedByRole: requesterRole,
+    requestedDate: todayLong,
+    details,
+    comments: comments.trim() || undefined,
+    extraHoursByDate: selectedDates.map((date) => ({ date, hours: hoursByDate[date] ?? 0 })),
+    ...(needsManualApproval ? {} : { resolvedBy: 'Auto-Approval System', resolvedDate: todayNumeric }),
+  };
+
+  MOCK_CA_REQUESTS.unshift(request);
+  return request;
 }
 
 export function getInvoicesForVA(email: string): InvoiceRecord[] {

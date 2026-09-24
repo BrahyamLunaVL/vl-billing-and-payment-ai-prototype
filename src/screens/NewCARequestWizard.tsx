@@ -17,7 +17,8 @@ import {
   CA_STATUS_LABEL,
   CA_STATUS_TONE,
   getWeekRange,
-  getExtraHoursTakenForWeek,
+  buildWeekGroups,
+  createExtraHoursCARequest,
   type CARequest,
 } from '../services/vaAccount'
 import type { AgreementSettings } from '../services/clientAccount'
@@ -43,7 +44,7 @@ const TOTAL_MAX_HOURS = 60
 const RATE_PER_HOUR = 10
 /** How far back the calendar lets a VA select dates, regardless of the
  *  agreement's own auto-approval period — see `WeekGroup.isOutsidePeriod`. */
-const MAX_LOOKBACK_WEEKS = 12
+const MAX_LOOKBACK_WEEKS = 16
 
 const DEFAULT_AGREEMENT_SETTINGS: AgreementSettings = {
   autoApproveChanges: false,
@@ -51,7 +52,7 @@ const DEFAULT_AGREEMENT_SETTINGS: AgreementSettings = {
   overThresholdAmount: 500,
   autoApproveExtraHours: true,
   preApprovedHoursPerWeek: 5,
-  reportBackWeeks: 12,
+  reportBackWeeks: 16,
   emailOnPreApprovedExtraHours: false,
 }
 
@@ -94,65 +95,11 @@ function formatWeekRange(startISO: string, endISO: string): string {
   return `${startLabel} – ${endLabel}`
 }
 
-interface WeekGroup {
-  start: string
-  end: string
-  dates: string[]
-  enteredHours: number
-  takenHours: number
-  remainingHours: number
-  /** True once this week falls further back than the agreement's own
-   *  auto-approval period (`reportBackWeeks`) — still selectable up to
-   *  `MAX_LOOKBACK_WEEKS`, just no longer auto-approvable. */
-  isOutsidePeriod: boolean
-}
-
-/**
- * Buckets the in-progress selection into Monday–Sunday weeks, each with its
- * own pre-approved-hours math — the allowance resets every week, so "taken"
- * (from prior approved requests) and "remaining" only make sense per week,
- * not as a single total across the whole multi-week selection.
- */
-function buildWeekGroups(
-  selectedDates: string[],
-  hoursByDate: Record<string, number>,
-  vaEmail: string,
-  preApprovedHours: number,
-  reportBackWeeks: number,
-  maxDate: string,
-): WeekGroup[] {
-  const byWeekStart = new Map<string, WeekGroup>()
-  const currentWeekStart = getWeekRange(maxDate).start
-
-  for (const date of selectedDates) {
-    const { start, end } = getWeekRange(date)
-    let group = byWeekStart.get(start)
-    if (!group) {
-      const takenHours = getExtraHoursTakenForWeek(vaEmail, start, end)
-      const weeksAgo = Math.round(
-        (parseISODate(currentWeekStart).getTime() - parseISODate(start).getTime()) / (7 * 24 * 60 * 60 * 1000),
-      )
-      group = {
-        start,
-        end,
-        dates: [],
-        enteredHours: 0,
-        takenHours,
-        remainingHours: Math.max(0, preApprovedHours - takenHours),
-        isOutsidePeriod: weeksAgo >= reportBackWeeks,
-      }
-      byWeekStart.set(start, group)
-    }
-    group.dates.push(date)
-    group.enteredHours += hoursByDate[date] ?? 0
-  }
-
-  return [...byWeekStart.values()].sort((a, b) => a.start.localeCompare(b.start))
-}
-
 export interface NewCARequestWizardProps {
   /** The VA the request is for — used to look up hours already taken this week against their pre-approved allowance. */
   vaEmail: string
+  /** The active agreement this request is submitted under — persisted onto the created request and used to look up its client/pre-approval rules. */
+  agreementId?: string
   /** The VA's most recent request, shown as a reference on step 1. */
   recentRequest?: CARequest
   /**
@@ -163,6 +110,8 @@ export interface NewCARequestWizardProps {
    * VA has no active agreement (shouldn't normally happen).
    */
   agreementSettings?: AgreementSettings
+  /** Who's submitting this request when `showOnBehalfOf` isn't shown (VA's own screen vs Client's own screen) — drives the created request's `requestedByRole`. Ignored when `showOnBehalfOf` is set, since the wizard's own Client/VA radio decides it instead. */
+  requesterRole?: 'va' | 'client'
   /** Shows the Admin-only "Request on behalf of" Client/VA selector on step 1, above the request type list. */
   showOnBehalfOf?: boolean
   /** Label for step 4's primary button — where it goes differs per viewer role (e.g. "Go My Account" for a VA, "Go to C&A Table" for a Client/Admin). */
@@ -176,8 +125,10 @@ export interface NewCARequestWizardProps {
 /** The 4-step "New Request for Changes" wizard (Figma's "Changes & Approvals Form" flow). */
 export const NewCARequestWizard = ({
   vaEmail,
+  agreementId,
   recentRequest,
   agreementSettings = DEFAULT_AGREEMENT_SETTINGS,
+  requesterRole = 'va',
   showOnBehalfOf = false,
   finishButtonLabel,
   onFinish,
@@ -196,9 +147,11 @@ export const NewCARequestWizard = ({
 
   const preApprovedHours = agreementSettings.preApprovedHoursPerWeek
 
-  const today = new Date()
-  const maxDate = toISODate(today)
-  const minDate = toISODate(addDays(today, -MAX_LOOKBACK_WEEKS * 7))
+  // The current Monday–Sunday week is fully blocked — the VA can only
+  // report hours for the MAX_LOOKBACK_WEEKS full weeks before it.
+  const currentWeekStart = getWeekRange(toISODate(new Date())).start
+  const maxDate = toISODate(addDays(parseISODate(currentWeekStart), -1))
+  const minDate = toISODate(addDays(parseISODate(currentWeekStart), -MAX_LOOKBACK_WEEKS * 7))
 
   const toggleDate = (date: string) => {
     setSelectedDates((prev) => {
@@ -237,6 +190,22 @@ export const NewCARequestWizard = ({
   const handleReset = () => {
     setSelectedDates([])
     setHoursByDate({})
+  }
+
+  const handleSubmit = () => {
+    if (requestType === 'extra-hours' && agreementId) {
+      createExtraHoursCARequest({
+        vaEmail,
+        agreementId,
+        selectedDates,
+        hoursByDate,
+        comments,
+        requesterRole: showOnBehalfOf ? onBehalfOf : requesterRole,
+        anyWeekOverHours,
+        anyWeekOutsidePeriod,
+      })
+    }
+    setStep(4)
   }
 
   const handleRequestMore = () => {
@@ -626,7 +595,7 @@ export const NewCARequestWizard = ({
                   this request. Thus, please double check everything you&apos;re submitting is correct.
                 </p>
                 <div className="ca-wizard__actions ca-wizard__actions--end">
-                  <Button buttonText="Submit form" onClick={() => setStep(4)} />
+                  <Button buttonText="Submit form" onClick={handleSubmit} />
                 </div>
               </div>
             </ProfileCard>

@@ -24,8 +24,10 @@ export const ClientNewCARequestScreen = ({ agreement, onFinish }: ClientNewCAReq
       </div>
       <NewCARequestWizard
         vaEmail={agreement.vaEmail}
+        agreementId={agreement.id}
         recentRequest={recentRequest}
         agreementSettings={agreement.settings}
+        requesterRole="client"
         onStepChange={setWizardStep}
         finishButtonLabel="Go to C&A Table"
         onFinish={onFinish}

@@ -27,7 +27,7 @@ export interface ClientAgreementScreenProps {
   onRequestChanges?: () => void
 }
 
-const REPORT_BACK_WEEK_OPTIONS = [4, 8, 12].map((weeks) => ({
+const REPORT_BACK_WEEK_OPTIONS = [4, 8, 16].map((weeks) => ({
   value: String(weeks),
   label: `${weeks} weeks`,
 }))

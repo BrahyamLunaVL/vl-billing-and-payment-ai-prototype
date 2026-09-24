@@ -24,6 +24,7 @@ export const AdminNewCARequestScreen = ({ agreement, onFinish }: AdminNewCAReque
       </div>
       <NewCARequestWizard
         vaEmail={agreement.vaEmail}
+        agreementId={agreement.id}
         recentRequest={recentRequest}
         agreementSettings={agreement.settings}
         showOnBehalfOf
