@@ -61,20 +61,6 @@ const INITIAL_VA_PROFILES: VAProfile[] = [
     phoneNumber: '+52 55 1234 5678',
     hubspotId: '124318284949',
   },
-  {
-    email: 'va-requested@virtuallatinos.com',
-    legalName: 'Andres Rojas',
-    vaSinceDate: 'Wednesday, February 18, 2026',
-    samContactName: 'Javiera Mercado',
-    telegramHandle: '@andres.rojas',
-    paymentEmail: 'andres.rojas@virtuallatinos.com',
-    paymentMethod: 'Payoneer',
-    hiredStatus: 'hired',
-    country: 'Argentina',
-    aka: 'Andres R.',
-    phoneNumber: '+54 11 4567 8901',
-    hubspotId: '124318284950',
-  },
 ];
 
 /** VA-specific profile fields that don't belong on every user (see MockUser in ./users). */

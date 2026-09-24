@@ -202,36 +202,6 @@ const INITIAL_AGREEMENTS: Agreement[] = [
       '31 - 40 hours per week @ $10.00/hr',
     ],
   },
-  {
-    id: 'agr-4',
-    vaEmail: 'va-requested@virtuallatinos.com',
-    clientEmail: 'client@virtuallatinos.com',
-    clientName: 'Bloominari dba Virtual Latinos',
-    contactName: 'Jaime Nacach',
-    contactEmail: 'jaime@virtuallatinos.com',
-    vaRate: 'VA Rate: $11.00',
-    billedRate: '$8.00',
-    vaHourlyRate: '$11.00',
-    hoursPerWeek: '40 Hours per week',
-    billingType: 'Post Pay',
-    dateStart: 'Date Start 2026-02-18',
-    startDate: '2/18/2026',
-    nextPaymentDate: '9/13/2026',
-    hubspotId: '44787728134',
-    status: 'active',
-    week: FULL_TIME_WEEK,
-    settings: { ...DEFAULT_SETTINGS },
-    clientRateRanges: [
-      '10 - 20 hours per week @ $20.00/hr',
-      '21 - 30 hours per week @ $19.00/hr',
-      '31 - 40 hours per week @ $35.00/hr',
-    ],
-    vaRateRanges: [
-      '10 - 20 hours per week @ $10.00/hr',
-      '21 - 30 hours per week @ $10.50/hr',
-      '31 - 40 hours per week @ $11.00/hr',
-    ],
-  },
 ];
 
 /** Stand-in for an agreements table — see MOCK_USERS' own doc comment for the pattern. */
