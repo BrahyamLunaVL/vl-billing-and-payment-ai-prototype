@@ -74,7 +74,7 @@ const DEFAULT_SETTINGS: AgreementSettings = {
   overThresholdAmount: 500,
   autoApproveExtraHours: true,
   preApprovedHoursPerWeek: 5,
-  reportBackWeeks: 16,
+  reportBackWeeks: 4,
   emailOnPreApprovedExtraHours: false,
 };
 

@@ -53,7 +53,7 @@ const DEFAULT_AGREEMENT_SETTINGS: AgreementSettings = {
   overThresholdAmount: 500,
   autoApproveExtraHours: true,
   preApprovedHoursPerWeek: 5,
-  reportBackWeeks: 16,
+  reportBackWeeks: 4,
   emailOnPreApprovedExtraHours: false,
 }
 
@@ -474,29 +474,29 @@ export const NewCARequestWizard = ({
                                       <FormField key={date} label={formatFullDate(date)}>
                                         <Input
                                           type="number"
-                                          min={0}
+                                          min={1}
                                           max={DAILY_MAX_HOURS}
                                           rightText="Hrs"
-                                          value={hoursByDate[date] ?? 0}
+                                          value={hoursByDate[date] ?? 1}
                                           onChange={(event) =>
                                             setHoursByDate((prev) => ({
                                               ...prev,
                                               [date]: Math.min(
                                                 DAILY_MAX_HOURS,
-                                                Math.max(0, Number(event.target.value)),
+                                                Math.max(1, Number(event.target.value)),
                                               ),
                                             }))
                                           }
                                           onIncrement={() =>
                                             setHoursByDate((prev) => ({
                                               ...prev,
-                                              [date]: Math.min(DAILY_MAX_HOURS, (prev[date] ?? 0) + 1),
+                                              [date]: Math.min(DAILY_MAX_HOURS, (prev[date] ?? 1) + 1),
                                             }))
                                           }
                                           onDecrement={() =>
                                             setHoursByDate((prev) => ({
                                               ...prev,
-                                              [date]: Math.max(0, (prev[date] ?? 0) - 1),
+                                              [date]: Math.max(1, (prev[date] ?? 1) - 1),
                                             }))
                                           }
                                           incrementLabel={`Increase hours for ${formatFullDate(date)}`}
@@ -525,7 +525,7 @@ export const NewCARequestWizard = ({
                                         message={`You have already requested ${week.takenHours} hours for this period.`}
                                       />
                                     )}
-                                  {week.enteredHours > week.remainingHours && (
+                                  {preApprovedHours > 0 && week.enteredHours > week.remainingHours && (
                                     <Alert
                                       type="warning"
                                       message={`Reduce by ${week.enteredHours - week.remainingHours} hrs to keep this request automatic.`}

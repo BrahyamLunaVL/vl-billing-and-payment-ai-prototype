@@ -392,8 +392,9 @@ export const SubmittingAnExtraHoursRequestPersistsIt: Story = {
         '.calendar__day:not(:disabled):not(.calendar__day--outside)',
       );
       if (!enabledDay) throw new globalThis.Error('Expected at least one enabled calendar day');
-      // The default 1 hour is well within va@'s 5-hour weekly cap and
-      // 16-week auto-approval period, so this submission should auto-approve.
+      // The default 1 hour is well within va@'s 5-hour weekly cap, and the
+      // earliest enabled day in the initial month view is still inside the
+      // 4-week auto-approval period, so this submission should auto-approve.
       await userEvent.click(enabledDay);
 
       await userEvent.click(canvas.getByRole('button', { name: /^next$/i }));
