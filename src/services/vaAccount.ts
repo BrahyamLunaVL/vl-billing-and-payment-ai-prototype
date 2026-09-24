@@ -236,7 +236,7 @@ function buildRemainingPreApprovedHoursBreakdown(
   const weekStarts = [...new Set(selectedDates.map((date) => getWeekRange(date).start))].sort();
 
   return weekStarts
-    .map((weekStartISO, index) => {
+    .map((weekStartISO) => {
       const weekStart = parseISODate(weekStartISO);
       const weekEnd = addDays(weekStart, 6);
       const weekEndISO = toISODate(weekEnd);
@@ -248,7 +248,7 @@ function buildRemainingPreApprovedHoursBreakdown(
           .reduce((sum, [, hours]) => sum + hours, 0);
       }
       const remaining = Math.max(0, preApprovedHours - taken);
-      return `Week ${index + 1} (${formatShortDate(weekStart)} to ${formatShortDate(weekEnd)}): ${remaining} Hours`;
+      return `Week from ${formatShortDate(weekStart)} to ${formatShortDate(weekEnd)}, ${weekEnd.getFullYear()}: ${remaining} Hours`;
     })
     .join('\n');
 }

@@ -64,7 +64,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '5 Hours' },
       {
         label: 'Remaining Pre-approved Hours',
-        value: 'Week 1 (Apr 20 to Apr 26): 5 Hours',
+        value: 'Week from Apr 20 to Apr 26, 2026: 5 Hours',
         fullWidth: true,
       },
       { label: 'Total Extra Hours Reported', value: '15 Hours' },
@@ -102,7 +102,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '5 Hours' },
       {
         label: 'Remaining Pre-approved Hours',
-        value: 'Week 1 (Apr 6 to Apr 12): 1 Hours\nWeek 2 (Apr 13 to Apr 19): 2 Hours',
+        value: 'Week from Apr 6 to Apr 12, 2026: 1 Hours\nWeek from Apr 13 to Apr 19, 2026: 2 Hours',
         fullWidth: true,
       },
       { label: 'Total Extra Hours Reported', value: '7 Hours' },
@@ -140,7 +140,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '5 Hours' },
       {
         label: 'Remaining Pre-approved Hours',
-        value: 'Week 1 (May 18 to May 24): 5 Hours',
+        value: 'Week from May 18 to May 24, 2026: 5 Hours',
         fullWidth: true,
       },
       { label: 'Total Extra Hours Reported', value: '15 Hours' },
@@ -178,7 +178,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '5 Hours' },
       {
         label: 'Remaining Pre-approved Hours',
-        value: 'Week 1 (May 4 to May 10): 2 Hours\nWeek 2 (May 11 to May 17): 1 Hours',
+        value: 'Week from May 4 to May 10, 2026: 2 Hours\nWeek from May 11 to May 17, 2026: 1 Hours',
         fullWidth: true,
       },
       { label: 'Total Extra Hours Reported', value: '7 Hours' },
@@ -216,7 +216,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '0 Hours' },
       {
         label: 'Remaining Pre-approved Hours',
-        value: 'Week 1 (Feb 16 to Feb 22): 0 Hours',
+        value: 'Week from Feb 16 to Feb 22, 2026: 0 Hours',
         fullWidth: true,
       },
       { label: 'Total Extra Hours Reported', value: '15 Hours' },
@@ -255,7 +255,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '0 Hours' },
       {
         label: 'Remaining Pre-approved Hours',
-        value: 'Week 1 (Feb 2 to Feb 8): 0 Hours\nWeek 2 (Feb 9 to Feb 15): 0 Hours',
+        value: 'Week from Feb 2 to Feb 8, 2026: 0 Hours\nWeek from Feb 9 to Feb 15, 2026: 0 Hours',
         fullWidth: true,
       },
       { label: 'Total Extra Hours Reported', value: '7 Hours' },
@@ -293,7 +293,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '5 Hours' },
       {
         label: 'Remaining Pre-approved Hours',
-        value: 'Week 1 (Mar 16 to Mar 22): 5 Hours',
+        value: 'Week from Mar 16 to Mar 22, 2026: 5 Hours',
         fullWidth: true,
       },
       { label: 'Total Extra Hours Reported', value: '15 Hours' },
@@ -331,7 +331,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '5 Hours' },
       {
         label: 'Remaining Pre-approved Hours',
-        value: 'Week 1 (Mar 2 to Mar 8): 3 Hours\nWeek 2 (Mar 9 to Mar 15): 0 Hours',
+        value: 'Week from Mar 2 to Mar 8, 2026: 3 Hours\nWeek from Mar 9 to Mar 15, 2026: 0 Hours',
         fullWidth: true,
       },
       { label: 'Total Extra Hours Reported', value: '7 Hours' },
