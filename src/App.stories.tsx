@@ -228,7 +228,7 @@ export const VaLoginShowsVaSidebar: Story = {
     // C&A request, and an invoice all render from the VA's own mock data.
     await expect(canvas.getAllByText('Elena Ruiz')[0]).toBeVisible();
     await expect(canvas.getAllByText('Bloominari dba Virtual Latinos @ $11.00')[0]).toBeVisible();
-    await expect(canvas.getByText('Request approval for short time off')).toBeVisible();
+    await expect(canvas.getAllByText('Request approval for extra hours')[0]).toBeVisible();
     await expect(canvas.getByText('Invoice Preview #1940-3326')).toBeVisible();
   },
 };
@@ -263,13 +263,13 @@ export const ClickingACARequestShowsItsDetails: Story = {
     await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
     await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
 
-    await userEvent.click(await canvas.findByRole('button', { name: /request approval for short time off/i }));
+    await userEvent.click((await canvas.findAllByRole('button', { name: /request approval for extra hours/i }))[0]);
 
     // The dashboard grid/invoices are replaced by the request's details —
     // Figma's "My Account - C&A Details" — and the page title is hidden,
     // matching that frame exactly.
-    await expect(await canvas.findByText('Time Off Dates')).toBeVisible();
-    await expect(canvas.getByText('Wednesday 2025-12-10')).toBeVisible();
+    await expect(await canvas.findByText('Days Selected (with hours/day)')).toBeVisible();
+    await expect(canvas.getByText('Approval Type')).toBeVisible();
     await expect(canvas.getByText(/requested by/i)).toBeVisible();
     await expect(canvas.queryByText('My Account', { selector: 'h1' })).not.toBeInTheDocument();
     await expect(canvas.queryByText('Virtual Latinos Invoices')).not.toBeInTheDocument();
@@ -301,8 +301,9 @@ export const NavigatingToChangesApprovalsAndBack: Story = {
     await expect(canvas.queryByText('Virtual Latinos Invoices')).not.toBeInTheDocument();
 
     // Clicking a list card expands it in place (an accordion, not a
-    // navigation), showing its richer detail grid. There are two "extra
-    // hours" requests (manual and auto approval) — the manual one is first.
+    // navigation), showing its richer detail grid. Every VA has 3 extra
+    // hours requests (manual approved, auto approved, then pending) — the
+    // manual-approved one is first.
     await userEvent.click(canvas.getAllByRole('button', { name: /request approval for extra hours/i })[0]);
     await expect(await canvas.findByText('Approval Type')).toBeVisible();
     await expect(canvas.getByText('Manual')).toBeVisible();
@@ -400,15 +401,17 @@ export const AdminReviewingASingleRequest: Story = {
       await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
 
       await expect(await canvas.findByText('Changes & Approvals Form', { selector: 'h1' })).toBeVisible();
-      // Every VA has its own pending "short time off" request, so this
-      // title appears once per VA — assert on the first match.
-      await expect(canvas.getAllByText('Request approval for short time off')[0]).toBeVisible();
+      // Every VA has its own pending extra-hours request, so at least one
+      // "New" status chip renders.
+      await expect(canvas.getAllByText('New')[0]).toBeVisible();
 
       // The pending ("New") request's View modal offers Reject/Approve —
       // approving it updates the table in place, from the same underlying
-      // mock the "View" modal itself reads.
+      // mock the "View" modal itself reads. Each VA's 3 rows are ordered
+      // manual approved / auto approved / pending, so the first VA's
+      // pending row (and its View button) is the third one.
       const viewButtons = canvas.getAllByRole('button', { name: /^view$/i });
-      await userEvent.click(viewButtons[0]);
+      await userEvent.click(viewButtons[2]);
 
       await expect(await canvas.findByText('VA Name')).toBeVisible();
       const approveButton = canvas.getByRole('button', { name: /^approve$/i });
@@ -434,9 +437,12 @@ export const AdminBulkApprovingSelectedRequests: Story = {
       await expect(reviewRequestButton).toBeDisabled();
 
       const rowCheckboxes = canvasElement.querySelectorAll('.table__checkbox');
-      // rowCheckboxes[0] is the header's "select all" — select the first 2 data rows.
-      await userEvent.click(rowCheckboxes[1]);
-      await userEvent.click(rowCheckboxes[2]);
+      // rowCheckboxes[0] is the header's "select all". Only pending ("New")
+      // rows are selectable, and each VA's 3 rows are ordered manual
+      // approved / auto approved / pending, so rows 3 and 6 (the first two
+      // VAs' pending requests) are the first two selectable checkboxes.
+      await userEvent.click(rowCheckboxes[3]);
+      await userEvent.click(rowCheckboxes[6]);
       await expect(reviewRequestButton).toBeEnabled();
 
       await userEvent.click(reviewRequestButton);
