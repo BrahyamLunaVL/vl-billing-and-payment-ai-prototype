@@ -41,7 +41,8 @@ export interface CADayGroupsProps {
  * hover/focus tooltip breaks down the pre-approved-hours balance for that
  * week: the weekly allowance, what other requests already reported (when
  * any), what this request reports, and what's left of the allowance — plus,
- * while the request is still pending, a projected balance if it's approved.
+ * while the request is still pending, a projected balance if it's approved
+ * (skipped when there's no weekly allowance to begin with).
  */
 export const CADayGroups = ({ groups, requestStatus, className }: CADayGroupsProps) => {
   const [collapsedWeeks, setCollapsedWeeks] = useState<Set<string>>(new Set());
@@ -96,7 +97,7 @@ export const CADayGroups = ({ groups, requestStatus, className }: CADayGroupsPro
             )
           : 0;
         const estimatedRemainingIfApproved =
-          hoursTooltip && isPending
+          hoursTooltip && isPending && hoursTooltip.preApprovedHoursPerWeek > 0
             ? Math.max(0, hoursTooltip.preApprovedHoursPerWeek - hoursTooltip.takenByOtherRequests - hoursTooltip.reportedInThisRequest)
             : undefined;
         return (
@@ -154,9 +155,7 @@ export const CADayGroups = ({ groups, requestStatus, className }: CADayGroupsPro
                           <span>{hoursTooltip.reportedInThisRequest} Hours</span>
                         </span>
                         <span className="ca-day-groups__tooltip-row">
-                          <span>
-                            {isPending ? 'Pre-approved Hours Remaining at Request Time' : 'Pre-approved Hours Remaining'}
-                          </span>
+                          <span>Pre-approved Hours Remaining</span>
                           <span>{remainingHours} Hours</span>
                         </span>
                         {estimatedRemainingIfApproved !== undefined && (
