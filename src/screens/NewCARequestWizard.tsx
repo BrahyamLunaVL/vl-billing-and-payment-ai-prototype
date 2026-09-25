@@ -550,7 +550,7 @@ export const NewCARequestWizard = ({
                       message="One week in this request is outside your auto-approval period, so the entire request will be sent to your client for approval, not only that week."
                     />
                   )}
-                  {anyWeekOverHours && (
+                  {preApprovedHours > 0 && anyWeekOverHours && (
                     <Alert
                       type="warning"
                       message="This request goes over your pre-approved amount for at least one week, so the entire request will be sent to your client for approval, not only the extra hours."
