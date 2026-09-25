@@ -236,13 +236,16 @@ function slashDateToISO(mdy: string): string {
 /**
  * Groups a request's selected dates into Monday–Sunday weeks for the
  * "Days Selected (with hours/day)" detail's collapsible per-week display,
- * each week carrying its own `hoursTooltip` breakdown: pre-approved hours
- * remaining before this request's own hours in that week (`initialRemaining`,
- * from other approved requests only), this request's own hours reported in
- * that week (`reported`), and the hours remaining after (`newRemaining`). A
- * frozen snapshot computed once at submission time, like every other
- * `details` field — it does not update if resolved later or if other
- * requests change the VA's balance afterward.
+ * each week carrying its own `hoursTooltip` breakdown: the weekly
+ * pre-approved allowance (`preApprovedHoursPerWeek`), what this VA's OTHER
+ * requests already reported that week (`takenByOtherRequests`), what THIS
+ * request reports that week (`reportedInThisRequest`), and what's left of
+ * the allowance (`remainingHours` — `preApprovedHoursPerWeek` minus
+ * `takenByOtherRequests` only, not this request's own hours, since those
+ * haven't been approved yet when this is computed). A frozen snapshot
+ * computed once at submission time, like every other `details` field — it
+ * does not update if resolved later or if other requests change the VA's
+ * balance afterward.
  */
 function buildDaySelectionGroups(
   vaEmail: string,
@@ -258,13 +261,18 @@ function buildDaySelectionGroups(
     const weekEndISO = toISODate(weekEnd);
     const daysInWeek = selectedDates.filter((date) => date >= weekStartISO && date <= weekEndISO).sort();
 
-    const initialRemaining = Math.max(0, preApprovedHours - getExtraHoursTakenForWeek(vaEmail, weekStartISO, weekEndISO));
-    const reported = daysInWeek.reduce((sum, date) => sum + (hoursByDate[date] ?? 0), 0);
+    const takenByOtherRequests = getExtraHoursTakenForWeek(vaEmail, weekStartISO, weekEndISO);
+    const reportedInThisRequest = daysInWeek.reduce((sum, date) => sum + (hoursByDate[date] ?? 0), 0);
 
     return {
       weekLabel: formatWeekLabel(weekStart, weekEnd),
       days: daysInWeek.map((date) => `${formatWeekdayMDY(date)} (${hoursByDate[date] ?? 0} Hours)`),
-      hoursTooltip: { initialRemaining, reported, newRemaining: Math.max(0, initialRemaining - reported) },
+      hoursTooltip: {
+        preApprovedHoursPerWeek: preApprovedHours,
+        takenByOtherRequests,
+        reportedInThisRequest,
+        remainingHours: Math.max(0, preApprovedHours - takenByOtherRequests),
+      },
     };
   });
 }

@@ -8,12 +8,14 @@ export interface CARequestDayGroup {
   days: string[];
   /** Present when the agreement has pre-approved hours — shown as a tooltip on the week header. */
   hoursTooltip?: {
-    /** Pre-approved hours remaining before this week's own reported hours are counted. */
-    initialRemaining: number;
+    /** Same value as the "Pre-approved Hours per week" detail. */
+    preApprovedHoursPerWeek: number;
+    /** Hours this VA's OTHER requests already reported in this week — the tooltip omits this row when 0. */
+    takenByOtherRequests: number;
     /** This request's own reported hours falling in this week. */
-    reported: number;
-    /** Pre-approved hours remaining after subtracting `reported` from `initialRemaining`. */
-    newRemaining: number;
+    reportedInThisRequest: number;
+    /** `preApprovedHoursPerWeek` minus `takenByOtherRequests` — does not subtract this request's own hours. */
+    remainingHours: number;
   };
 }
 
@@ -90,7 +92,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
           {
             weekLabel: 'Week from Apr 20 to Apr 26, 2026',
             days: ['Tuesday 04-21-2026 (8 Hours)', 'Thursday 04-23-2026 (7 Hours)'],
-            hoursTooltip: { initialRemaining: 5, reported: 15, newRemaining: 0 },
+            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 15, remainingHours: 5 },
           },
         ],
       },
@@ -131,12 +133,12 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
           {
             weekLabel: 'Week from Apr 6 to Apr 12, 2026',
             days: ['Wednesday 04-08-2026 (4 Hours)'],
-            hoursTooltip: { initialRemaining: 5, reported: 4, newRemaining: 1 },
+            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 4, remainingHours: 5 },
           },
           {
             weekLabel: 'Week from Apr 13 to Apr 19, 2026',
             days: ['Thursday 04-16-2026 (3 Hours)'],
-            hoursTooltip: { initialRemaining: 5, reported: 3, newRemaining: 2 },
+            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 3, remainingHours: 5 },
           },
         ],
       },
@@ -177,7 +179,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
           {
             weekLabel: 'Week from May 18 to May 24, 2026',
             days: ['Monday 05-18-2026 (9 Hours)', 'Wednesday 05-20-2026 (6 Hours)'],
-            hoursTooltip: { initialRemaining: 5, reported: 15, newRemaining: 0 },
+            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 15, remainingHours: 5 },
           },
         ],
       },
@@ -218,12 +220,12 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
           {
             weekLabel: 'Week from May 4 to May 10, 2026',
             days: ['Tuesday 05-05-2026 (3 Hours)'],
-            hoursTooltip: { initialRemaining: 5, reported: 3, newRemaining: 2 },
+            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 3, remainingHours: 5 },
           },
           {
             weekLabel: 'Week from May 11 to May 17, 2026',
             days: ['Wednesday 05-13-2026 (4 Hours)'],
-            hoursTooltip: { initialRemaining: 5, reported: 4, newRemaining: 1 },
+            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 4, remainingHours: 5 },
           },
         ],
       },
@@ -265,7 +267,7 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
           {
             weekLabel: 'Week from Feb 16 to Feb 22, 2026',
             days: ['Tuesday 02-17-2026 (8 Hours)', 'Thursday 02-19-2026 (7 Hours)'],
-            hoursTooltip: { initialRemaining: 0, reported: 15, newRemaining: 0 },
+            hoursTooltip: { preApprovedHoursPerWeek: 0, takenByOtherRequests: 0, reportedInThisRequest: 15, remainingHours: 0 },
           },
         ],
       },
@@ -306,12 +308,12 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
           {
             weekLabel: 'Week from Feb 2 to Feb 8, 2026',
             days: ['Wednesday 02-04-2026 (4 Hours)'],
-            hoursTooltip: { initialRemaining: 0, reported: 4, newRemaining: 0 },
+            hoursTooltip: { preApprovedHoursPerWeek: 0, takenByOtherRequests: 0, reportedInThisRequest: 4, remainingHours: 0 },
           },
           {
             weekLabel: 'Week from Feb 9 to Feb 15, 2026',
             days: ['Thursday 02-12-2026 (3 Hours)'],
-            hoursTooltip: { initialRemaining: 0, reported: 3, newRemaining: 0 },
+            hoursTooltip: { preApprovedHoursPerWeek: 0, takenByOtherRequests: 0, reportedInThisRequest: 3, remainingHours: 0 },
           },
         ],
       },

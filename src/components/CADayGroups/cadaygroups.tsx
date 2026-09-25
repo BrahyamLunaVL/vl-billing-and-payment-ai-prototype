@@ -4,12 +4,14 @@ import { Icon } from '../Icon';
 import './cadaygroups.css';
 
 export interface CADayGroupHoursTooltip {
-  /** Pre-approved hours remaining before this week's own reported hours are counted. */
-  initialRemaining: number;
+  /** Same value as the "Pre-approved Hours per week" detail. */
+  preApprovedHoursPerWeek: number;
+  /** Hours this VA's OTHER requests already reported in this week — the tooltip omits this row when 0. */
+  takenByOtherRequests: number;
   /** This request's own reported hours falling in this week. */
-  reported: number;
-  /** Pre-approved hours remaining after subtracting `reported` from `initialRemaining`. */
-  newRemaining: number;
+  reportedInThisRequest: number;
+  /** `preApprovedHoursPerWeek` minus `takenByOtherRequests` — does not subtract this request's own hours. */
+  remainingHours: number;
 }
 
 export interface CADayGroup {
@@ -32,7 +34,8 @@ export interface CADayGroupsProps {
  * chevron on the far right) toggles independently. A week with
  * `hoursTooltip` also gets an info icon right next to the week label whose
  * hover/focus tooltip breaks down the pre-approved-hours balance for that
- * week.
+ * week: the weekly allowance, what other requests already reported (when
+ * any), what this request reports, and what's left of the allowance.
  */
 export const CADayGroups = ({ groups, className }: CADayGroupsProps) => {
   const [collapsedWeeks, setCollapsedWeeks] = useState<Set<string>>(new Set());
@@ -117,16 +120,22 @@ export const CADayGroups = ({ groups, className }: CADayGroupsProps) => {
                         style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
                       >
                         <span className="ca-day-groups__tooltip-row">
-                          <span>Pre-approved Hours Remaining (Initial)</span>
-                          <span>{group.hoursTooltip.initialRemaining} Hours</span>
+                          <span>Pre-approved Hours per week</span>
+                          <span>{group.hoursTooltip.preApprovedHoursPerWeek} Hours</span>
+                        </span>
+                        {group.hoursTooltip.takenByOtherRequests > 0 && (
+                          <span className="ca-day-groups__tooltip-row">
+                            <span>Hours Reported in Other Requests</span>
+                            <span>{group.hoursTooltip.takenByOtherRequests} Hours</span>
+                          </span>
+                        )}
+                        <span className="ca-day-groups__tooltip-row">
+                          <span>Hours Reported in This Request</span>
+                          <span>{group.hoursTooltip.reportedInThisRequest} Hours</span>
                         </span>
                         <span className="ca-day-groups__tooltip-row">
-                          <span>Hours Reported</span>
-                          <span>{group.hoursTooltip.reported} Hours</span>
-                        </span>
-                        <span className="ca-day-groups__tooltip-row">
-                          <span>Pre-approved Hours Remaining (New)</span>
-                          <span>{group.hoursTooltip.newRemaining} Hours</span>
+                          <span>Pre-approved Hours Remaining</span>
+                          <span>{group.hoursTooltip.remainingHours} Hours</span>
                         </span>
                       </span>,
                       document.body,
