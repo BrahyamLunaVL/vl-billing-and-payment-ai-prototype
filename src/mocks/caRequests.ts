@@ -6,6 +6,15 @@ export interface CARequestDayGroup {
   weekLabel: string;
   /** e.g. "Wednesday 04-08-2026 (4 Hours)". */
   days: string[];
+  /** Present when the agreement has pre-approved hours — shown as a tooltip on the week header. */
+  hoursTooltip?: {
+    /** Pre-approved hours remaining before this week's own reported hours are counted. */
+    initialRemaining: number;
+    /** This request's own reported hours falling in this week. */
+    reported: number;
+    /** Pre-approved hours remaining after subtracting `reported` from `initialRemaining`. */
+    newRemaining: number;
+  };
 }
 
 export interface CARequestDetail {
@@ -74,7 +83,6 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     details: [
       { label: 'Pre-approved Hours per week', value: '5 Hours' },
       { label: 'Total Extra Hours Reported', value: '15 Hours' },
-      { label: 'Selected Weeks', value: 'Week from Apr 20 to Apr 26, 2026' },
       {
         label: 'Days Selected (with hours/day)',
         value: 'Tuesday 04-21-2026 (8 Hours)\nThursday 04-23-2026 (7 Hours)',
@@ -82,12 +90,9 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
           {
             weekLabel: 'Week from Apr 20 to Apr 26, 2026',
             days: ['Tuesday 04-21-2026 (8 Hours)', 'Thursday 04-23-2026 (7 Hours)'],
+            hoursTooltip: { initialRemaining: 5, reported: 15, newRemaining: 0 },
           },
         ],
-      },
-      {
-        label: 'Remaining Pre-approved Hours',
-        value: 'Week from Apr 20 to Apr 26, 2026: 5 Hours',
       },
       { label: 'Approval Type', value: 'Manual' },
       {
@@ -120,20 +125,20 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '5 Hours' },
       { label: 'Total Extra Hours Reported', value: '7 Hours' },
       {
-        label: 'Selected Weeks',
-        value: 'Week from Apr 6 to Apr 12, 2026\nWeek from Apr 13 to Apr 19, 2026',
-      },
-      {
         label: 'Days Selected (with hours/day)',
         value: 'Wednesday 04-08-2026 (4 Hours)\nThursday 04-16-2026 (3 Hours)',
         dayGroups: [
-          { weekLabel: 'Week from Apr 6 to Apr 12, 2026', days: ['Wednesday 04-08-2026 (4 Hours)'] },
-          { weekLabel: 'Week from Apr 13 to Apr 19, 2026', days: ['Thursday 04-16-2026 (3 Hours)'] },
+          {
+            weekLabel: 'Week from Apr 6 to Apr 12, 2026',
+            days: ['Wednesday 04-08-2026 (4 Hours)'],
+            hoursTooltip: { initialRemaining: 5, reported: 4, newRemaining: 1 },
+          },
+          {
+            weekLabel: 'Week from Apr 13 to Apr 19, 2026',
+            days: ['Thursday 04-16-2026 (3 Hours)'],
+            hoursTooltip: { initialRemaining: 5, reported: 3, newRemaining: 2 },
+          },
         ],
-      },
-      {
-        label: 'Remaining Pre-approved Hours',
-        value: 'Week from Apr 6 to Apr 12, 2026: 1 Hours\nWeek from Apr 13 to Apr 19, 2026: 2 Hours',
       },
       { label: 'Approval Type', value: 'Auto Approval' },
       {
@@ -165,7 +170,6 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     details: [
       { label: 'Pre-approved Hours per week', value: '5 Hours' },
       { label: 'Total Extra Hours Reported', value: '15 Hours' },
-      { label: 'Selected Weeks', value: 'Week from May 18 to May 24, 2026' },
       {
         label: 'Days Selected (with hours/day)',
         value: 'Monday 05-18-2026 (9 Hours)\nWednesday 05-20-2026 (6 Hours)',
@@ -173,12 +177,9 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
           {
             weekLabel: 'Week from May 18 to May 24, 2026',
             days: ['Monday 05-18-2026 (9 Hours)', 'Wednesday 05-20-2026 (6 Hours)'],
+            hoursTooltip: { initialRemaining: 5, reported: 15, newRemaining: 0 },
           },
         ],
-      },
-      {
-        label: 'Remaining Pre-approved Hours',
-        value: 'Week from May 18 to May 24, 2026: 5 Hours',
       },
       { label: 'Approval Type', value: 'Manual' },
       {
@@ -211,20 +212,20 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '5 Hours' },
       { label: 'Total Extra Hours Reported', value: '7 Hours' },
       {
-        label: 'Selected Weeks',
-        value: 'Week from May 4 to May 10, 2026\nWeek from May 11 to May 17, 2026',
-      },
-      {
         label: 'Days Selected (with hours/day)',
         value: 'Tuesday 05-05-2026 (3 Hours)\nWednesday 05-13-2026 (4 Hours)',
         dayGroups: [
-          { weekLabel: 'Week from May 4 to May 10, 2026', days: ['Tuesday 05-05-2026 (3 Hours)'] },
-          { weekLabel: 'Week from May 11 to May 17, 2026', days: ['Wednesday 05-13-2026 (4 Hours)'] },
+          {
+            weekLabel: 'Week from May 4 to May 10, 2026',
+            days: ['Tuesday 05-05-2026 (3 Hours)'],
+            hoursTooltip: { initialRemaining: 5, reported: 3, newRemaining: 2 },
+          },
+          {
+            weekLabel: 'Week from May 11 to May 17, 2026',
+            days: ['Wednesday 05-13-2026 (4 Hours)'],
+            hoursTooltip: { initialRemaining: 5, reported: 4, newRemaining: 1 },
+          },
         ],
-      },
-      {
-        label: 'Remaining Pre-approved Hours',
-        value: 'Week from May 4 to May 10, 2026: 2 Hours\nWeek from May 11 to May 17, 2026: 1 Hours',
       },
       { label: 'Approval Type', value: 'Auto Approval' },
       {
@@ -257,7 +258,6 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '0 Hours' },
       { label: 'Total Extra Hours Reported', value: '15 Hours' },
       { label: 'Manual Approved Hours', value: '15 Hours' },
-      { label: 'Selected Weeks', value: 'Week from Feb 16 to Feb 22, 2026' },
       {
         label: 'Days Selected (with hours/day)',
         value: 'Tuesday 02-17-2026 (8 Hours)\nThursday 02-19-2026 (7 Hours)',
@@ -265,12 +265,9 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
           {
             weekLabel: 'Week from Feb 16 to Feb 22, 2026',
             days: ['Tuesday 02-17-2026 (8 Hours)', 'Thursday 02-19-2026 (7 Hours)'],
+            hoursTooltip: { initialRemaining: 0, reported: 15, newRemaining: 0 },
           },
         ],
-      },
-      {
-        label: 'Remaining Pre-approved Hours',
-        value: 'Week from Feb 16 to Feb 22, 2026: 0 Hours',
       },
       { label: 'Approval Type', value: 'Manual' },
       {
@@ -303,20 +300,20 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
       { label: 'Pre-approved Hours per week', value: '0 Hours' },
       { label: 'Total Extra Hours Reported', value: '7 Hours' },
       {
-        label: 'Selected Weeks',
-        value: 'Week from Feb 2 to Feb 8, 2026\nWeek from Feb 9 to Feb 15, 2026',
-      },
-      {
         label: 'Days Selected (with hours/day)',
         value: 'Wednesday 02-04-2026 (4 Hours)\nThursday 02-12-2026 (3 Hours)',
         dayGroups: [
-          { weekLabel: 'Week from Feb 2 to Feb 8, 2026', days: ['Wednesday 02-04-2026 (4 Hours)'] },
-          { weekLabel: 'Week from Feb 9 to Feb 15, 2026', days: ['Thursday 02-12-2026 (3 Hours)'] },
+          {
+            weekLabel: 'Week from Feb 2 to Feb 8, 2026',
+            days: ['Wednesday 02-04-2026 (4 Hours)'],
+            hoursTooltip: { initialRemaining: 0, reported: 4, newRemaining: 0 },
+          },
+          {
+            weekLabel: 'Week from Feb 9 to Feb 15, 2026',
+            days: ['Thursday 02-12-2026 (3 Hours)'],
+            hoursTooltip: { initialRemaining: 0, reported: 3, newRemaining: 0 },
+          },
         ],
-      },
-      {
-        label: 'Remaining Pre-approved Hours',
-        value: 'Week from Feb 2 to Feb 8, 2026: 0 Hours\nWeek from Feb 9 to Feb 15, 2026: 0 Hours',
       },
       { label: 'Approval Type', value: 'Manual' },
       {

@@ -215,7 +215,7 @@ function formatWeekdayMDY(dateISO: string): string {
   return `${weekday} ${mdy}`;
 }
 
-/** "Week from Apr 6 to Apr 12, 2026" — shared by "Selected Weeks", "Days Selected", and "Remaining Pre-approved Hours". */
+/** "Week from Apr 6 to Apr 12, 2026" — the "Days Selected (with hours/day)" week-group header. */
 function formatWeekLabel(weekStart: Date, weekEnd: Date): string {
   return `Week from ${formatShortDate(weekStart)} to ${formatShortDate(weekEnd)}, ${weekEnd.getFullYear()}`;
 }
@@ -234,46 +234,19 @@ function slashDateToISO(mdy: string): string {
 }
 
 /**
- * "Remaining Pre-approved Hours" broken out per week — one line per week
- * this request's own selected dates actually fall into (not every week in
- * the lookback window), oldest first. A frozen snapshot computed once at
- * submission time, like every other `details` field — it does not update
- * if resolved later or if other requests change the VA's balance afterward.
- */
-function buildRemainingPreApprovedHoursBreakdown(
-  vaEmail: string,
-  preApprovedHours: number,
-  selectedDates: string[],
-  hoursByDate: Record<string, number>,
-  countOwnHours: boolean,
-): string {
-  const weekStarts = [...new Set(selectedDates.map((date) => getWeekRange(date).start))].sort();
-
-  return weekStarts
-    .map((weekStartISO) => {
-      const weekStart = parseISODate(weekStartISO);
-      const weekEnd = addDays(weekStart, 6);
-      const weekEndISO = toISODate(weekEnd);
-
-      let taken = getExtraHoursTakenForWeek(vaEmail, weekStartISO, weekEndISO);
-      if (countOwnHours) {
-        taken += Object.entries(hoursByDate)
-          .filter(([date]) => date >= weekStartISO && date <= weekEndISO)
-          .reduce((sum, [, hours]) => sum + hours, 0);
-      }
-      const remaining = Math.max(0, preApprovedHours - taken);
-      return `${formatWeekLabel(weekStart, weekEnd)}: ${remaining} Hours`;
-    })
-    .join('\n');
-}
-
-/**
  * Groups a request's selected dates into Monday–Sunday weeks for the
- * "Days Selected (with hours/day)" detail's collapsible per-week display —
- * same week-bucketing as `buildRemainingPreApprovedHoursBreakdown`, but
- * listing the individual days (with their hours) instead of a remaining total.
+ * "Days Selected (with hours/day)" detail's collapsible per-week display,
+ * each week carrying its own `hoursTooltip` breakdown: pre-approved hours
+ * remaining before this request's own hours in that week (`initialRemaining`,
+ * from other approved requests only), this request's own hours reported in
+ * that week (`reported`), and the hours remaining after (`newRemaining`). A
+ * frozen snapshot computed once at submission time, like every other
+ * `details` field — it does not update if resolved later or if other
+ * requests change the VA's balance afterward.
  */
 function buildDaySelectionGroups(
+  vaEmail: string,
+  preApprovedHours: number,
   selectedDates: string[],
   hoursByDate: Record<string, number>,
 ): CARequestDayGroup[] {
@@ -285,9 +258,13 @@ function buildDaySelectionGroups(
     const weekEndISO = toISODate(weekEnd);
     const daysInWeek = selectedDates.filter((date) => date >= weekStartISO && date <= weekEndISO).sort();
 
+    const initialRemaining = Math.max(0, preApprovedHours - getExtraHoursTakenForWeek(vaEmail, weekStartISO, weekEndISO));
+    const reported = daysInWeek.reduce((sum, date) => sum + (hoursByDate[date] ?? 0), 0);
+
     return {
       weekLabel: formatWeekLabel(weekStart, weekEnd),
       days: daysInWeek.map((date) => `${formatWeekdayMDY(date)} (${hoursByDate[date] ?? 0} Hours)`),
+      hoursTooltip: { initialRemaining, reported, newRemaining: Math.max(0, initialRemaining - reported) },
     };
   });
 }
@@ -328,25 +305,16 @@ export function createExtraHoursCARequest(input: CreateExtraHoursRequestInput): 
   const todayNumeric = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
 
   const preApprovedHours = agreement?.settings.preApprovedHoursPerWeek ?? 0;
-  const remainingBreakdown = buildRemainingPreApprovedHoursBreakdown(
-    vaEmail,
-    preApprovedHours,
-    selectedDates,
-    hoursByDate,
-    !needsManualApproval,
-  );
-  const dayGroups = buildDaySelectionGroups(selectedDates, hoursByDate);
+  const dayGroups = buildDaySelectionGroups(vaEmail, preApprovedHours, selectedDates, hoursByDate);
 
   const details: CARequestDetail[] = [
     { label: 'Pre-approved Hours per week', value: `${preApprovedHours} Hours` },
     { label: 'Total Extra Hours Reported', value: `${totalHours} Hours` },
-    { label: 'Selected Weeks', value: dayGroups.map((group) => group.weekLabel).join('\n') },
     {
       label: 'Days Selected (with hours/day)',
       value: dayGroups.flatMap((group) => group.days).join('\n'),
       dayGroups,
     },
-    { label: 'Remaining Pre-approved Hours', value: remainingBreakdown },
     { label: 'Approval Type', value: needsManualApproval ? 'Manual' : 'Auto Approval' },
   ];
   if (agreement && vaUser) {
