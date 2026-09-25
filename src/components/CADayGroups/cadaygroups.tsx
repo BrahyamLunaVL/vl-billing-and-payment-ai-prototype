@@ -13,9 +13,13 @@ export interface CADayGroupHoursTooltip {
   /**
    * `preApprovedHoursPerWeek` minus `takenByOtherRequests`, and minus
    * `reportedInThisRequest` too when this request was approved — its hours
-   * only count against the balance once approved.
+   * only count against the balance once approved. While the request is
+   * still pending, this is the balance "at request time" and the tooltip
+   * also shows `estimatedRemainingIfApproved`.
    */
   remainingHours: number;
+  /** Only present while the request is still pending — the projected balance if this request gets approved. */
+  estimatedRemainingIfApproved?: number;
 }
 
 export interface CADayGroup {
@@ -39,7 +43,8 @@ export interface CADayGroupsProps {
  * `hoursTooltip` also gets an info icon right next to the week label whose
  * hover/focus tooltip breaks down the pre-approved-hours balance for that
  * week: the weekly allowance, what other requests already reported (when
- * any), what this request reports, and what's left of the allowance.
+ * any), what this request reports, and what's left of the allowance — plus,
+ * while the request is still pending, a projected balance if it's approved.
  */
 export const CADayGroups = ({ groups, className }: CADayGroupsProps) => {
   const [collapsedWeeks, setCollapsedWeeks] = useState<Set<string>>(new Set());
@@ -138,9 +143,19 @@ export const CADayGroups = ({ groups, className }: CADayGroupsProps) => {
                           <span>{group.hoursTooltip.reportedInThisRequest} Hours</span>
                         </span>
                         <span className="ca-day-groups__tooltip-row">
-                          <span>Pre-approved Hours Remaining</span>
+                          <span>
+                            {group.hoursTooltip.estimatedRemainingIfApproved !== undefined
+                              ? 'Pre-approved Hours Remaining at Request Time'
+                              : 'Pre-approved Hours Remaining'}
+                          </span>
                           <span>{group.hoursTooltip.remainingHours} Hours</span>
                         </span>
+                        {group.hoursTooltip.estimatedRemainingIfApproved !== undefined && (
+                          <span className="ca-day-groups__tooltip-row">
+                            <span>Estimated Remaining if Approved</span>
+                            <span>{group.hoursTooltip.estimatedRemainingIfApproved} Hours</span>
+                          </span>
+                        )}
                       </span>,
                       document.body,
                     )}

@@ -243,9 +243,13 @@ function slashDateToISO(mdy: string): string {
  * the allowance (`remainingHours`). `isApproved` reflects whether THIS
  * request's own hours actually count against the balance — only an
  * approved request's hours are subtracted; a rejected or still-pending one
- * leaves the balance untouched. A frozen snapshot computed once at
- * submission time, like every other `details` field — it does not update
- * if resolved later or if other requests change the VA's balance afterward.
+ * leaves the balance untouched. When `!isApproved` (this request is being
+ * created as pending `new`, awaiting manual review), `remainingHours` is
+ * the balance "at request time" and an extra `estimatedRemainingIfApproved`
+ * projects what it would be if this request later gets approved. A frozen
+ * snapshot computed once at submission time, like every other `details`
+ * field — it does not update if resolved later or if other requests change
+ * the VA's balance afterward.
  */
 function buildDaySelectionGroups(
   vaEmail: string,
@@ -264,7 +268,7 @@ function buildDaySelectionGroups(
 
     const takenByOtherRequests = getExtraHoursTakenForWeek(vaEmail, weekStartISO, weekEndISO);
     const reportedInThisRequest = daysInWeek.reduce((sum, date) => sum + (hoursByDate[date] ?? 0), 0);
-    const takenTotal = takenByOtherRequests + (isApproved ? reportedInThisRequest : 0);
+    const remainingHours = Math.max(0, preApprovedHours - takenByOtherRequests - (isApproved ? reportedInThisRequest : 0));
 
     return {
       weekLabel: formatWeekLabel(weekStart, weekEnd),
@@ -273,7 +277,10 @@ function buildDaySelectionGroups(
         preApprovedHoursPerWeek: preApprovedHours,
         takenByOtherRequests,
         reportedInThisRequest,
-        remainingHours: Math.max(0, preApprovedHours - takenTotal),
+        remainingHours,
+        ...(isApproved
+          ? {}
+          : { estimatedRemainingIfApproved: Math.max(0, remainingHours - reportedInThisRequest) }),
       },
     };
   });

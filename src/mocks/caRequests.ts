@@ -19,8 +19,17 @@ export interface CARequestDayGroup {
      * `reportedInThisRequest` too when this request's own `status` is
      * 'approved' — its hours only actually count against the balance once
      * approved, so a rejected/pending request leaves the balance untouched.
+     * While the request is still pending ('new'), this is the balance "at
+     * request time" — see `estimatedRemainingIfApproved` for the projected
+     * balance.
      */
     remainingHours: number;
+    /**
+     * Only present while the request is still pending ('new') —
+     * `remainingHours` minus `reportedInThisRequest`, i.e. the projected
+     * balance if this request goes on to be approved.
+     */
+    estimatedRemainingIfApproved?: number;
   };
 }
 
