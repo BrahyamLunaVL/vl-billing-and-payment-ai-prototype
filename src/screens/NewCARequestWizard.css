@@ -173,6 +173,12 @@
   color: #7a7a7a;
 }
 
+.ca-wizard__metric-value-suffix--dark {
+  font-size: 14px;
+  font-weight: 400;
+  color: #263238;
+}
+
 .ca-wizard__details-box {
   display: flex;
   flex-direction: column;

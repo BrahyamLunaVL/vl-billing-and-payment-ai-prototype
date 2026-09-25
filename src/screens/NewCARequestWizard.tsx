@@ -362,22 +362,32 @@ export const NewCARequestWizard = ({
 
                   <div className="ca-wizard__details-box">
                     <div className="ca-wizard__metric-row">
-                      <FormField
-                        label="Pre-approved Hours per Week"
-                        info="The number of extra hours your agreement allows each week without needing separate client approval. Resets every Monday."
-                      >
-                        <p className="ca-wizard__metric-value">
-                          {preApprovedHours} <span>Hours</span>
-                        </p>
-                      </FormField>
-                      <FormField
-                        label="Pre-approved Period"
-                        info={`How far back your extra hours are auto-approved, set by your client. You can still report hours up to ${MAX_LOOKBACK_WEEKS} weeks back, but anything past this period needs their approval.`}
-                      >
-                        <p className="ca-wizard__metric-value">
-                          Last {agreementSettings.reportBackWeeks} <span>Weeks</span>
-                        </p>
-                      </FormField>
+                      {preApprovedHours > 0 ? (
+                        <>
+                          <FormField
+                            label="Pre-approved Hours per Week"
+                            info="The number of extra hours your agreement allows each week without needing separate client approval. Resets every Monday."
+                          >
+                            <p className="ca-wizard__metric-value">
+                              {preApprovedHours} <span>Hours</span>
+                            </p>
+                          </FormField>
+                          <FormField
+                            label="Pre-approved Period"
+                            info={`How far back your extra hours are auto-approved, set by your client. You can still report hours up to ${MAX_LOOKBACK_WEEKS} weeks back, but anything past this period needs their approval.`}
+                          >
+                            <p className="ca-wizard__metric-value">
+                              Last {agreementSettings.reportBackWeeks} <span>Weeks</span>
+                            </p>
+                          </FormField>
+                        </>
+                      ) : (
+                        <FormField label="Report up to">
+                          <p className="ca-wizard__metric-value">
+                            Last 12 <span className="ca-wizard__metric-value-suffix--dark">Weeks</span>
+                          </p>
+                        </FormField>
+                      )}
                       <FormField label="Current Rate per hour">
                         <p className="ca-wizard__metric-value">
                           ${RATE_PER_HOUR.toFixed(2)} <span>USD</span>
