@@ -58,6 +58,12 @@
   color: #263238;
 }
 
+.ca-request-details-modal__row--stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
 .ca-request-details-modal__label {
   flex-shrink: 0;
   font-weight: 700;

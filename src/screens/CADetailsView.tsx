@@ -1,4 +1,4 @@
-import { ProfileCard, Chip } from '../components'
+import { ProfileCard, Chip, CADayGroups } from '../components'
 import { CA_STATUS_LABEL, CA_STATUS_TONE, type CARequest } from '../services/vaAccount'
 import './CADetailsView.css'
 
@@ -41,7 +41,11 @@ export const CADetailsView = ({ request }: CADetailsViewProps) => {
               }
             >
               <span className="ca-details-view__field-label">{detail.label}</span>
-              <span className="ca-details-view__field-value">{detail.value}</span>
+              {detail.dayGroups ? (
+                <CADayGroups groups={detail.dayGroups} />
+              ) : (
+                <span className="ca-details-view__field-value">{detail.value}</span>
+              )}
             </div>
           ))}
           {request.comments && (

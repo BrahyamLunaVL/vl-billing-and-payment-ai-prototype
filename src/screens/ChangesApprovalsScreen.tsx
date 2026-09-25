@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Icon, Chip, Button } from '../components'
+import { Icon, Chip, Button, CADayGroups } from '../components'
 import type { AuthenticatedUser } from '../services/auth'
 import {
   getCARequestsForVA,
@@ -57,7 +57,11 @@ function RequestAccordionCard({ request, expanded, onToggle }: RequestAccordionC
                 className={detail.fullWidth ? 'ca-list-card__field ca-list-card__field--full' : 'ca-list-card__field'}
               >
                 <span className="ca-list-card__field-label">{detail.label}</span>
-                <span className="ca-list-card__field-value">{detail.value}</span>
+                {detail.dayGroups ? (
+                  <CADayGroups groups={detail.dayGroups} />
+                ) : (
+                  <span className="ca-list-card__field-value">{detail.value}</span>
+                )}
               </div>
             ))}
             {request.resolvedBy && (

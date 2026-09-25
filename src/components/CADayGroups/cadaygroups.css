@@ -1,0 +1,53 @@
+.ca-day-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.ca-day-groups__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ca-day-groups__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.ca-day-groups__week-label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #6f1d5d;
+}
+
+.ca-day-groups__header .icon {
+  flex-shrink: 0;
+  color: #6f1d5d;
+}
+
+.ca-day-groups__days {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0 0 0 16px;
+  list-style: none;
+}
+
+.ca-day-groups__day {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #263238;
+}

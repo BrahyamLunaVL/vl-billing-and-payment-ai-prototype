@@ -1,13 +1,19 @@
 import type { ChipTone } from '../components';
 import { MOCK_VA_PROFILES, type VAProfile } from '../mocks/vaProfiles';
 import { MOCK_AGREEMENTS, type Agreement, type AgreementStatus } from '../mocks/agreements';
-import { MOCK_CA_REQUESTS, type CARequest, type CARequestStatus, type CARequestDetail } from '../mocks/caRequests';
+import {
+  MOCK_CA_REQUESTS,
+  type CARequest,
+  type CARequestStatus,
+  type CARequestDetail,
+  type CARequestDayGroup,
+} from '../mocks/caRequests';
 import { MOCK_USERS } from '../mocks/users';
 import { MOCK_INVOICES, groupInvoiceItems, type InvoiceRecord, type InvoiceGroupView, type InvoiceStatus } from '../mocks/invoices';
 
 export type { VAProfile } from '../mocks/vaProfiles';
 export type { Agreement, AgreementStatus } from '../mocks/agreements';
-export type { CARequest, CARequestStatus, CARequestDetail } from '../mocks/caRequests';
+export type { CARequest, CARequestStatus, CARequestDetail, CARequestDayGroup } from '../mocks/caRequests';
 export type { InvoiceRecord, InvoiceLineItemData, InvoiceGroupView, InvoiceStatus } from '../mocks/invoices';
 
 /** Shared status -> display label/color mappings, so every screen that shows one of these statuses agrees. */
@@ -201,9 +207,17 @@ function nextCARequestId(): string {
   return `ca-${maxNum + 1}`;
 }
 
-function formatWeekdayISO(dateISO: string): string {
-  const weekday = parseISODate(dateISO).toLocaleDateString('en-US', { weekday: 'long' });
-  return `${weekday} ${dateISO}`;
+/** "2026-04-08" -> "Wednesday 04-08-2026". */
+function formatWeekdayMDY(dateISO: string): string {
+  const date = parseISODate(dateISO);
+  const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+  const mdy = `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${date.getFullYear()}`;
+  return `${weekday} ${mdy}`;
+}
+
+/** "Week from Apr 6 to Apr 12, 2026" — shared by "Selected Weeks", "Days Selected", and "Remaining Pre-approved Hours". */
+function formatWeekLabel(weekStart: Date, weekEnd: Date): string {
+  return `Week from ${formatShortDate(weekStart)} to ${formatShortDate(weekEnd)}, ${weekEnd.getFullYear()}`;
 }
 
 /** "Elena Ruiz" -> "Elena R." — matches the short-name style already used in the "Agreement" detail line. */
@@ -248,9 +262,34 @@ function buildRemainingPreApprovedHoursBreakdown(
           .reduce((sum, [, hours]) => sum + hours, 0);
       }
       const remaining = Math.max(0, preApprovedHours - taken);
-      return `Week from ${formatShortDate(weekStart)} to ${formatShortDate(weekEnd)}, ${weekEnd.getFullYear()}: ${remaining} Hours`;
+      return `${formatWeekLabel(weekStart, weekEnd)}: ${remaining} Hours`;
     })
     .join('\n');
+}
+
+/**
+ * Groups a request's selected dates into Monday–Sunday weeks for the
+ * "Days Selected (with hours/day)" detail's collapsible per-week display —
+ * same week-bucketing as `buildRemainingPreApprovedHoursBreakdown`, but
+ * listing the individual days (with their hours) instead of a remaining total.
+ */
+function buildDaySelectionGroups(
+  selectedDates: string[],
+  hoursByDate: Record<string, number>,
+): CARequestDayGroup[] {
+  const weekStarts = [...new Set(selectedDates.map((date) => getWeekRange(date).start))].sort();
+
+  return weekStarts.map((weekStartISO) => {
+    const weekStart = parseISODate(weekStartISO);
+    const weekEnd = addDays(weekStart, 6);
+    const weekEndISO = toISODate(weekEnd);
+    const daysInWeek = selectedDates.filter((date) => date >= weekStartISO && date <= weekEndISO).sort();
+
+    return {
+      weekLabel: formatWeekLabel(weekStart, weekEnd),
+      days: daysInWeek.map((date) => `${formatWeekdayMDY(date)} (${hoursByDate[date] ?? 0} Hours)`),
+    };
+  });
 }
 
 export interface CreateExtraHoursRequestInput {
@@ -296,21 +335,26 @@ export function createExtraHoursCARequest(input: CreateExtraHoursRequestInput): 
     hoursByDate,
     !needsManualApproval,
   );
+  const dayGroups = buildDaySelectionGroups(selectedDates, hoursByDate);
 
   const details: CARequestDetail[] = [
     { label: 'Pre-approved Hours per week', value: `${preApprovedHours} Hours` },
-    { label: 'Remaining Pre-approved Hours', value: remainingBreakdown, fullWidth: true },
     { label: 'Total Extra Hours Reported', value: `${totalHours} Hours` },
+    { label: 'Selected Weeks', value: dayGroups.map((group) => group.weekLabel).join('\n'), fullWidth: true },
     {
       label: 'Days Selected (with hours/day)',
-      value: selectedDates.map((date) => `${formatWeekdayISO(date)} (${hoursByDate[date] ?? 0} Hrs)`).join('\n'),
+      value: dayGroups.flatMap((group) => group.days).join('\n'),
+      dayGroups,
+      fullWidth: true,
     },
+    { label: 'Remaining Pre-approved Hours', value: remainingBreakdown },
     { label: 'Approval Type', value: needsManualApproval ? 'Manual' : 'Auto Approval' },
   ];
   if (agreement && vaUser) {
     details.push({
       label: 'Agreement',
       value: `VL-Agreement-${agreement.clientName}-${shortenVAName(vaUser.name)}-${slashDateToISO(agreement.startDate)}`,
+      fullWidth: true,
     });
   }
 
