@@ -20,10 +20,10 @@ type Story = StoryObj<typeof meta>;
 
 // The seed data no longer includes any pending ("New") extra-hours
 // requests (every VA starts with exactly one approved, one rejected) —
-// tests that exercise the pending-request flows (Admin review/bulk-approve,
-// the one-active-request block) manufacture their own via this helper.
-// `anyWeekOverHours: true` guarantees `needsManualApproval`, so the created
-// request is always `new` regardless of the VA's actual agreement settings.
+// tests that exercise the pending-request flows (Admin review/bulk-approve)
+// manufacture their own via this helper. `anyWeekOverHours: true` guarantees
+// `needsManualApproval`, so the created request is always `new` regardless
+// of the VA's actual agreement settings.
 function seedPendingExtraHoursRequest(vaEmail: string, agreementId: string) {
   createExtraHoursCARequest({
     vaEmail,
@@ -421,11 +421,12 @@ export const SubmittingAnExtraHoursRequestPersistsIt: Story = {
   },
 };
 
-export const CannotSubmitASecondActiveExtraHoursRequest: Story = {
+export const CanSubmitAnExtraHoursRequestWhileAnotherIsPending: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     try {
-      // The seed data has no pending requests by default — manufacture one
-      // for va@ so there's an active request for the wizard to block on.
+      // VAs are no longer limited to one outstanding extra-hours request —
+      // manufacture a pending one for va@ and confirm the wizard neither
+      // blocks nor warns, and a second request submits successfully.
       seedPendingExtraHoursRequest('va@virtuallatinos.com', 'agr-1');
 
       await loginAsVA(canvas, userEvent);
@@ -433,9 +434,10 @@ export const CannotSubmitASecondActiveExtraHoursRequest: Story = {
       await userEvent.click(await canvas.findByRole('button', { name: /^new request for changes$/i }));
       await userEvent.click(canvas.getByRole('button', { name: /^next$/i }));
 
+      await expect(await canvas.findByText('No days selected')).toBeVisible();
       await expect(
-        await canvas.findByText(/you currently have an active extra hours request/i),
-      ).toBeVisible();
+        canvas.queryByText(/you currently have an active extra hours request/i),
+      ).not.toBeInTheDocument();
 
       const enabledDay = canvasElement.querySelector<HTMLButtonElement>(
         '.calendar__day:not(:disabled):not(.calendar__day--outside)',
@@ -443,7 +445,12 @@ export const CannotSubmitASecondActiveExtraHoursRequest: Story = {
       if (!enabledDay) throw new globalThis.Error('Expected at least one enabled calendar day');
       await userEvent.click(enabledDay);
 
-      await expect(canvas.getByRole('button', { name: /^next$/i })).toBeDisabled();
+      await expect(canvas.getByRole('button', { name: /^next$/i })).not.toBeDisabled();
+      await userEvent.click(canvas.getByRole('button', { name: /^next$/i }));
+      await expect(await canvas.findByText(/anything else you.*tell us/i)).toBeVisible();
+      await userEvent.click(canvas.getByRole('button', { name: /^submit form$/i }));
+
+      await expect(await canvas.findByText('Request Submitted Successfully')).toBeVisible();
     } finally {
       resetMockCARequests();
     }
