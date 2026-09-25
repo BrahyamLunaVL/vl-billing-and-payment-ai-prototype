@@ -28,10 +28,11 @@ export interface CADayGroupsProps {
 
 /**
  * The "Days Selected (with hours/day)" detail's collapsible per-week list —
- * every week starts expanded, and each one's header (week label + chevron on
- * the far right) toggles independently. A week with `hoursTooltip` also gets
- * an info icon whose hover/focus tooltip breaks down the pre-approved-hours
- * balance for that week.
+ * every week starts expanded, and each one's header (week label, with a
+ * chevron on the far right) toggles independently. A week with
+ * `hoursTooltip` also gets an info icon right next to the week label whose
+ * hover/focus tooltip breaks down the pre-approved-hours balance for that
+ * week.
  */
 export const CADayGroups = ({ groups, className }: CADayGroupsProps) => {
   const [collapsedWeeks, setCollapsedWeeks] = useState<Set<string>>(new Set());
@@ -85,7 +86,6 @@ export const CADayGroups = ({ groups, className }: CADayGroupsProps) => {
                 aria-expanded={isExpanded}
               >
                 <span className="ca-day-groups__week-label">{group.weekLabel}</span>
-                <Icon name={isExpanded ? 'chevron-up' : 'chevron-down'} size={14} />
               </button>
               {group.hoursTooltip && (
                 <span
@@ -133,6 +133,15 @@ export const CADayGroups = ({ groups, className }: CADayGroupsProps) => {
                     )}
                 </span>
               )}
+              <button
+                type="button"
+                className="ca-day-groups__header-chevron"
+                onClick={() => toggleWeek(group.weekLabel)}
+                aria-hidden="true"
+                tabIndex={-1}
+              >
+                <Icon name={isExpanded ? 'chevron-up' : 'chevron-down'} size={14} />
+              </button>
             </div>
             {isExpanded && (
               <ul className="ca-day-groups__days">

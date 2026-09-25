@@ -21,10 +21,7 @@
 .ca-day-groups__header-toggle {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex: 1;
   min-width: 0;
-  gap: 12px;
   padding: 0;
   border: none;
   background: transparent;
@@ -39,8 +36,15 @@
   color: #263238;
 }
 
-.ca-day-groups__header-toggle .icon {
+.ca-day-groups__header-chevron {
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
   color: #263238;
 }
 
