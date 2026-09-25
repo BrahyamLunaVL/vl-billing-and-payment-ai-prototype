@@ -8,6 +8,7 @@ import {
   resetMockAgreements,
   resetMockCARequests,
 } from './services/clientAccount';
+import { createExtraHoursCARequest } from './services/vaAccount';
 
 const meta = {
   component: App,
@@ -16,6 +17,25 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+// The seed data no longer includes any pending ("New") extra-hours
+// requests (every VA starts with exactly one approved, one rejected) —
+// tests that exercise the pending-request flows (Admin review/bulk-approve)
+// manufacture their own via this helper. `anyWeekOverHours: true` guarantees
+// `needsManualApproval`, so the created request is always `new` regardless
+// of the VA's actual agreement settings.
+function seedPendingExtraHoursRequest(vaEmail: string, agreementId: string) {
+  createExtraHoursCARequest({
+    vaEmail,
+    agreementId,
+    selectedDates: ['2026-06-08'],
+    hoursByDate: { '2026-06-08': 1 },
+    comments: 'Test setup: forced pending request.',
+    requesterRole: 'va',
+    anyWeekOverHours: true,
+    anyWeekOutsidePeriod: false,
+  });
+}
 
 // --- Login screen -----------------------------------------------------
 
@@ -228,7 +248,7 @@ export const VaLoginShowsVaSidebar: Story = {
     // C&A request, and an invoice all render from the VA's own mock data.
     await expect(canvas.getAllByText('Elena Ruiz')[0]).toBeVisible();
     await expect(canvas.getAllByText('Bloominari dba Virtual Latinos @ $11.00')[0]).toBeVisible();
-    await expect(canvas.getByText('Request approval for short time off')).toBeVisible();
+    await expect(canvas.getAllByText('Request approval for extra hours')[0]).toBeVisible();
     await expect(canvas.getByText('Invoice Preview #1940-3326')).toBeVisible();
   },
 };
@@ -263,13 +283,15 @@ export const ClickingACARequestShowsItsDetails: Story = {
     await userEvent.type(canvas.getByPlaceholderText('Enter your password'), 'VL-Testing-2026');
     await userEvent.click(canvas.getByRole('button', { name: /^log in$/i }));
 
-    await userEvent.click(await canvas.findByRole('button', { name: /request approval for short time off/i }));
+    // Newest-first ordering — va@'s rejected request (Apr 27) is more
+    // recent than the approved one (Apr 20), so it's the first card.
+    await userEvent.click((await canvas.findAllByRole('button', { name: /request approval for extra hours/i }))[0]);
 
     // The dashboard grid/invoices are replaced by the request's details —
     // Figma's "My Account - C&A Details" — and the page title is hidden,
     // matching that frame exactly.
-    await expect(await canvas.findByText('Time Off Dates')).toBeVisible();
-    await expect(canvas.getByText('2025-12-10')).toBeVisible();
+    await expect(await canvas.findByText('Days Selected (with hours/day)')).toBeVisible();
+    await expect(canvas.getByText('Pre-approved Hours per week')).toBeVisible();
     await expect(canvas.getByText(/requested by/i)).toBeVisible();
     await expect(canvas.queryByText('My Account', { selector: 'h1' })).not.toBeInTheDocument();
     await expect(canvas.queryByText('Virtual Latinos Invoices')).not.toBeInTheDocument();
@@ -301,8 +323,10 @@ export const NavigatingToChangesApprovalsAndBack: Story = {
     await expect(canvas.queryByText('Virtual Latinos Invoices')).not.toBeInTheDocument();
 
     // Clicking a list card expands it in place (an accordion, not a
-    // navigation), showing its richer detail grid. There are two "extra
-    // hours" requests (manual and auto approval) — the manual one is first.
+    // navigation), showing its richer detail grid. Every VA has 2 extra
+    // hours requests, newest-first — va@'s rejected one (Apr 27, Manual
+    // approval type) is more recent than the approved one (Apr 20), so
+    // it's the first row.
     await userEvent.click(canvas.getAllByRole('button', { name: /request approval for extra hours/i })[0]);
     await expect(await canvas.findByText('Approval Type')).toBeVisible();
     await expect(canvas.getByText('Manual')).toBeVisible();
@@ -325,8 +349,9 @@ export const CreatingAnExtraHoursRequest: Story = {
 
     await expect(await canvas.findByText('No days selected')).toBeVisible();
 
-    // Selecting a day on the calendar (today is always enabled — it's the
-    // max date) replaces the empty state with an hour entry for that day.
+    // Selecting a day on the calendar (the current week is always fully
+    // blocked, so this picks a day from the most recent selectable week
+    // instead) replaces the empty state with an hour entry for that day.
     const enabledDay = canvasElement.querySelector<HTMLButtonElement>(
       '.calendar__day:not(:disabled):not(.calendar__day--outside)',
     );
@@ -351,6 +376,84 @@ export const CreatingAnExtraHoursRequest: Story = {
     await expect(
       await canvas.findByText((_, element) => element?.textContent === '12 Hours' && element?.tagName === 'P'),
     ).toBeVisible();
+  },
+};
+
+export const SubmittingAnExtraHoursRequestPersistsIt: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    try {
+      await loginAsVA(canvas, userEvent);
+      await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
+      await userEvent.click(await canvas.findByRole('button', { name: /^new request for changes$/i }));
+      await userEvent.click(canvas.getByRole('button', { name: /^next$/i }));
+
+      await expect(await canvas.findByText('No days selected')).toBeVisible();
+      const enabledDay = canvasElement.querySelector<HTMLButtonElement>(
+        '.calendar__day:not(:disabled):not(.calendar__day--outside)',
+      );
+      if (!enabledDay) throw new globalThis.Error('Expected at least one enabled calendar day');
+      // The default 1 hour is well within va@'s 5-hour weekly cap, and the
+      // earliest enabled day in the initial month view is still inside the
+      // 4-week auto-approval period, so this submission should auto-approve.
+      await userEvent.click(enabledDay);
+
+      await userEvent.click(canvas.getByRole('button', { name: /^next$/i }));
+      await expect(await canvas.findByText(/anything else you.*tell us/i)).toBeVisible();
+      await userEvent.click(canvas.getByRole('button', { name: /^submit form$/i }));
+
+      await expect(await canvas.findByText('Request Submitted Successfully')).toBeVisible();
+      await userEvent.click(canvas.getByRole('button', { name: /^go my account$/i }));
+
+      // Before `createExtraHoursCARequest` existed, "Submit form" only
+      // advanced the wizard's own step — the request never actually got
+      // written anywhere. Now it does: My Account re-fetches fresh from the
+      // mock "database" on this navigation, and the newest-first sort puts
+      // the just-created request in the very first card, already Approved
+      // since it qualified for auto-approval.
+      await expect(await canvas.findByText('My Account', { selector: 'h1' })).toBeVisible();
+      const firstCard = canvasElement.querySelector('.ca-card');
+      if (!firstCard) throw new globalThis.Error('Expected at least one CA card to render');
+      expect(firstCard.textContent).toContain('Approved');
+      expect(firstCard.textContent).toContain('Request approval for extra hours');
+    } finally {
+      resetMockCARequests();
+    }
+  },
+};
+
+export const CanSubmitAnExtraHoursRequestWhileAnotherIsPending: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    try {
+      // VAs are no longer limited to one outstanding extra-hours request —
+      // manufacture a pending one for va@ and confirm the wizard neither
+      // blocks nor warns, and a second request submits successfully.
+      seedPendingExtraHoursRequest('va@virtuallatinos.com', 'agr-1');
+
+      await loginAsVA(canvas, userEvent);
+      await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
+      await userEvent.click(await canvas.findByRole('button', { name: /^new request for changes$/i }));
+      await userEvent.click(canvas.getByRole('button', { name: /^next$/i }));
+
+      await expect(await canvas.findByText('No days selected')).toBeVisible();
+      await expect(
+        canvas.queryByText(/you currently have an active extra hours request/i),
+      ).not.toBeInTheDocument();
+
+      const enabledDay = canvasElement.querySelector<HTMLButtonElement>(
+        '.calendar__day:not(:disabled):not(.calendar__day--outside)',
+      );
+      if (!enabledDay) throw new globalThis.Error('Expected at least one enabled calendar day');
+      await userEvent.click(enabledDay);
+
+      await expect(canvas.getByRole('button', { name: /^next$/i })).not.toBeDisabled();
+      await userEvent.click(canvas.getByRole('button', { name: /^next$/i }));
+      await expect(await canvas.findByText(/anything else you.*tell us/i)).toBeVisible();
+      await userEvent.click(canvas.getByRole('button', { name: /^submit form$/i }));
+
+      await expect(await canvas.findByText('Request Submitted Successfully')).toBeVisible();
+    } finally {
+      resetMockCARequests();
+    }
   },
 };
 
@@ -396,11 +499,16 @@ async function loginAsAdmin(canvas: any, userEvent: any) {
 export const AdminReviewingASingleRequest: Story = {
   play: async ({ canvas, userEvent }) => {
     try {
+      // The seed data has no pending requests by default — manufacture one.
+      // It's dated "today", newer than every seed entry, so it sorts to the
+      // very first row of the table regardless of which VA it's for.
+      seedPendingExtraHoursRequest('va@virtuallatinos.com', 'agr-1');
+
       await loginAsAdmin(canvas, userEvent);
       await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
 
       await expect(await canvas.findByText('Changes & Approvals Form', { selector: 'h1' })).toBeVisible();
-      await expect(canvas.getByText('Request approval for short time off')).toBeVisible();
+      await expect(canvas.getAllByText('New')[0]).toBeVisible();
 
       // The pending ("New") request's View modal offers Reject/Approve —
       // approving it updates the table in place, from the same underlying
@@ -423,6 +531,13 @@ export const AdminReviewingASingleRequest: Story = {
 export const AdminBulkApprovingSelectedRequests: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     try {
+      // The seed data has no pending requests by default — manufacture two,
+      // for different VAs. Both are dated "today", newer than every seed
+      // entry, so they sort to the table's first two rows (most-recently
+      // created first).
+      seedPendingExtraHoursRequest('va@virtuallatinos.com', 'agr-1');
+      seedPendingExtraHoursRequest('va2@virtuallatinos.com', 'agr-5');
+
       await loginAsAdmin(canvas, userEvent);
       await userEvent.click(canvas.getByRole('button', { name: /changes & approvals form/i }));
       await canvas.findByText('Changes & Approvals Form', { selector: 'h1' });
@@ -432,7 +547,8 @@ export const AdminBulkApprovingSelectedRequests: Story = {
       await expect(reviewRequestButton).toBeDisabled();
 
       const rowCheckboxes = canvasElement.querySelectorAll('.table__checkbox');
-      // rowCheckboxes[0] is the header's "select all" — select the first 2 data rows.
+      // rowCheckboxes[0] is the header's "select all" — rows 1 and 2 are
+      // the two pending requests just seeded above.
       await userEvent.click(rowCheckboxes[1]);
       await userEvent.click(rowCheckboxes[2]);
       await expect(reviewRequestButton).toBeEnabled();

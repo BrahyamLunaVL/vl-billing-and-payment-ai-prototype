@@ -139,6 +139,27 @@
   background: #f6f6f7;
 }
 
+.ca-wizard__metric-row .form-field__label {
+  white-space: normal;
+}
+
+.ca-wizard__metric-row .form-field__label-details {
+  /* The label can wrap to multiple lines at narrow widths (see the
+     white-space: normal override above) — align the info icon to the
+     top instead of centering it across the whole wrapped block, so it
+     reads as sitting next to the label's first line. */
+  align-items: flex-start;
+}
+
+.ca-wizard__metric-row .form-field__info {
+  /* flex-start above puts the icon flush with the top of the label's
+     line box, but the label's line-height (23.2px for its 14px text)
+     leaves visible leading space above the glyphs themselves — without
+     this the icon reads as floating above the first line instead of
+     sitting next to it. */
+  margin-top: 6px;
+}
+
 .ca-wizard__metric-value {
   margin: 0;
   font-size: 16px;
@@ -150,6 +171,12 @@
   font-size: 14px;
   font-weight: 400;
   color: #7a7a7a;
+}
+
+.ca-wizard__metric-value-suffix--dark {
+  font-size: 14px;
+  font-weight: 400;
+  color: #263238;
 }
 
 .ca-wizard__details-box {
@@ -221,6 +248,33 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.ca-wizard__week-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ca-wizard__week-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #ececef;
+  border-radius: 8px;
+}
+
+.ca-wizard__week-group .ca-wizard__metric-row {
+  background: #f9e9ee;
+  border-color: #f0c7d5;
+}
+
+.ca-wizard__week-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #6f1d5d;
 }
 
 .ca-wizard__totals {

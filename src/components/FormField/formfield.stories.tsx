@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect } from 'storybook/test';
+import { expect, screen } from 'storybook/test';
 import { FormField } from './formfield';
 
 const Placeholder = () => (
@@ -55,16 +55,17 @@ export const WithInfoTooltip: Story = {
   args: {
     info: 'This explains what the field is for.',
   },
-  play: async ({ canvasElement, canvas, userEvent }) => {
-    const tooltip = canvasElement.querySelector('.form-field__tooltip');
-    if (!tooltip) throw new globalThis.Error('Expected tooltip element to render');
-    await expect(tooltip).toHaveAttribute('hidden');
+  play: async ({ canvas, userEvent }) => {
+    // The tooltip is portaled to document.body, outside canvasElement, and
+    // only mounted while open — query it via the global screen instead of
+    // canvas, and check presence rather than a `hidden` attribute.
+    await expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
     const trigger = canvas.getByRole('button', { name: '' });
     await userEvent.hover(trigger);
-    await expect(tooltip).not.toHaveAttribute('hidden');
+    const tooltip = await screen.findByRole('tooltip');
     await expect(tooltip).toHaveTextContent('This explains what the field is for.');
     await userEvent.unhover(trigger);
-    await expect(tooltip).toHaveAttribute('hidden');
+    await expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   },
 };
 

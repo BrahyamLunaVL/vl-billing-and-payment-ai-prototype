@@ -23,8 +23,11 @@ export const ClientNewCARequestScreen = ({ agreement, onFinish }: ClientNewCAReq
         {wizardStep !== 4 && <Button type="tertiary" buttonText="Click to see SAM Contact Info" />}
       </div>
       <NewCARequestWizard
+        vaEmail={agreement.vaEmail}
+        agreementId={agreement.id}
         recentRequest={recentRequest}
         agreementSettings={agreement.settings}
+        requesterRole="client"
         onStepChange={setWizardStep}
         finishButtonLabel="Go to C&A Table"
         onFinish={onFinish}

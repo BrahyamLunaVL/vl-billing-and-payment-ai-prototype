@@ -1,4 +1,4 @@
-import { PopUp, Icon, Button } from '../components'
+import { PopUp, Icon, Button, CADayGroups } from '../components'
 import type { ClientCARequestView } from '../services/clientAccount'
 import './CARequestDetailsModal.css'
 
@@ -41,11 +41,22 @@ export const CARequestDetailsModal = ({ request, onClose, onApprove, onReject }:
             <span className="ca-request-details-modal__value">{request.clientName}</span>
           </div>
           {request.details.map((detail) => (
-            <div key={detail.label} className="ca-request-details-modal__row">
+            <div
+              key={detail.label}
+              className={
+                detail.dayGroups
+                  ? 'ca-request-details-modal__row ca-request-details-modal__row--stacked'
+                  : 'ca-request-details-modal__row'
+              }
+            >
               <span className="ca-request-details-modal__label">{detail.label}</span>
-              <span className="ca-request-details-modal__value ca-request-details-modal__value--pre">
-                {detail.value}
-              </span>
+              {detail.dayGroups ? (
+                <CADayGroups groups={detail.dayGroups} requestStatus={request.status} />
+              ) : (
+                <span className="ca-request-details-modal__value ca-request-details-modal__value--pre">
+                  {detail.value}
+                </span>
+              )}
             </div>
           ))}
           <div className="ca-request-details-modal__row">

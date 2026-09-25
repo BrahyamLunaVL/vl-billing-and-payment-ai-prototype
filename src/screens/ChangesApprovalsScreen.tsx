@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Icon, Chip, Button } from '../components'
+import { useReducer, useState } from 'react'
+import { Icon, Chip, Button, CADayGroups } from '../components'
 import type { AuthenticatedUser } from '../services/auth'
 import {
   getCARequestsForVA,
@@ -8,6 +8,7 @@ import {
   CA_STATUS_TONE,
   type CARequest,
 } from '../services/vaAccount'
+import { resolveCARequest } from '../services/clientAccount'
 import { NewCARequestWizard } from './NewCARequestWizard'
 import './ChangesApprovalsScreen.css'
 
@@ -23,9 +24,12 @@ interface RequestAccordionCardProps {
   request: CARequest
   expanded: boolean
   onToggle: () => void
+  /** Present only for a pending ('new') request — simulates Admin/Client resolving it, for demoing the flow without switching accounts. */
+  onApprove: () => void
+  onReject: () => void
 }
 
-function RequestAccordionCard({ request, expanded, onToggle }: RequestAccordionCardProps) {
+function RequestAccordionCard({ request, expanded, onToggle, onApprove, onReject }: RequestAccordionCardProps) {
   return (
     <div className={expanded ? 'ca-list-card ca-list-card--expanded' : 'ca-list-card'}>
       <button type="button" className="ca-list-card__header" onClick={onToggle} aria-expanded={expanded}>
@@ -57,7 +61,11 @@ function RequestAccordionCard({ request, expanded, onToggle }: RequestAccordionC
                 className={detail.fullWidth ? 'ca-list-card__field ca-list-card__field--full' : 'ca-list-card__field'}
               >
                 <span className="ca-list-card__field-label">{detail.label}</span>
-                <span className="ca-list-card__field-value">{detail.value}</span>
+                {detail.dayGroups ? (
+                  <CADayGroups groups={detail.dayGroups} requestStatus={request.status} />
+                ) : (
+                  <span className="ca-list-card__field-value">{detail.value}</span>
+                )}
               </div>
             ))}
             {request.resolvedBy && (
@@ -75,6 +83,12 @@ function RequestAccordionCard({ request, expanded, onToggle }: RequestAccordionC
               </div>
             )}
           </div>
+          {request.status === 'new' && (
+            <div className="ca-list-card__footer">
+              <Button type="tertiary" buttonText="Reject" onClick={onReject} style={{ width: '160px' }} />
+              <Button buttonText="Approve" onClick={onApprove} style={{ width: '160px' }} />
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -86,11 +100,19 @@ export const ChangesApprovalsScreen = ({ user, openWizard = false, onFinishWizar
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [showWizard, setShowWizard] = useState(openWizard)
   const [wizardStep, setWizardStep] = useState<1 | 2 | 3 | 4>(1)
+  // `resolveCARequest` mutates the shared mock record in place — this forces
+  // a re-render so the just-resolved status/chip actually shows up.
+  const [, forceRefresh] = useReducer((tick: number) => tick + 1, 0)
 
   const requests = getCARequestsForVA(user.email)
   const activeAgreement = getAgreementsForVA(user.email).find((agreement) => agreement.status === 'active')
 
   const showSuccessHeader = showWizard && wizardStep === 4
+
+  const handleResolve = (id: string, decision: 'approved' | 'rejected') => {
+    resolveCARequest(id, decision)
+    forceRefresh()
+  }
 
   return (
     <div className="ca-screen">
@@ -103,8 +125,11 @@ export const ChangesApprovalsScreen = ({ user, openWizard = false, onFinishWizar
 
       {showWizard ? (
         <NewCARequestWizard
+          vaEmail={user.email}
+          agreementId={activeAgreement?.id}
           recentRequest={requests[0]}
           agreementSettings={activeAgreement?.settings}
+          requesterRole="va"
           onStepChange={setWizardStep}
           finishButtonLabel="Go My Account"
           onFinish={onFinishWizard}
@@ -125,6 +150,8 @@ export const ChangesApprovalsScreen = ({ user, openWizard = false, onFinishWizar
                 request={request}
                 expanded={expandedId === request.id}
                 onToggle={() => setExpandedId((prev) => (prev === request.id ? null : request.id))}
+                onApprove={() => handleResolve(request.id, 'approved')}
+                onReject={() => handleResolve(request.id, 'rejected')}
               />
             ))}
           </div>

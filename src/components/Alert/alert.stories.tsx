@@ -45,6 +45,7 @@ export const UsesTypeColorForIconAndText: Story = {
     if (!root) throw new globalThis.Error('Expected the alert to render');
     const cs = getComputedStyle(root);
     await expect(cs.color).toBe('rgb(222, 21, 21)');
-    await expect(cs.backgroundColor).toBe('rgb(250, 220, 220)');
+    await expect(cs.backgroundColor).toBe('rgb(253, 241, 241)');
+    await expect(cs.borderColor).toBe('rgb(247, 197, 197)');
   },
 };

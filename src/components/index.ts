@@ -49,6 +49,9 @@ export type { NotificationProps } from './Notification';
 export { Alert } from './Alert';
 export type { AlertProps, AlertType } from './Alert';
 
+export { CADayGroups } from './CADayGroups';
+export type { CADayGroup, CADayGroupsProps } from './CADayGroups';
+
 export { Option } from './Option';
 export type { OptionProps, OptionType } from './Option';
 

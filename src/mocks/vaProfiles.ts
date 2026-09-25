@@ -47,6 +47,20 @@ const INITIAL_VA_PROFILES: VAProfile[] = [
     phoneNumber: '+57 300 462 1845',
     hubspotId: '124318284948',
   },
+  {
+    email: 'va-no-hours@virtuallatinos.com',
+    legalName: 'Camila Torres',
+    vaSinceDate: 'Monday, January 12, 2026',
+    samContactName: 'Javiera Mercado',
+    telegramHandle: '@camila.torres',
+    paymentEmail: 'camila.torres@virtuallatinos.com',
+    paymentMethod: 'Payoneer',
+    hiredStatus: 'hired',
+    country: 'Mexico',
+    aka: 'Camila T.',
+    phoneNumber: '+52 55 1234 5678',
+    hubspotId: '124318284949',
+  },
 ];
 
 /** VA-specific profile fields that don't belong on every user (see MockUser in ./users). */

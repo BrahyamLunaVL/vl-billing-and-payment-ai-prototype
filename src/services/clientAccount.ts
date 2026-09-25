@@ -3,6 +3,7 @@ import { MOCK_AGREEMENTS, resetMockAgreements, type Agreement, type AgreementSet
 import { MOCK_VA_PROFILES } from '../mocks/vaProfiles';
 import { MOCK_USERS } from '../mocks/users';
 import { MOCK_INVOICES, groupInvoiceItems, type InvoiceGroupView } from '../mocks/invoices';
+import { sortCARequestsByRecency } from './vaAccount';
 import {
   MOCK_CA_REQUESTS,
   resetMockCARequests,
@@ -117,18 +118,20 @@ export interface ClientCARequestView extends CARequest {
 
 /** Every Changes & Approvals request under this client's account (Figma's client-facing table). */
 export function getCARequestsForClient(clientEmail: string): ClientCARequestView[] {
-  return MOCK_CA_REQUESTS.filter((request) => request.clientEmail === clientEmail).map((request) => {
+  const requests = MOCK_CA_REQUESTS.filter((request) => request.clientEmail === clientEmail).map((request) => {
     const vaUser = MOCK_USERS.find((user) => user.email === request.vaEmail);
     return { ...request, vaName: vaUser?.name ?? request.vaEmail };
   });
+  return sortCARequestsByRecency(requests);
 }
 
 /** Every Changes & Approvals request platform-wide — the Admin table's view, unscoped to one client. */
 export function getAllCARequests(): ClientCARequestView[] {
-  return MOCK_CA_REQUESTS.map((request) => {
+  const requests = MOCK_CA_REQUESTS.map((request) => {
     const vaUser = MOCK_USERS.find((user) => user.email === request.vaEmail);
     return { ...request, vaName: vaUser?.name ?? request.vaEmail };
   });
+  return sortCARequestsByRecency(requests);
 }
 
 export function getCARequestByIdForClient(id: string): ClientCARequestView | undefined {
