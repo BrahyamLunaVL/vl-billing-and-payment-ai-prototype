@@ -62,7 +62,7 @@ function RequestAccordionCard({ request, expanded, onToggle, onApprove, onReject
               >
                 <span className="ca-list-card__field-label">{detail.label}</span>
                 {detail.dayGroups ? (
-                  <CADayGroups groups={detail.dayGroups} />
+                  <CADayGroups groups={detail.dayGroups} requestStatus={request.status} />
                 ) : (
                   <span className="ca-list-card__field-value">{detail.value}</span>
                 )}

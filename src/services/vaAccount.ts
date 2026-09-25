@@ -238,25 +238,18 @@ function slashDateToISO(mdy: string): string {
  * "Days Selected (with hours/day)" detail's collapsible per-week display,
  * each week carrying its own `hoursTooltip` breakdown: the weekly
  * pre-approved allowance (`preApprovedHoursPerWeek`), what this VA's OTHER
- * requests already reported that week (`takenByOtherRequests`), what THIS
- * request reports that week (`reportedInThisRequest`), and what's left of
- * the allowance (`remainingHours`). `isApproved` reflects whether THIS
- * request's own hours actually count against the balance — only an
- * approved request's hours are subtracted; a rejected or still-pending one
- * leaves the balance untouched. When `!isApproved` (this request is being
- * created as pending `new`, awaiting manual review), `remainingHours` is
- * the balance "at request time" and an extra `estimatedRemainingIfApproved`
- * projects what it would be if this request later gets approved. A frozen
- * snapshot computed once at submission time, like every other `details`
- * field — it does not update if resolved later or if other requests change
- * the VA's balance afterward.
+ * requests already reported that week (`takenByOtherRequests`), and what
+ * THIS request reports that week (`reportedInThisRequest`). Deliberately
+ * doesn't compute a "remaining" number here — `CADayGroups` derives that
+ * live from the request's current status, since only an approved request's
+ * hours actually count against the balance, and this request's own status
+ * can change after submission (resolved later).
  */
 function buildDaySelectionGroups(
   vaEmail: string,
   preApprovedHours: number,
   selectedDates: string[],
   hoursByDate: Record<string, number>,
-  isApproved: boolean,
 ): CARequestDayGroup[] {
   const weekStarts = [...new Set(selectedDates.map((date) => getWeekRange(date).start))].sort();
 
@@ -266,21 +259,13 @@ function buildDaySelectionGroups(
     const weekEndISO = toISODate(weekEnd);
     const daysInWeek = selectedDates.filter((date) => date >= weekStartISO && date <= weekEndISO).sort();
 
-    const takenByOtherRequests = getExtraHoursTakenForWeek(vaEmail, weekStartISO, weekEndISO);
-    const reportedInThisRequest = daysInWeek.reduce((sum, date) => sum + (hoursByDate[date] ?? 0), 0);
-    const remainingHours = Math.max(0, preApprovedHours - takenByOtherRequests - (isApproved ? reportedInThisRequest : 0));
-
     return {
       weekLabel: formatWeekLabel(weekStart, weekEnd),
       days: daysInWeek.map((date) => `${formatWeekdayMDY(date)} (${hoursByDate[date] ?? 0} Hours)`),
       hoursTooltip: {
         preApprovedHoursPerWeek: preApprovedHours,
-        takenByOtherRequests,
-        reportedInThisRequest,
-        remainingHours,
-        ...(isApproved
-          ? {}
-          : { estimatedRemainingIfApproved: Math.max(0, remainingHours - reportedInThisRequest) }),
+        takenByOtherRequests: getExtraHoursTakenForWeek(vaEmail, weekStartISO, weekEndISO),
+        reportedInThisRequest: daysInWeek.reduce((sum, date) => sum + (hoursByDate[date] ?? 0), 0),
       },
     };
   });
@@ -322,7 +307,7 @@ export function createExtraHoursCARequest(input: CreateExtraHoursRequestInput): 
   const todayNumeric = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
 
   const preApprovedHours = agreement?.settings.preApprovedHoursPerWeek ?? 0;
-  const dayGroups = buildDaySelectionGroups(vaEmail, preApprovedHours, selectedDates, hoursByDate, !needsManualApproval);
+  const dayGroups = buildDaySelectionGroups(vaEmail, preApprovedHours, selectedDates, hoursByDate);
 
   const details: CARequestDetail[] = [
     { label: 'Pre-approved Hours per week', value: `${preApprovedHours} Hours` },

@@ -51,7 +51,7 @@ export const CARequestDetailsModal = ({ request, onClose, onApprove, onReject }:
             >
               <span className="ca-request-details-modal__label">{detail.label}</span>
               {detail.dayGroups ? (
-                <CADayGroups groups={detail.dayGroups} />
+                <CADayGroups groups={detail.dayGroups} requestStatus={request.status} />
               ) : (
                 <span className="ca-request-details-modal__value ca-request-details-modal__value--pre">
                   {detail.value}

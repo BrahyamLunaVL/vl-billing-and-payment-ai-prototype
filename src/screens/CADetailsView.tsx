@@ -45,7 +45,7 @@ export const CADetailsView = ({ request, onApprove, onReject }: CADetailsViewPro
             >
               <span className="ca-details-view__field-label">{detail.label}</span>
               {detail.dayGroups ? (
-                <CADayGroups groups={detail.dayGroups} />
+                <CADayGroups groups={detail.dayGroups} requestStatus={request.status} />
               ) : (
                 <span className="ca-details-view__field-value">{detail.value}</span>
               )}
