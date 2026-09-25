@@ -27,13 +27,14 @@
 .ca-day-groups__week-label {
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
-  font-weight: 700;
-  color: #6f1d5d;
+  font-weight: 400;
+  color: #263238;
+  text-decoration: underline;
 }
 
 .ca-day-groups__header .icon {
   flex-shrink: 0;
-  color: #6f1d5d;
+  color: #263238;
 }
 
 .ca-day-groups__days {
