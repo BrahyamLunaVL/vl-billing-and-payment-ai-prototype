@@ -240,18 +240,19 @@ function slashDateToISO(mdy: string): string {
  * pre-approved allowance (`preApprovedHoursPerWeek`), what this VA's OTHER
  * requests already reported that week (`takenByOtherRequests`), what THIS
  * request reports that week (`reportedInThisRequest`), and what's left of
- * the allowance (`remainingHours` — `preApprovedHoursPerWeek` minus
- * `takenByOtherRequests` only, not this request's own hours, since those
- * haven't been approved yet when this is computed). A frozen snapshot
- * computed once at submission time, like every other `details` field — it
- * does not update if resolved later or if other requests change the VA's
- * balance afterward.
+ * the allowance (`remainingHours`). `isApproved` reflects whether THIS
+ * request's own hours actually count against the balance — only an
+ * approved request's hours are subtracted; a rejected or still-pending one
+ * leaves the balance untouched. A frozen snapshot computed once at
+ * submission time, like every other `details` field — it does not update
+ * if resolved later or if other requests change the VA's balance afterward.
  */
 function buildDaySelectionGroups(
   vaEmail: string,
   preApprovedHours: number,
   selectedDates: string[],
   hoursByDate: Record<string, number>,
+  isApproved: boolean,
 ): CARequestDayGroup[] {
   const weekStarts = [...new Set(selectedDates.map((date) => getWeekRange(date).start))].sort();
 
@@ -263,6 +264,7 @@ function buildDaySelectionGroups(
 
     const takenByOtherRequests = getExtraHoursTakenForWeek(vaEmail, weekStartISO, weekEndISO);
     const reportedInThisRequest = daysInWeek.reduce((sum, date) => sum + (hoursByDate[date] ?? 0), 0);
+    const takenTotal = takenByOtherRequests + (isApproved ? reportedInThisRequest : 0);
 
     return {
       weekLabel: formatWeekLabel(weekStart, weekEnd),
@@ -271,7 +273,7 @@ function buildDaySelectionGroups(
         preApprovedHoursPerWeek: preApprovedHours,
         takenByOtherRequests,
         reportedInThisRequest,
-        remainingHours: Math.max(0, preApprovedHours - takenByOtherRequests),
+        remainingHours: Math.max(0, preApprovedHours - takenTotal),
       },
     };
   });
@@ -313,7 +315,7 @@ export function createExtraHoursCARequest(input: CreateExtraHoursRequestInput): 
   const todayNumeric = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
 
   const preApprovedHours = agreement?.settings.preApprovedHoursPerWeek ?? 0;
-  const dayGroups = buildDaySelectionGroups(vaEmail, preApprovedHours, selectedDates, hoursByDate);
+  const dayGroups = buildDaySelectionGroups(vaEmail, preApprovedHours, selectedDates, hoursByDate, !needsManualApproval);
 
   const details: CARequestDetail[] = [
     { label: 'Pre-approved Hours per week', value: `${preApprovedHours} Hours` },

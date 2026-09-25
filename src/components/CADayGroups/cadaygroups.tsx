@@ -10,7 +10,11 @@ export interface CADayGroupHoursTooltip {
   takenByOtherRequests: number;
   /** This request's own reported hours falling in this week. */
   reportedInThisRequest: number;
-  /** `preApprovedHoursPerWeek` minus `takenByOtherRequests` — does not subtract this request's own hours. */
+  /**
+   * `preApprovedHoursPerWeek` minus `takenByOtherRequests`, and minus
+   * `reportedInThisRequest` too when this request was approved — its hours
+   * only count against the balance once approved.
+   */
   remainingHours: number;
 }
 

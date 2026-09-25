@@ -14,7 +14,12 @@ export interface CARequestDayGroup {
     takenByOtherRequests: number;
     /** This request's own reported hours falling in this week. */
     reportedInThisRequest: number;
-    /** `preApprovedHoursPerWeek` minus `takenByOtherRequests` — does not subtract this request's own hours. */
+    /**
+     * `preApprovedHoursPerWeek` minus `takenByOtherRequests`, and minus
+     * `reportedInThisRequest` too when this request's own `status` is
+     * 'approved' — its hours only actually count against the balance once
+     * approved, so a rejected/pending request leaves the balance untouched.
+     */
     remainingHours: number;
   };
 }
@@ -133,12 +138,12 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
           {
             weekLabel: 'Week from Apr 6 to Apr 12, 2026',
             days: ['Wednesday 04-08-2026 (4 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 4, remainingHours: 5 },
+            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 4, remainingHours: 1 },
           },
           {
             weekLabel: 'Week from Apr 13 to Apr 19, 2026',
             days: ['Thursday 04-16-2026 (3 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 3, remainingHours: 5 },
+            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 3, remainingHours: 2 },
           },
         ],
       },
@@ -220,12 +225,12 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
           {
             weekLabel: 'Week from May 4 to May 10, 2026',
             days: ['Tuesday 05-05-2026 (3 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 3, remainingHours: 5 },
+            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 3, remainingHours: 2 },
           },
           {
             weekLabel: 'Week from May 11 to May 17, 2026',
             days: ['Wednesday 05-13-2026 (4 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 4, remainingHours: 5 },
+            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 4, remainingHours: 1 },
           },
         ],
       },
