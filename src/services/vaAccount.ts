@@ -340,12 +340,11 @@ export function createExtraHoursCARequest(input: CreateExtraHoursRequestInput): 
   const details: CARequestDetail[] = [
     { label: 'Pre-approved Hours per week', value: `${preApprovedHours} Hours` },
     { label: 'Total Extra Hours Reported', value: `${totalHours} Hours` },
-    { label: 'Selected Weeks', value: dayGroups.map((group) => group.weekLabel).join('\n'), fullWidth: true },
+    { label: 'Selected Weeks', value: dayGroups.map((group) => group.weekLabel).join('\n') },
     {
       label: 'Days Selected (with hours/day)',
       value: dayGroups.flatMap((group) => group.days).join('\n'),
       dayGroups,
-      fullWidth: true,
     },
     { label: 'Remaining Pre-approved Hours', value: remainingBreakdown },
     { label: 'Approval Type', value: needsManualApproval ? 'Manual' : 'Auto Approval' },
