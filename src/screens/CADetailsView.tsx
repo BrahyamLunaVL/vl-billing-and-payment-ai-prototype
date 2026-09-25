@@ -1,9 +1,12 @@
-import { ProfileCard, Chip, CADayGroups } from '../components'
+import { ProfileCard, Chip, CADayGroups, Button } from '../components'
 import { CA_STATUS_LABEL, CA_STATUS_TONE, type CARequest } from '../services/vaAccount'
 import './CADetailsView.css'
 
 export interface CADetailsViewProps {
   request: CARequest
+  /** Present only for a pending ('new') request — simulates Admin/Client resolving it, for demoing the flow without switching accounts. */
+  onApprove?: () => void
+  onReject?: () => void
 }
 
 /**
@@ -12,7 +15,7 @@ export interface CADetailsViewProps {
  * screen's own header row (next to the SAM contact button), not part of
  * this component.
  */
-export const CADetailsView = ({ request }: CADetailsViewProps) => {
+export const CADetailsView = ({ request, onApprove, onReject }: CADetailsViewProps) => {
   return (
     <div className="ca-details-view">
       <ProfileCard className="ca-details-view__card">
@@ -55,6 +58,12 @@ export const CADetailsView = ({ request }: CADetailsViewProps) => {
             </div>
           )}
         </div>
+        {request.status === 'new' && (onApprove || onReject) && (
+          <div className="ca-details-view__footer">
+            <Button type="tertiary" buttonText="Reject" onClick={onReject} style={{ width: '160px' }} />
+            <Button buttonText="Approve" onClick={onApprove} style={{ width: '160px' }} />
+          </div>
+        )}
       </ProfileCard>
     </div>
   )

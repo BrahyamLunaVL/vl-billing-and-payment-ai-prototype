@@ -155,3 +155,12 @@
   color: #263238;
   white-space: pre-line;
 }
+
+.ca-list-card__footer {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ececef;
+}
