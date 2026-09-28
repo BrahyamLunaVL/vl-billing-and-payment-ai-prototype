@@ -20,10 +20,17 @@ interface AgreementActionsMenuProps {
   onView: () => void
 }
 
+/** Bare "N hrs" from a week's day entry (or "-" when the agreement has no active schedule) — Admin table's Monday..Sunday columns. */
+function weekDayValue(row: ClientAgreementView, index: number): string {
+  const day = row.week?.[index]
+  return day ? day.value.replace(' hrs', '') : '-'
+}
+
 /**
  * The per-row "Select Action" dropdown (Figma's "Admin - Agreements - All
  * Agreements - Actions"): View, plus decorative Edit/Request for Changes
- * since neither has a designed destination of its own yet.
+ * since neither has a designed destination of its own yet — text-only,
+ * no icons.
  *
  * The menu itself is portaled to `document.body` and positioned with
  * `position: fixed` from the trigger's own `getBoundingClientRect()`,
@@ -89,14 +96,13 @@ function AgreementActionsMenu({ onView }: AgreementActionsMenuProps) {
             <Dropdown>
               <DropdownOption
                 text="View"
-                leftIcon="eye"
                 onClick={() => {
                   setOpen(false)
                   onView()
                 }}
               />
-              <DropdownOption text="Edit" leftIcon="pencil" onClick={() => setOpen(false)} />
-              <DropdownOption text="Request for Changes" leftIcon="pen-to-square" onClick={() => setOpen(false)} />
+              <DropdownOption text="Edit" onClick={() => setOpen(false)} />
+              <DropdownOption text="Request for Changes" onClick={() => setOpen(false)} />
             </Dropdown>
           </div>,
           document.body,
@@ -186,6 +192,25 @@ export const AdminAgreementsListScreen = ({ onViewAgreement }: AdminAgreementsLi
       render: (row) => <span className="admin-agreements-list-screen__link">{row.vaName}</span>,
     },
     { key: 'billedRate', label: 'CLIENT RATE', width: 150, sortable: true, render: (row) => `${row.billedRate}/hr` },
+    { key: 'vaHourlyRate', label: 'VA RATE', width: 150, sortable: true, render: (row) => `${row.vaHourlyRate}/hr` },
+    {
+      key: 'hoursPerWeek',
+      label: 'BASE HOURS',
+      width: 150,
+      render: (row) => row.hoursPerWeek.replace('Hours per week', 'hr/week'),
+    },
+    { key: 'samContactName', label: 'SAM', width: 180, sortable: true, render: (row) => row.samContactName },
+    { key: 'billingType', label: 'BILLING TYPE', width: 150, sortable: true, render: (row) => row.billingType },
+    { key: 'startDate', label: 'START DATE', width: 150, sortable: true, render: (row) => row.startDate },
+    { key: 'endDate', label: 'END DATE', width: 150, sortable: true, render: (row) => row.endDate ?? '-' },
+    { key: 'monday', label: 'MONDAY', width: 110, render: (row) => weekDayValue(row, 0) },
+    { key: 'tuesday', label: 'TUESDAY', width: 110, render: (row) => weekDayValue(row, 1) },
+    { key: 'wednesday', label: 'WEDNESDAY', width: 130, render: (row) => weekDayValue(row, 2) },
+    { key: 'thursday', label: 'THURSDAY', width: 120, render: (row) => weekDayValue(row, 3) },
+    { key: 'friday', label: 'FRIDAY', width: 110, render: (row) => weekDayValue(row, 4) },
+    { key: 'saturday', label: 'SATURDAY', width: 120, render: (row) => weekDayValue(row, 5) },
+    { key: 'sunday', label: 'SUNDAY', width: 110, render: (row) => weekDayValue(row, 6) },
+    { key: 'agreementName', label: 'AGREEMENT NAME', width: 420, sortable: true, render: (row) => row.agreementName },
   ]
 
   return (

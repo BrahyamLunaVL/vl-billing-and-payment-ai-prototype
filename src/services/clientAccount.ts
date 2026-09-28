@@ -33,6 +33,8 @@ export interface ClientAgreementView extends Agreement {
   vaPaymentMethod: string;
   vaPhoneNumber: string;
   vaHubspotId: string;
+  /** The VA's own SAM contact, e.g. "Javiera Mercado" — shown on the Admin agreements table's SAM column. */
+  samContactName: string;
   clientCompanyName: string;
   /** The client company's own payment method — shown on the Agreement screen's Company card, Client only. */
   clientPaymentMethod: string;
@@ -53,6 +55,7 @@ function joinAgreementWithVA(agreement: Agreement): ClientAgreementView {
     vaPaymentMethod: vaProfile?.paymentMethod ?? '',
     vaPhoneNumber: vaProfile?.phoneNumber ?? '',
     vaHubspotId: vaProfile?.hubspotId ?? '',
+    samContactName: vaProfile?.samContactName ?? '',
     clientCompanyName: clientProfile?.companyName ?? agreement.clientName,
     clientPaymentMethod: clientProfile?.paymentMethod ?? '',
   };
