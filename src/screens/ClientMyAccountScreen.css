@@ -19,6 +19,10 @@
   width: 100%;
 }
 
+.client-my-account-screen__profile-header .icon {
+  color: #c32059;
+}
+
 .client-my-account-screen__profile-name {
   margin: 0;
   font-size: 20px;
