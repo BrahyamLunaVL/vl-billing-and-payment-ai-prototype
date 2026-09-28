@@ -217,6 +217,14 @@ export const AdminViewingAVAInvoice: Story = {
 
     await userEvent.click(await canvas.findByRole('button', { name: /^va invoice$/i }));
 
+    // Admin lands on the "All Invoices" table first — same per-row "Select
+    // Action" menu pattern as the Agreements table, portaled to
+    // document.body, so it's queried via the global `screen` instead of
+    // `canvas`.
+    await expect(await canvas.findByText('VA Invoice', { selector: 'h1' })).toBeVisible();
+    await userEvent.click((await canvas.findAllByRole('button', { name: /select action/i }))[0]);
+    await userEvent.click(await screen.findByRole('option', { name: /^view$/i }));
+
     // Admin's View Invoice adds an "Invoice Status" chip, a "Payment Data"
     // card, and — only while the invoice is still unauthorized ("Due") —
     // a warning banner, none of which the VA's own View Invoice shows.

@@ -2,7 +2,7 @@ import { MOCK_CLIENT_PROFILES, type ClientProfile } from '../mocks/clients';
 import { MOCK_AGREEMENTS, resetMockAgreements, type Agreement, type AgreementSettings } from '../mocks/agreements';
 import { MOCK_VA_PROFILES } from '../mocks/vaProfiles';
 import { MOCK_USERS } from '../mocks/users';
-import { MOCK_INVOICES, groupInvoiceItems, type InvoiceGroupView } from '../mocks/invoices';
+import { MOCK_INVOICES, groupInvoiceItems, type InvoiceGroupView, type InvoiceRecord } from '../mocks/invoices';
 import { sortCARequestsByRecency } from './vaAccount';
 import {
   MOCK_CA_REQUESTS,
@@ -73,6 +73,26 @@ export function getAllAgreements(): ClientAgreementView[] {
 export function getAgreementById(id: string): ClientAgreementView | undefined {
   const agreement = MOCK_AGREEMENTS.find((candidate) => candidate.id === id);
   return agreement ? joinAgreementWithVA(agreement) : undefined;
+}
+
+/** An `InvoiceRecord` plus the VA display info Admin's "All Invoices" table shows alongside it. */
+export interface AdminInvoiceView extends InvoiceRecord {
+  vaLegalName: string;
+  vaPaymentEmail: string;
+  vaBillingCountry: string;
+}
+
+/** Every invoice platform-wide — the Admin table's view, unscoped to one VA/client. */
+export function getAllInvoices(): AdminInvoiceView[] {
+  return MOCK_INVOICES.map((invoice) => {
+    const vaProfile = MOCK_VA_PROFILES.find((profile) => profile.email === invoice.vaEmail);
+    return {
+      ...invoice,
+      vaLegalName: vaProfile?.legalName ?? invoice.vaEmail,
+      vaPaymentEmail: vaProfile?.paymentEmail ?? '',
+      vaBillingCountry: vaProfile?.country ?? '',
+    };
+  });
 }
 
 /** Persists edits made from the client's Agreement Settings screen — the VA's wizard reads the same record. */

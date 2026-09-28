@@ -49,6 +49,10 @@ export interface InvoiceRecord {
   uploadedReportName?: string;
   /** Admin's "Invoice Status" chip. Defaults to 'due' for invoices that omit it. */
   status?: InvoiceStatus;
+  /** e.g. "10/5/2023, 09:14:22 AM PST" — when the invoice was approved for issuing, shown on Admin's "All Invoices" table. */
+  approvalDate: string;
+  /** Whether this is a standard recurring billing cycle, shown as a check/x-mark icon on Admin's "All Invoices" table. */
+  isRegular: boolean;
 }
 
 const INITIAL_INVOICES: InvoiceRecord[] = [
@@ -96,6 +100,8 @@ const INITIAL_INVOICES: InvoiceRecord[] = [
     uploadedReportsMessage: 'No reports uploaded',
     uploadedReportName: 'Work Report',
     status: 'due',
+    approvalDate: '10/5/2023, 09:14:22 AM PST',
+    isRegular: true,
   },
   {
     id: 'inv-2',
@@ -140,6 +146,8 @@ const INITIAL_INVOICES: InvoiceRecord[] = [
     ],
     uploadedReportsMessage: 'No reports uploaded',
     status: 'due',
+    approvalDate: '9/20/2026, 11:02:47 AM PST',
+    isRegular: true,
   },
   {
     id: 'inv-3',
@@ -178,6 +186,8 @@ const INITIAL_INVOICES: InvoiceRecord[] = [
     ],
     uploadedReportsMessage: 'No reports uploaded',
     status: 'due',
+    approvalDate: '9/20/2026, 08:47:15 AM PST',
+    isRegular: true,
   },
 ];
 
