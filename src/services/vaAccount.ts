@@ -46,12 +46,18 @@ export const INVOICE_STATUS_LABEL: Record<InvoiceStatus, string> = {
   due: 'Due',
   paid: 'Paid',
   preview: 'Preview',
+  refunded: 'Refunded',
+  'pending-payment': 'Pending Payment',
+  'payment-failed': 'Payment Failed',
 };
 
 export const INVOICE_STATUS_TONE: Record<InvoiceStatus, ChipTone> = {
-  due: 'gray',
-  paid: 'blue',
+  due: 'purple',
+  paid: 'green',
   preview: 'blue',
+  refunded: 'gray',
+  'pending-payment': 'orange',
+  'payment-failed': 'red',
 };
 
 /**

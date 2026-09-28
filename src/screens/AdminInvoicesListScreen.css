@@ -23,6 +23,20 @@
   color: #378fce;
 }
 
+.admin-invoices-list-screen__regular-cell {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.admin-invoices-list-screen__regular-icon--check {
+  color: #21a184;
+}
+
+.admin-invoices-list-screen__regular-icon--x {
+  color: #de1515;
+}
+
 .admin-invoices-list-screen__actions-menu {
   position: relative;
   display: inline-flex;

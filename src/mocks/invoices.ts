@@ -4,7 +4,7 @@ export type InvoiceLineItemGroup = 'agreement' | 'extra-hours' | 'time-off';
  * Admin's "Invoice Status" chip variants (the VA's own View Invoice always
  * shows "Preview" regardless of this field — only Admin's screen reads it).
  */
-export type InvoiceStatus = 'due' | 'paid' | 'preview';
+export type InvoiceStatus = 'due' | 'paid' | 'preview' | 'refunded' | 'pending-payment' | 'payment-failed';
 
 export interface InvoiceLineItemData {
   key: string;

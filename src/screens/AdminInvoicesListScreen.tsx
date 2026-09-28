@@ -95,10 +95,13 @@ function InvoiceActionsMenu({ onView }: InvoiceActionsMenuProps) {
 }
 
 /**
- * Admin's "VA Invoice" table (Figma's "VA Invoice - All Invoices"): every
+ * Admin's "Invoices" table (Figma's "VA Invoice - All Invoices"): every
  * invoice platform-wide, sortable/paginated, with a per-row "Select Action"
  * menu whose "View" opens the invoice's own detail screen (the same "View
- * Invoice" page the VA's own Invoices list already reaches).
+ * Invoice" page the VA's own Invoices list already reaches). The Regular/
+ * Irregular/Invoice Preview/Product Code tabs aren't wired to any filtering
+ * yet — same not-yet-designed-destination treatment as the Agreements
+ * table's "My Agreements" tab.
  */
 export const AdminInvoicesListScreen = ({ onViewInvoice }: AdminInvoicesListScreenProps) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -155,7 +158,20 @@ export const AdminInvoicesListScreen = ({ onViewInvoice }: AdminInvoicesListScre
       key: 'isRegular',
       label: 'REGULAR',
       width: 110,
-      render: (row) => <Icon name={row.isRegular ? 'check' : 'xmark'} variant="bold" size={16} />,
+      render: (row) => (
+        <span className="admin-invoices-list-screen__regular-cell">
+          <Icon
+            name={row.isRegular ? 'check' : 'xmark'}
+            variant="bold"
+            size={16}
+            className={
+              row.isRegular
+                ? 'admin-invoices-list-screen__regular-icon--check'
+                : 'admin-invoices-list-screen__regular-icon--x'
+            }
+          />
+        </span>
+      ),
     },
     { key: 'invoiceNumber', label: 'INVOICE NUMBER', width: 180, sortable: true, render: (row) => row.invoiceNumber },
     { key: 'totalAmount', label: 'TOTAL', width: 150, sortable: true, render: (row) => row.totalAmount },
@@ -196,13 +212,16 @@ export const AdminInvoicesListScreen = ({ onViewInvoice }: AdminInvoicesListScre
   return (
     <>
       <div className="admin-invoices-list-screen__header">
-        <h1 className="admin-invoices-list-screen__title">VA Invoice</h1>
+        <h1 className="admin-invoices-list-screen__title">Invoices</h1>
       </div>
 
       <TabBar
         tabs={[
           { key: 'all', label: 'All Invoices' },
-          { key: 'mine', label: 'My Invoices', disabled: true },
+          { key: 'regular', label: 'Regular', disabled: true },
+          { key: 'irregular', label: 'Irregular', disabled: true },
+          { key: 'invoice-preview', label: 'Invoice Preview', disabled: true },
+          { key: 'product-code', label: 'Product Code', disabled: true },
         ]}
         selectedKey={selectedTab}
         onSelectTab={setSelectedTab}

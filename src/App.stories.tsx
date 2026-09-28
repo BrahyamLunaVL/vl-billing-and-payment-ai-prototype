@@ -221,7 +221,7 @@ export const AdminViewingAVAInvoice: Story = {
     // Action" menu pattern as the Agreements table, portaled to
     // document.body, so it's queried via the global `screen` instead of
     // `canvas`.
-    await expect(await canvas.findByText('VA Invoice', { selector: 'h1' })).toBeVisible();
+    await expect(await canvas.findByText('Invoices', { selector: 'h1' })).toBeVisible();
     await userEvent.click((await canvas.findAllByRole('button', { name: /select action/i }))[0]);
     await userEvent.click(await screen.findByRole('option', { name: /^view$/i }));
 
