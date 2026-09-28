@@ -96,11 +96,6 @@ export const ClientAgreementScreen = ({
               Next payment on {agreement.nextPaymentDate}
             </p>
           )}
-          {viewerRole === 'admin' && (
-            <p className="client-agreement-screen__meta client-agreement-screen__meta--regular">
-              HubSpot ID: {agreement.hubspotId}
-            </p>
-          )}
         </div>
         <div className="client-agreement-screen__header-actions">
           <Button
@@ -127,9 +122,10 @@ export const ClientAgreementScreen = ({
               {viewerRole !== 'va' && (
                 <CardRow title="Base Hours:" value={agreement.hoursPerWeek.replace(' per week', '/week')} />
               )}
-              {viewerRole === 'client' && <CardRow title="Payment Method:" value={agreement.clientPaymentMethod} />}
+              {viewerRole !== 'va' && <CardRow title="Payment Method:" value={agreement.clientPaymentMethod} />}
               <CardRow title="Contact:" value={agreement.contactName} />
               <CardRow title="Email:" value={agreement.contactEmail} />
+              {viewerRole === 'admin' && <CardRow title="HubSpot ID:" value={agreement.hubspotId} />}
             </div>
             {viewerRole !== 'va' && (
               <div className="client-agreement-screen__va-actions">
