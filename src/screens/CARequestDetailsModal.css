@@ -42,39 +42,8 @@
 }
 
 .ca-request-details-modal__body {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
   padding: 20px;
   overflow-y: auto;
-}
-
-.ca-request-details-modal__row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 20px;
-  font-size: 14px;
-  color: #263238;
-}
-
-.ca-request-details-modal__row--stacked {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-}
-
-.ca-request-details-modal__label {
-  flex-shrink: 0;
-  font-weight: 700;
-}
-
-.ca-request-details-modal__value {
-  text-align: right;
-}
-
-.ca-request-details-modal__value--pre {
-  white-space: pre-line;
 }
 
 .ca-request-details-modal__footer {

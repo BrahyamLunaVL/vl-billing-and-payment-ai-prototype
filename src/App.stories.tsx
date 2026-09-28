@@ -562,13 +562,13 @@ export const AdminBulkApprovingSelectedRequests: Story = {
       await expect(reviewRequestButton).toBeEnabled();
 
       await userEvent.click(reviewRequestButton);
-      await expect(await canvas.findByText(/review 2 selected requests/i)).toBeVisible();
+      await expect(await canvas.findByText(/selected requests \(2\)/i)).toBeVisible();
 
       await userEvent.click(canvas.getByRole('button', { name: /^approve all$/i }));
 
       // The modal closes and selection clears — "Review Request" is
       // disabled again — once the bulk action resolves both requests.
-      await expect(canvas.queryByText(/review 2 selected requests/i)).not.toBeInTheDocument();
+      await expect(canvas.queryByText(/selected requests \(2\)/i)).not.toBeInTheDocument();
       await expect(reviewRequestButton).toBeDisabled();
     } finally {
       resetMockCARequests();

@@ -1,5 +1,6 @@
-import { PopUp, Icon, Button, CADayGroups } from '../components'
+import { PopUp, Icon, Button } from '../components'
 import type { ClientCARequestView } from '../services/clientAccount'
+import { CARequestFields } from './CARequestFields'
 import './CARequestDetailsModal.css'
 
 export interface CARequestDetailsModalProps {
@@ -32,64 +33,7 @@ export const CARequestDetailsModal = ({ request, onClose, onApprove, onReject }:
           </button>
         </div>
         <div className="ca-request-details-modal__body">
-          <div className="ca-request-details-modal__row">
-            <span className="ca-request-details-modal__label">VA Name</span>
-            <span className="ca-request-details-modal__value">{request.vaName}</span>
-          </div>
-          <div className="ca-request-details-modal__row">
-            <span className="ca-request-details-modal__label">Company Name</span>
-            <span className="ca-request-details-modal__value">{request.clientName}</span>
-          </div>
-          {request.details.map((detail) => (
-            <div
-              key={detail.label}
-              className={
-                detail.dayGroups
-                  ? 'ca-request-details-modal__row ca-request-details-modal__row--stacked'
-                  : 'ca-request-details-modal__row'
-              }
-            >
-              <span className="ca-request-details-modal__label">{detail.label}</span>
-              {detail.dayGroups ? (
-                <CADayGroups groups={detail.dayGroups} requestStatus={request.status} />
-              ) : (
-                <span className="ca-request-details-modal__value ca-request-details-modal__value--pre">
-                  {detail.value}
-                </span>
-              )}
-            </div>
-          ))}
-          <div className="ca-request-details-modal__row">
-            <span className="ca-request-details-modal__label">Request Date</span>
-            <span className="ca-request-details-modal__value">{request.requestedDate}</span>
-          </div>
-          {request.comments && (
-            <div className="ca-request-details-modal__row">
-              <span className="ca-request-details-modal__label">Comments</span>
-              <span className="ca-request-details-modal__value">{request.comments}</span>
-            </div>
-          )}
-          {isPending ? (
-            <div className="ca-request-details-modal__row">
-              <span className="ca-request-details-modal__label">Review Date</span>
-              <span className="ca-request-details-modal__value">—</span>
-            </div>
-          ) : (
-            <>
-              <div className="ca-request-details-modal__row">
-                <span className="ca-request-details-modal__label">Status</span>
-                <span className="ca-request-details-modal__value">
-                  {request.status === 'approved' ? 'Approved' : request.status === 'rejected' ? 'Rejected' : 'Expired'}
-                </span>
-              </div>
-              {request.resolvedDate && (
-                <div className="ca-request-details-modal__row">
-                  <span className="ca-request-details-modal__label">Review Date</span>
-                  <span className="ca-request-details-modal__value">{request.resolvedDate}</span>
-                </div>
-              )}
-            </>
-          )}
+          <CARequestFields request={request} />
         </div>
         <div className="ca-request-details-modal__footer">
           {isPending ? (
