@@ -145,7 +145,11 @@ export const NewCARequestWizard = ({
     onStepChange?.(step)
   }, [step, onStepChange])
 
-  const preApprovedHours = agreementSettings.preApprovedHoursPerWeek
+  // Auto-approval off means no pre-approved hours regardless of whatever
+  // number is still sitting in `preApprovedHoursPerWeek` — the Agreement
+  // Settings screen disables that field when the toggle is off but doesn't
+  // clear its value, so it can't be trusted on its own here.
+  const preApprovedHours = agreementSettings.autoApproveExtraHours ? agreementSettings.preApprovedHoursPerWeek : 0
 
   // The current Monday–Sunday week is fully blocked — the VA can only
   // report hours for the MAX_LOOKBACK_WEEKS full weeks before it.
