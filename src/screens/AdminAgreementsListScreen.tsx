@@ -7,6 +7,7 @@ import './AdminAgreementsListScreen.css'
 
 export interface AdminAgreementsListScreenProps {
   onViewAgreement: (agreementId: string) => void
+  onRequestChanges: (agreementId: string) => void
 }
 
 type SortDirection = 'asc' | 'desc'
@@ -18,6 +19,7 @@ function compareValues(a: string, b: string, direction: SortDirection): number {
 
 interface AgreementActionsMenuProps {
   onView: () => void
+  onRequestChanges: () => void
 }
 
 /** Bare "N hrs" from a week's day entry (or "-" when the agreement has no active schedule) — Admin table's Monday..Sunday columns. */
@@ -28,9 +30,9 @@ function weekDayValue(row: ClientAgreementView, index: number): string {
 
 /**
  * The per-row "Select Action" dropdown (Figma's "Admin - Agreements - All
- * Agreements - Actions"): View, plus decorative Edit/Request for Changes
- * since neither has a designed destination of its own yet — text-only,
- * no icons.
+ * Agreements - Actions"): View and Request for Changes are both wired,
+ * Edit stays decorative since it has no designed destination yet —
+ * text-only, no icons.
  *
  * The menu itself is portaled to `document.body` and positioned with
  * `position: fixed` from the trigger's own `getBoundingClientRect()`,
@@ -40,7 +42,7 @@ function weekDayValue(row: ClientAgreementView, index: number): string {
  * z-index. That's exactly what happens for a short table or a dropdown
  * opened from one of the last rows.
  */
-function AgreementActionsMenu({ onView }: AgreementActionsMenuProps) {
+function AgreementActionsMenu({ onView, onRequestChanges }: AgreementActionsMenuProps) {
   const [open, setOpen] = useState(false)
   const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -102,7 +104,13 @@ function AgreementActionsMenu({ onView }: AgreementActionsMenuProps) {
                 }}
               />
               <DropdownOption text="Edit" onClick={() => setOpen(false)} />
-              <DropdownOption text="Request for Changes" onClick={() => setOpen(false)} />
+              <DropdownOption
+                text="Request for Changes"
+                onClick={() => {
+                  setOpen(false)
+                  onRequestChanges()
+                }}
+              />
             </Dropdown>
           </div>,
           document.body,
@@ -114,12 +122,12 @@ function AgreementActionsMenu({ onView }: AgreementActionsMenuProps) {
 /**
  * Admin's "Agreements" table (Figma's "Admin - Agreements - All Agreements"):
  * every agreement platform-wide, sortable/paginated, with a per-row "Select
- * Action" menu whose "View" opens the agreement's own detail screen — the
- * only action Figma gives a real destination ("Edit"/"Request for Changes"
- * are shown but stay decorative, same as this prototype's other
- * not-yet-designed actions).
+ * Action" menu whose "View" opens the agreement's own detail screen and
+ * "Request for Changes" opens that agreement's own Request Changes wizard
+ * directly — "Edit" stays decorative, same as this prototype's other
+ * not-yet-designed actions.
  */
-export const AdminAgreementsListScreen = ({ onViewAgreement }: AdminAgreementsListScreenProps) => {
+export const AdminAgreementsListScreen = ({ onViewAgreement, onRequestChanges }: AdminAgreementsListScreenProps) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [sortKey, setSortKey] = useState<string | undefined>(undefined)
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
@@ -168,7 +176,9 @@ export const AdminAgreementsListScreen = ({ onViewAgreement }: AdminAgreementsLi
       key: 'actions',
       label: 'ACTIONS',
       width: 160,
-      render: (row) => <AgreementActionsMenu onView={() => onViewAgreement(row.id)} />,
+      render: (row) => (
+        <AgreementActionsMenu onView={() => onViewAgreement(row.id)} onRequestChanges={() => onRequestChanges(row.id)} />
+      ),
     },
     {
       key: 'status',

@@ -68,6 +68,11 @@ export const AdminApp = ({ user }: AdminAppProps) => {
     setPage('agreement')
   }
 
+  const handleRequestChangesForAgreement = (agreementId: string) => {
+    setSelectedAgreementId(agreementId)
+    setPage('ca-wizard')
+  }
+
   const handleViewInvoice = (invoiceId: string) => {
     setSelectedInvoiceId(invoiceId)
     setPage('va-invoice-detail')
@@ -82,7 +87,12 @@ export const AdminApp = ({ user }: AdminAppProps) => {
 
   return (
     <AdminAppShell user={user} selectedSidebarItem={selectedSidebarItem} onSelectSidebarItem={handleSelectSidebarItem}>
-      {page === 'agreements' && <AdminAgreementsListScreen onViewAgreement={handleViewAgreement} />}
+      {page === 'agreements' && (
+        <AdminAgreementsListScreen
+          onViewAgreement={handleViewAgreement}
+          onRequestChanges={handleRequestChangesForAgreement}
+        />
+      )}
       {page === 'agreement' && selectedAgreementId && (
         <ClientAgreementScreen
           user={user}
