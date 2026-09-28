@@ -33,11 +33,11 @@ export const ClientInvoicesPanel = ({ clientEmail }: ClientInvoicesPanelProps) =
   const invoiceTotal = perVABreakdown.reduce((sum, va) => sum + va.totalAmount, 0)
 
   const perVASections = perVABreakdown.map((va) => ({
-    key: va.vaEmail,
+    key: va.invoiceId,
     label: va.vaName,
     totalAmount: formatUSD(va.totalAmount),
     sections: va.groups.map((group) => ({
-      key: `${va.vaEmail}-${group.group}`,
+      key: `${va.invoiceId}-${group.group}`,
       label: group.label,
       totalAmount: formatUSD(group.totalAmount),
       items: group.items,
