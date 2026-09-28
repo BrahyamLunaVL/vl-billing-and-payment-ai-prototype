@@ -127,7 +127,7 @@ export const ChangesApprovalsScreen = ({ user, openWizard = false, onFinishWizar
         <NewCARequestWizard
           vaEmail={user.email}
           agreementId={activeAgreement?.id}
-          recentRequest={requests[0]}
+          recentRequests={requests}
           agreementSettings={activeAgreement?.settings}
           requesterRole="va"
           onStepChange={setWizardStep}

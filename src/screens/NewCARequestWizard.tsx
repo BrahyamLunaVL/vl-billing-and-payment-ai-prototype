@@ -100,8 +100,8 @@ export interface NewCARequestWizardProps {
   vaEmail: string
   /** The active agreement this request is submitted under — persisted onto the created request and used to look up its client/pre-approval rules. */
   agreementId?: string
-  /** The VA's most recent request, shown as a reference on step 1. */
-  recentRequest?: CARequest
+  /** The VA's requests (newest first), shown as a reference list on step 1. */
+  recentRequests?: CARequest[]
   /**
    * The client's Agreement Settings for the agreement this request is
    * under — the source of the pre-approved-hours/lookback-window rules
@@ -126,7 +126,7 @@ export interface NewCARequestWizardProps {
 export const NewCARequestWizard = ({
   vaEmail,
   agreementId,
-  recentRequest,
+  recentRequests,
   agreementSettings = DEFAULT_AGREEMENT_SETTINGS,
   requesterRole = 'va',
   showOnBehalfOf = false,
@@ -248,15 +248,19 @@ export const NewCARequestWizard = ({
             <p className="ca-wizard__description">
               Please let us know the details of what you&apos;d like to change or approve.
             </p>
-            {recentRequest && (
+            {recentRequests && recentRequests.length > 0 && (
               <>
                 <h3 className="ca-wizard__subheading">Recent and Pending Changes</h3>
-                <div className="ca-wizard__recent-card">
-                  <div className="ca-wizard__recent-card-text">
-                    <span className="ca-wizard__recent-card-date">{recentRequest.date}</span>
-                    <span className="ca-wizard__recent-card-title">{recentRequest.title}</span>
-                  </div>
-                  <Chip label={CA_STATUS_LABEL[recentRequest.status]} tone={CA_STATUS_TONE[recentRequest.status]} />
+                <div className="ca-wizard__recent-list">
+                  {recentRequests.map((request) => (
+                    <div key={request.id} className="ca-wizard__recent-card">
+                      <div className="ca-wizard__recent-card-text">
+                        <span className="ca-wizard__recent-card-date">{request.date}</span>
+                        <span className="ca-wizard__recent-card-title">{request.title}</span>
+                      </div>
+                      <Chip label={CA_STATUS_LABEL[request.status]} tone={CA_STATUS_TONE[request.status]} />
+                    </div>
+                  ))}
                 </div>
               </>
             )}

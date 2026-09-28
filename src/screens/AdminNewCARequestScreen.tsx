@@ -13,7 +13,7 @@ export interface AdminNewCARequestScreenProps {
 
 /** Admin's "Request for Changes" flow, opened from an agreement's own detail screen — the same wizard as the VA's, plus the "Request on behalf of" Client/VA selector Figma adds for Admin. */
 export const AdminNewCARequestScreen = ({ agreement, onFinish }: AdminNewCARequestScreenProps) => {
-  const recentRequest = getCARequestsForVA(agreement.vaEmail)[0]
+  const recentRequests = getCARequestsForVA(agreement.vaEmail)
   const [wizardStep, setWizardStep] = useState<1 | 2 | 3 | 4>(1)
 
   return (
@@ -25,7 +25,7 @@ export const AdminNewCARequestScreen = ({ agreement, onFinish }: AdminNewCAReque
       <NewCARequestWizard
         vaEmail={agreement.vaEmail}
         agreementId={agreement.id}
-        recentRequest={recentRequest}
+        recentRequests={recentRequests}
         agreementSettings={agreement.settings}
         showOnBehalfOf
         onStepChange={setWizardStep}

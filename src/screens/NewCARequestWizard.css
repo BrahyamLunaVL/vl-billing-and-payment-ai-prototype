@@ -51,6 +51,14 @@
   color: #7a7a7a;
 }
 
+.ca-wizard__recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
 .ca-wizard__recent-card {
   display: flex;
   align-items: center;
