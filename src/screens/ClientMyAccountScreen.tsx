@@ -97,6 +97,7 @@ export const ClientMyAccountScreen = ({ user, onEditAgreement, onRequestChanges 
                   name={contact.name}
                   accessTypeLabel={contact.accessTypeLabel}
                   description={contact.description}
+                  showCallButton={false}
                   hideDivider={index === profile.contacts.length - 1}
                 />
               ))}

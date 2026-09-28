@@ -9,6 +9,8 @@ export interface ContactCardProps {
   description: string;
   onCall?: () => void;
   onSendEmail?: () => void;
+  /** Hides the Call button, leaving only Send Email — set for the company's own contacts in My Account. */
+  showCallButton?: boolean;
   /** Hides the bottom divider — set on the last card in a list. */
   hideDivider?: boolean;
   className?: string;
@@ -25,6 +27,7 @@ export const ContactCard = ({
   description,
   onCall,
   onSendEmail,
+  showCallButton = true,
   hideDivider = false,
   className,
 }: ContactCardProps) => {
@@ -44,7 +47,9 @@ export const ContactCard = ({
           </p>
         </div>
         <div className="contact-card__actions">
-          <Button type="tertiary" size="small" buttonText="Call" onClick={onCall} style={{ width: '150px' }} />
+          {showCallButton && (
+            <Button type="tertiary" size="small" buttonText="Call" onClick={onCall} style={{ width: '150px' }} />
+          )}
           <Button
             type="tertiary"
             size="small"
