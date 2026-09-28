@@ -38,8 +38,10 @@ export const ContactCard = ({
         </span>
         <div className="contact-card__details">
           <p className="contact-card__name">{name}</p>
-          <p className="contact-card__access-type">{accessTypeLabel}</p>
-          <p className="contact-card__description">{description}</p>
+          <p className="contact-card__access-line">
+            <span className="contact-card__access-type">{accessTypeLabel}</span>{' '}
+            <span className="contact-card__description">{description}</span>
+          </p>
         </div>
         <div className="contact-card__actions">
           <Button type="tertiary" size="small" buttonText="Call" onClick={onCall} style={{ width: '150px' }} />
