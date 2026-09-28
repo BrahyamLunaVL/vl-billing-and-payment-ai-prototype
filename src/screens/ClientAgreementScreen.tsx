@@ -351,6 +351,7 @@ export const ClientAgreementScreen = ({
                           <span className="client-agreement-screen__optional">(Optional)</span>
                         </>
                       }
+                      description="You'll always be emailed when a request needs your manual approval, regardless of this setting."
                       checked={draftSettings.emailOnPreApprovedExtraHours}
                       onChange={(event) =>
                         setDraftSettings((prev) => prev && { ...prev, emailOnPreApprovedExtraHours: event.target.checked })

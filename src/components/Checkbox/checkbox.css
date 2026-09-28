@@ -52,8 +52,20 @@
   background: var(--checkbox-color-gray-300);
 }
 
+.checkbox__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .checkbox__label {
   font-size: 14px;
   font-weight: 700;
   color: var(--checkbox-color-black);
+}
+
+.checkbox__description {
+  font-size: 12px;
+  font-weight: 400;
+  color: #bbbbbb;
 }
