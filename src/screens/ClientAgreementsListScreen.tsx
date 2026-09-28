@@ -40,7 +40,6 @@ export const ClientAgreementsListScreen = ({
             billingType={agreement.billingType}
             dateStart={agreement.dateStart}
             vaName={agreement.vaName}
-            vaHiredStatus={agreement.vaHiredStatus}
             vaTelegramHandle={agreement.vaTelegramHandle}
             vaCountry={agreement.vaCountry}
             vaAka={agreement.vaAka}

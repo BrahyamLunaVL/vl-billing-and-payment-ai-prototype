@@ -73,7 +73,6 @@ export const ClientMyAccountScreen = ({ user, onEditAgreement, onRequestChanges 
               billingType={agreement.billingType}
               dateStart={agreement.dateStart}
               vaName={agreement.vaName}
-              vaHiredStatus={agreement.vaHiredStatus}
               vaTelegramHandle={agreement.vaTelegramHandle}
               vaCountry={agreement.vaCountry}
               vaAka={agreement.vaAka}

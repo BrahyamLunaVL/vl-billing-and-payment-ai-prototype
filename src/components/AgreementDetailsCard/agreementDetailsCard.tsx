@@ -13,7 +13,6 @@ export interface AgreementDetailsCardProps {
   billingType: string;
   dateStart: string;
   vaName: string;
-  vaHiredStatus: 'hired' | 'inactive';
   vaTelegramHandle: string;
   vaCountry: string;
   vaAka: string;
@@ -27,7 +26,8 @@ export interface AgreementDetailsCardProps {
  * wide, two-tier card shown in the client's My Account agreements list:
  * a header row with the agreement title/status and View/Request Changes
  * actions, then a shaded details row with schedule facts plus the VA's
- * name/hired status/Telegram/country/AKA. Unlike `AgreementCard` (the VA's
+ * name/Telegram/country/AKA. The agreement's own status chip (next to the
+ * title) is the only chip on the card — unlike `AgreementCard` (the VA's
  * own compact view of their agreement), this is the client's wider,
  * VA-focused view of the same relationship.
  */
@@ -39,7 +39,6 @@ export const AgreementDetailsCard = ({
   billingType,
   dateStart,
   vaName,
-  vaHiredStatus,
   vaTelegramHandle,
   vaCountry,
   vaAka,
@@ -93,7 +92,6 @@ export const AgreementDetailsCard = ({
           <div className="agreement-details-card__va-row-left">
             <span className="agreement-details-card__va-label">Your VA:</span>
             <span className="agreement-details-card__va-name">{vaName}</span>
-            <Chip label={vaHiredStatus === 'hired' ? 'Hired' : 'Inactive'} tone="orange" />
           </div>
         </div>
         <div className="agreement-details-card__meta-row">
