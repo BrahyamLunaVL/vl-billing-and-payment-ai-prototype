@@ -40,6 +40,17 @@
   box-shadow: 2px 10px 30px rgba(195, 32, 89, 0.3);
 }
 
+/* ProfileCard's own `.profile-card__content` wrapper has no gap of its
+   own — it just stacks whatever children a caller passes, flush against
+   each other. This card's own direct children (the two meta rows, the
+   divider, the invoice breakdown, the disclaimer) need the same 20px
+   rhythm Figma uses between every block in this card. */
+.admin-invoice-screen__card .profile-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .admin-invoice-screen__meta-row {
   display: flex;
   justify-content: space-between;
