@@ -267,22 +267,60 @@
 .ca-wizard__week-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: 20px;
+  padding: 12px;
   border: 1px solid #ececef;
   border-radius: 8px;
 }
 
-.ca-wizard__week-group .ca-wizard__metric-row {
-  background: #f9e9ee;
-  border-color: #f0c7d5;
+.ca-wizard__week-group--flagged {
+  border-color: #ed9731;
+}
+
+.ca-wizard__week-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.ca-wizard__week-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .ca-wizard__week-title {
   margin: 0;
   font-size: 14px;
   font-weight: 700;
-  color: #6f1d5d;
+  color: #7a7a7a;
+}
+
+.ca-wizard__week-caption {
+  margin: 0;
+  font-size: 12px;
+  color: #7a7a7a;
+}
+
+.ca-wizard__inline-warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px 12px;
+  border: 1px solid #fbe5cc;
+  border-radius: 8px;
+  background: #fef9f3;
+  color: #ed9731;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ca-wizard__inline-warning .icon {
+  flex-shrink: 0;
 }
 
 .ca-wizard__totals {
@@ -329,6 +367,31 @@
   margin: 0;
   font-size: 12px;
   color: #7a7a7a;
+}
+
+.ca-wizard__totals-value-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ca-wizard__totals-week-label {
+  font-size: 14px;
+  color: #7a7a7a;
+}
+
+.ca-wizard__totals-estimate-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.ca-wizard__totals-amount {
+  font-size: 14px;
+  font-weight: 700;
+  color: #263238;
 }
 
 .ca-wizard__actions--end {

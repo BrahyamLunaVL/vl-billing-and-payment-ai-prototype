@@ -95,6 +95,22 @@ function formatWeekRange(startISO: string, endISO: string): string {
   return `${startLabel} – ${endLabel}`
 }
 
+/**
+ * The small bordered warning box Figma nests inside a flagged week's own
+ * card (and reuses, full-width, for the request-level banner below the
+ * totals) — visually distinct from the shared `Alert` component (a
+ * triangle-exclamation icon and a bordered, lighter-tint background,
+ * rather than `Alert`'s borderless fill and check icon).
+ */
+function InlineWarning({ message }: { message: string }) {
+  return (
+    <div className="ca-wizard__inline-warning">
+      <Icon name="triangle-exclamation" size={20} />
+      <span>{message}</span>
+    </div>
+  )
+}
+
 export interface NewCARequestWizardProps {
   /** The VA the request is for — used to look up hours already taken this week against their pre-approved allowance. */
   vaEmail: string
@@ -191,6 +207,36 @@ export const NewCARequestWizard = ({
   // date) goes to manual approval.
   const anyWeekOverHours = weekGroups.some((week) => week.enteredHours > week.remainingHours)
   const anyWeekOutsidePeriod = weekGroups.some((week) => week.isOutsidePeriod)
+  const anyWeekWithNoRemaining = preApprovedHours > 0 && weekGroups.some((week) => week.remainingHours === 0)
+
+  // The bottom summary's second column and the big banner below it share
+  // the same "which problem, which week" pick — outside-period beats having
+  // no pre-approved hours left at all, which beats merely going over what's
+  // left this week (Figma never shows more than one of these at once, so
+  // ties are broken by this priority rather than shown side by side).
+  const outsidePeriodWeek = weekGroups.find((week) => week.isOutsidePeriod)
+  const noRemainingWeek = weekGroups.find((week) => week.remainingHours === 0)
+  const overWithRemainingWeek = weekGroups.find((week) => week.enteredHours > week.remainingHours)
+
+  const totalsSecondColumn = outsidePeriodWeek
+    ? { label: 'Outside your auto-approval period', hours: outsidePeriodWeek.enteredHours, week: outsidePeriodWeek }
+    : anyWeekWithNoRemaining && noRemainingWeek
+      ? { label: 'No pre-approved hours left', hours: noRemainingWeek.enteredHours, week: noRemainingWeek }
+      : preApprovedHours > 0 && anyWeekOverHours && overWithRemainingWeek
+        ? {
+            label: 'Over the weekly amount',
+            hours: overWithRemainingWeek.enteredHours - overWithRemainingWeek.remainingHours,
+            week: overWithRemainingWeek,
+          }
+        : null
+
+  const bottomAlertMessage = anyWeekOutsidePeriod
+    ? 'One week in this request is outside your auto-approval period, so the entire request will be sent to your client for approval, not only that week.'
+    : anyWeekWithNoRemaining
+      ? 'One week in this request has no pre-approved hours left, so the entire request will be sent to your client for approval, not only that week.'
+      : preApprovedHours > 0 && anyWeekOverHours
+        ? 'This request goes over your pre-approved amount for at least one week, so the entire request will be sent to your client for approval, not only the extra hours.'
+        : null
 
   const handleReset = () => {
     setSelectedDates([])
@@ -373,15 +419,15 @@ export const NewCARequestWizard = ({
                       {preApprovedHours > 0 ? (
                         <>
                           <FormField
-                            label="Pre-approved Hours per Week"
+                            label="Pre-approved Extra Hours"
                             info="The number of extra hours your agreement allows each week without needing separate client approval. Resets every Monday."
                           >
                             <p className="ca-wizard__metric-value">
-                              {preApprovedHours} <span>Hours</span>
+                              {preApprovedHours} <span>Hrs/Week</span>
                             </p>
                           </FormField>
                           <FormField
-                            label="Pre-approved Period"
+                            label="Auto-approval Period"
                             info={`How far back your extra hours are auto-approved, set by your client. You can still report hours up to ${MAX_LOOKBACK_WEEKS} weeks back, but anything past this period needs their approval.`}
                           >
                             <p className="ca-wizard__metric-value">
@@ -449,92 +495,86 @@ export const NewCARequestWizard = ({
                               client&apos;s approval.
                             </p>
                             <div className="ca-wizard__week-groups">
-                              {weekGroups.map((week) => (
-                                <div key={week.start} className="ca-wizard__week-group">
-                                  <h4 className="ca-wizard__week-title">
-                                    Week of {formatWeekRange(week.start, week.end)}
-                                  </h4>
-                                  <div className="ca-wizard__metric-row">
-                                    <FormField label="Weekly Limit">
-                                      <p className="ca-wizard__metric-value">
-                                        {preApprovedHours} <span>Hours</span>
-                                      </p>
-                                    </FormField>
-                                    <FormField label="Used This Week">
-                                      <p className="ca-wizard__metric-value">
-                                        {week.takenHours} <span>Hours</span>
-                                      </p>
-                                    </FormField>
-                                    <FormField label="Remaining This Week">
-                                      <p className="ca-wizard__metric-value">
-                                        {week.remainingHours} <span>Hours</span>
-                                      </p>
-                                    </FormField>
-                                  </div>
-                                  <div className="ca-wizard__date-rows">
-                                    {week.dates.map((date) => (
-                                      <FormField key={date} label={formatFullDate(date)}>
-                                        <Input
-                                          type="number"
-                                          min={1}
-                                          max={DAILY_MAX_HOURS}
-                                          rightText="Hrs"
-                                          value={hoursByDate[date] ?? 1}
-                                          onChange={(event) =>
-                                            setHoursByDate((prev) => ({
-                                              ...prev,
-                                              [date]: Math.min(
-                                                DAILY_MAX_HOURS,
-                                                Math.max(1, Number(event.target.value)),
-                                              ),
-                                            }))
-                                          }
-                                          onIncrement={() =>
-                                            setHoursByDate((prev) => ({
-                                              ...prev,
-                                              [date]: Math.min(DAILY_MAX_HOURS, (prev[date] ?? 1) + 1),
-                                            }))
-                                          }
-                                          onDecrement={() =>
-                                            setHoursByDate((prev) => ({
-                                              ...prev,
-                                              [date]: Math.max(1, (prev[date] ?? 1) - 1),
-                                            }))
-                                          }
-                                          incrementLabel={`Increase hours for ${formatFullDate(date)}`}
-                                          decrementLabel={`Decrease hours for ${formatFullDate(date)}`}
+                              {weekGroups.map((week) => {
+                                const isFlagged =
+                                  preApprovedHours > 0 &&
+                                  (week.isOutsidePeriod || week.enteredHours > week.remainingHours)
+                                const caption = week.isOutsidePeriod
+                                  ? 'No pre-approved hours apply to this week'
+                                  : week.takenHours > 0
+                                    ? `${week.takenHours} hrs already requested this week`
+                                    : null
+                                return (
+                                  <div
+                                    key={week.start}
+                                    className={
+                                      isFlagged
+                                        ? 'ca-wizard__week-group ca-wizard__week-group--flagged'
+                                        : 'ca-wizard__week-group'
+                                    }
+                                  >
+                                    <div className="ca-wizard__week-header">
+                                      <div className="ca-wizard__week-header-text">
+                                        <p className="ca-wizard__week-title">
+                                          Week of {formatWeekRange(week.start, week.end)}
+                                        </p>
+                                        {caption && <p className="ca-wizard__week-caption">{caption}</p>}
+                                      </div>
+                                      {preApprovedHours > 0 && (
+                                        <Chip
+                                          label={`${week.takenHours + week.enteredHours} of ${preApprovedHours} hrs`}
+                                          tone={isFlagged ? 'orange' : 'green'}
                                         />
-                                      </FormField>
-                                    ))}
-                                  </div>
-                                  {week.isOutsidePeriod && (
-                                    <Alert
-                                      type="warning"
-                                      message="This week is outside your auto-approval period, so it needs your client's approval."
-                                    />
-                                  )}
-                                  {preApprovedHours > 0 && week.takenHours >= preApprovedHours && (
-                                    <Alert
-                                      type="warning"
-                                      message={`You already used your ${preApprovedHours} pre-approved hours for this week in an earlier request, so these hours need your client's approval.`}
-                                    />
-                                  )}
-                                  {preApprovedHours > 0 &&
-                                    week.takenHours > 0 &&
-                                    week.takenHours < preApprovedHours && (
-                                      <Alert
-                                        type="info"
-                                        message={`You have already requested ${week.takenHours} hours for this period.`}
+                                      )}
+                                    </div>
+                                    <div className="ca-wizard__date-rows">
+                                      {week.dates.map((date) => (
+                                        <FormField key={date} label={formatFullDate(date)}>
+                                          <Input
+                                            type="number"
+                                            min={1}
+                                            max={DAILY_MAX_HOURS}
+                                            rightText="Hrs"
+                                            value={hoursByDate[date] ?? 1}
+                                            onChange={(event) =>
+                                              setHoursByDate((prev) => ({
+                                                ...prev,
+                                                [date]: Math.min(
+                                                  DAILY_MAX_HOURS,
+                                                  Math.max(1, Number(event.target.value)),
+                                                ),
+                                              }))
+                                            }
+                                            onIncrement={() =>
+                                              setHoursByDate((prev) => ({
+                                                ...prev,
+                                                [date]: Math.min(DAILY_MAX_HOURS, (prev[date] ?? 1) + 1),
+                                              }))
+                                            }
+                                            onDecrement={() =>
+                                              setHoursByDate((prev) => ({
+                                                ...prev,
+                                                [date]: Math.max(1, (prev[date] ?? 1) - 1),
+                                              }))
+                                            }
+                                            incrementLabel={`Increase hours for ${formatFullDate(date)}`}
+                                            decrementLabel={`Decrease hours for ${formatFullDate(date)}`}
+                                          />
+                                        </FormField>
+                                      ))}
+                                    </div>
+                                    {isFlagged && (
+                                      <InlineWarning
+                                        message={
+                                          week.isOutsidePeriod || week.remainingHours === 0
+                                            ? "These hours need your client's approval."
+                                            : 'Reduce the hours to keep this request automatic.'
+                                        }
                                       />
                                     )}
-                                  {preApprovedHours > 0 && week.enteredHours > week.remainingHours && (
-                                    <Alert
-                                      type="warning"
-                                      message={`Reduce by ${week.enteredHours - week.remainingHours} hrs to keep this request automatic.`}
-                                    />
-                                  )}
-                                </div>
-                              ))}
+                                  </div>
+                                )
+                              })}
                             </div>
                           </>
                         )}
@@ -542,38 +582,59 @@ export const NewCARequestWizard = ({
                     </div>
                   </div>
 
-                  <div className="ca-wizard__totals">
-                    <div className="ca-wizard__totals-columns">
-                      <div className="ca-wizard__totals-column">
-                        <span className="ca-wizard__totals-label">Total extra hours worked</span>
-                        <p className="ca-wizard__totals-value">
-                          {totalHours} <span>Hours</span>
-                        </p>
+                  {selectedDates.length === 0 ? (
+                    <div className="ca-wizard__totals">
+                      <div className="ca-wizard__totals-columns">
+                        <div className="ca-wizard__totals-column">
+                          <span className="ca-wizard__totals-label">Total worked extra hours</span>
+                          <p className="ca-wizard__totals-value">
+                            {totalHours} <span>Hours</span>
+                          </p>
+                        </div>
+                        <div className="ca-wizard__totals-column">
+                          <span className="ca-wizard__totals-label">Total amount of money you will receive</span>
+                          <p className="ca-wizard__totals-value">
+                            ${totalAmount.toFixed(2)} <span>USD</span>
+                          </p>
+                        </div>
                       </div>
-                      <div className="ca-wizard__totals-column">
-                        <span className="ca-wizard__totals-label">Total amount of money you will receive</span>
-                        <p className="ca-wizard__totals-value">
-                          ${totalAmount.toFixed(2)} <span>USD</span>
-                        </p>
+                      <p className="ca-wizard__totals-caption">
+                        Calculated from number of dates and hours you worked extra hours.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="ca-wizard__totals">
+                      <div className="ca-wizard__totals-columns">
+                        <div className="ca-wizard__totals-column">
+                          <span className="ca-wizard__totals-label">Total extra hours worked</span>
+                          <p className="ca-wizard__totals-value">
+                            {totalHours} <span>Hrs</span>
+                          </p>
+                        </div>
+                        {totalsSecondColumn && (
+                          <div className="ca-wizard__totals-column">
+                            <span className="ca-wizard__totals-label">{totalsSecondColumn.label}</span>
+                            <div className="ca-wizard__totals-value-row">
+                              <p className="ca-wizard__totals-value">
+                                {totalsSecondColumn.hours} <span>Hrs</span>
+                              </p>
+                              <span className="ca-wizard__totals-week-label">
+                                Week of {formatWeekRange(totalsSecondColumn.week.start, totalsSecondColumn.week.end)}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="ca-wizard__totals-estimate-row">
+                        <span className="ca-wizard__totals-caption">Estimated amount, if approved</span>
+                        <span className="ca-wizard__totals-amount">
+                          ${totalAmount.toFixed(2)} USD
+                        </span>
                       </div>
                     </div>
-                    <p className="ca-wizard__totals-caption">
-                      Calculated from number of dates and hours you worked extra hours.
-                    </p>
-                  </div>
+                  )}
 
-                  {anyWeekOutsidePeriod && (
-                    <Alert
-                      type="warning"
-                      message="One week in this request is outside your auto-approval period, so the entire request will be sent to your client for approval, not only that week."
-                    />
-                  )}
-                  {preApprovedHours > 0 && anyWeekOverHours && (
-                    <Alert
-                      type="warning"
-                      message="This request goes over your pre-approved amount for at least one week, so the entire request will be sent to your client for approval, not only the extra hours."
-                    />
-                  )}
+                  {bottomAlertMessage && <InlineWarning message={bottomAlertMessage} />}
                   {exceededMax && (
                     <Alert
                       type="error"
