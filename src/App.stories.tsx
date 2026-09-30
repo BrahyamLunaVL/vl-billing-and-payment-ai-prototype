@@ -372,7 +372,7 @@ export const CreatingAnExtraHoursRequest: Story = {
     // unit in gray), so match on the containing element's full text instead
     // of a single text node. Total starts at the new day's default 1 hour.
     await expect(
-      canvas.getByText((_, element) => element?.textContent === '1 Hours' && element?.tagName === 'P'),
+      canvas.getByText((_, element) => element?.textContent === '1 Hrs' && element?.tagName === 'P'),
     ).toBeVisible();
 
     // Typing directly into that day's hour input (clamped to the 12/day
@@ -382,7 +382,7 @@ export const CreatingAnExtraHoursRequest: Story = {
     await userEvent.clear(hourInput);
     await userEvent.type(hourInput, '12');
     await expect(
-      await canvas.findByText((_, element) => element?.textContent === '12 Hours' && element?.tagName === 'P'),
+      await canvas.findByText((_, element) => element?.textContent === '12 Hrs' && element?.tagName === 'P'),
     ).toBeVisible();
   },
 };
