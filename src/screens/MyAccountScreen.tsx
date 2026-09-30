@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react'
+import { useState } from 'react'
 import { ProfileCard, AgreementCard, CACard, Chip, Button, Icon } from '../components'
 import type { AuthenticatedUser } from '../services/auth'
 import {
@@ -11,7 +11,6 @@ import {
   CA_STATUS_LABEL,
   CA_STATUS_TONE,
 } from '../services/vaAccount'
-import { resolveCARequest } from '../services/clientAccount'
 import { CADetailsView } from './CADetailsView'
 import { VAInvoicesPanel } from './VAInvoicesPanel'
 import './MyAccountScreen.css'
@@ -25,19 +24,11 @@ export interface MyAccountScreenProps {
 /** The VA's home screen after login (Figma's "My Account" — Invoice Preview state). */
 export const MyAccountScreen = ({ user, onViewInvoice, onViewAgreement }: MyAccountScreenProps) => {
   const [selectedCARequestId, setSelectedCARequestId] = useState<string | null>(null)
-  // `resolveCARequest` mutates the shared mock record in place — this forces
-  // a re-render so the just-resolved status/chip actually shows up.
-  const [, forceRefresh] = useReducer((tick: number) => tick + 1, 0)
 
   const profile = getVAProfile(user.email)
   const agreements = getAgreementsForVA(user.email)
   const caRequests = getCARequestsForVA(user.email)
   const selectedCARequest = selectedCARequestId ? getCARequestById(selectedCARequestId) : undefined
-
-  const handleResolve = (id: string, decision: 'approved' | 'rejected') => {
-    resolveCARequest(id, decision)
-    forceRefresh()
-  }
 
   return (
     <>
@@ -56,11 +47,7 @@ export const MyAccountScreen = ({ user, onViewInvoice, onViewAgreement }: MyAcco
       </div>
 
       {selectedCARequest ? (
-        <CADetailsView
-          request={selectedCARequest}
-          onApprove={() => handleResolve(selectedCARequest.id, 'approved')}
-          onReject={() => handleResolve(selectedCARequest.id, 'rejected')}
-        />
+        <CADetailsView request={selectedCARequest} />
       ) : (
         <>
           <div className="my-account-screen__row">
