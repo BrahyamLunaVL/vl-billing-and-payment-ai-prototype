@@ -4,6 +4,7 @@ import { AdminAppShell } from './AdminAppShell'
 import { AdminAgreementsListScreen } from './AdminAgreementsListScreen'
 import { ClientAgreementScreen } from './ClientAgreementScreen'
 import { AdminNewCARequestScreen } from './AdminNewCARequestScreen'
+import { AdminInvoicesListScreen } from './AdminInvoicesListScreen'
 import { AdminInvoiceScreen } from './AdminInvoiceScreen'
 import { ClientChangesApprovalsScreen } from './ClientChangesApprovalsScreen'
 import { AdminPlaceholderScreen } from './AdminPlaceholderScreen'
@@ -13,11 +14,6 @@ export interface AdminAppProps {
   user: AuthenticatedUser
 }
 
-// The prototype's only invoice — Admin has no "VA Invoice" list screen
-// designed yet, so the sidebar item opens this one directly, same as its
-// agreement counterpart did before "All Agreements" was designed.
-const ADMIN_HOME_INVOICE_ID = 'inv-1'
-
 type AdminPage =
   | 'agreements'
   | 'agreement'
@@ -26,6 +22,7 @@ type AdminPage =
   | 'vas'
   | 'clients'
   | 'va-invoice'
+  | 'va-invoice-detail'
   | 'va-invoice-claims'
   | 'client-invoice'
   | 'client-invoice-claims'
@@ -36,7 +33,10 @@ type AdminPage =
   | 'resources'
 
 const PLACEHOLDER_TITLES: Record<
-  Exclude<AdminPage, 'agreements' | 'agreement' | 'ca-wizard' | 'changes-approvals-form' | 'va-invoice'>,
+  Exclude<
+    AdminPage,
+    'agreements' | 'agreement' | 'ca-wizard' | 'changes-approvals-form' | 'va-invoice' | 'va-invoice-detail'
+  >,
   string
 > = {
   users: 'Users',
@@ -56,6 +56,7 @@ export const AdminApp = ({ user }: AdminAppProps) => {
   const [page, setPage] = useState<AdminPage>('agreements')
   const [selectedSidebarItem, setSelectedSidebarItem] = useState('agreements')
   const [selectedAgreementId, setSelectedAgreementId] = useState<string | null>(null)
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
 
   const handleSelectSidebarItem = (key: string) => {
     setSelectedSidebarItem(key)
@@ -67,6 +68,16 @@ export const AdminApp = ({ user }: AdminAppProps) => {
     setPage('agreement')
   }
 
+  const handleRequestChangesForAgreement = (agreementId: string) => {
+    setSelectedAgreementId(agreementId)
+    setPage('ca-wizard')
+  }
+
+  const handleViewInvoice = (invoiceId: string) => {
+    setSelectedInvoiceId(invoiceId)
+    setPage('va-invoice-detail')
+  }
+
   const handleFinishWizard = () => {
     setSelectedSidebarItem('changes-approvals-form')
     setPage('changes-approvals-form')
@@ -76,7 +87,12 @@ export const AdminApp = ({ user }: AdminAppProps) => {
 
   return (
     <AdminAppShell user={user} selectedSidebarItem={selectedSidebarItem} onSelectSidebarItem={handleSelectSidebarItem}>
-      {page === 'agreements' && <AdminAgreementsListScreen onViewAgreement={handleViewAgreement} />}
+      {page === 'agreements' && (
+        <AdminAgreementsListScreen
+          onViewAgreement={handleViewAgreement}
+          onRequestChanges={handleRequestChangesForAgreement}
+        />
+      )}
       {page === 'agreement' && selectedAgreementId && (
         <ClientAgreementScreen
           user={user}
@@ -90,12 +106,14 @@ export const AdminApp = ({ user }: AdminAppProps) => {
         <AdminNewCARequestScreen agreement={selectedAgreement} onFinish={handleFinishWizard} />
       )}
       {page === 'changes-approvals-form' && <ClientChangesApprovalsScreen user={user} scope="admin" />}
-      {page === 'va-invoice' && <AdminInvoiceScreen invoiceId={ADMIN_HOME_INVOICE_ID} />}
+      {page === 'va-invoice' && <AdminInvoicesListScreen onViewInvoice={handleViewInvoice} />}
+      {page === 'va-invoice-detail' && selectedInvoiceId && <AdminInvoiceScreen invoiceId={selectedInvoiceId} />}
       {page !== 'agreements' &&
         page !== 'agreement' &&
         page !== 'ca-wizard' &&
         page !== 'changes-approvals-form' &&
-        page !== 'va-invoice' && <AdminPlaceholderScreen title={PLACEHOLDER_TITLES[page]} />}
+        page !== 'va-invoice' &&
+        page !== 'va-invoice-detail' && <AdminPlaceholderScreen title={PLACEHOLDER_TITLES[page]} />}
     </AdminAppShell>
   )
 }

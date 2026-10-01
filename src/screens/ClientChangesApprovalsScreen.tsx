@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Table, type TableColumn, Chip, Button, Icon, Input, PopUp } from '../components'
+import { Table, type TableColumn, Chip, Button, Icon, Input } from '../components'
 import type { AuthenticatedUser } from '../services/auth'
 import {
   getCARequestsForClient,
@@ -10,6 +10,7 @@ import {
 } from '../services/clientAccount'
 import { CA_STATUS_LABEL, CA_STATUS_TONE } from '../services/vaAccount'
 import { CARequestDetailsModal } from './CARequestDetailsModal'
+import { SelectedRequestsModal } from './SelectedRequestsModal'
 import './ClientChangesApprovalsScreen.css'
 
 export interface ClientChangesApprovalsScreenProps {
@@ -28,10 +29,11 @@ function compareValues(a: string, b: string, direction: SortDirection): number {
 /**
  * The client's "Changes & Approvals Form" (Figma's table view): every
  * request across the client's VAs, sortable/paginated, with a per-row
- * "View" details modal and a checkbox multi-select for bulk review. The
- * bulk "Review Request" flow here is a simple placeholder (select rows,
- * approve or reject them all) — Figma didn't detail its exact result view
- * for this specific interaction yet.
+ * "View" details modal and a checkbox multi-select for bulk review. "Review
+ * Request" opens the same modal chrome as "View" (see
+ * `SelectedRequestsModal`), titled "Selected requests (N)", listing each
+ * selected request as its own collapsible section rather than one fixed
+ * field grid, then approves/rejects all of them at once.
  */
 export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientChangesApprovalsScreenProps) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -244,36 +246,12 @@ export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientC
       )}
 
       {showBulkReview && (
-        <PopUp>
-          <div className="client-ca-screen__bulk-review">
-            <h2 className="client-ca-screen__bulk-review-title">
-              Review {selectedRequests.length} selected request{selectedRequests.length === 1 ? '' : 's'}
-            </h2>
-            <ul className="client-ca-screen__bulk-review-list">
-              {selectedRequests.map((request) => (
-                <li key={request.id}>
-                  {request.vaName} — {request.title}
-                </li>
-              ))}
-            </ul>
-            <div className="client-ca-screen__bulk-review-actions">
-              <Button
-                type="tertiary"
-                buttonText="Reject All"
-                onClick={() => handleBulkResolve('rejected')}
-                style={{ width: '160px' }}
-              />
-              <Button buttonText="Approve All" onClick={() => handleBulkResolve('approved')} style={{ width: '160px' }} />
-            </div>
-            <button
-              type="button"
-              className="client-ca-screen__bulk-review-cancel"
-              onClick={() => setShowBulkReview(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </PopUp>
+        <SelectedRequestsModal
+          requests={selectedRequests}
+          onClose={() => setShowBulkReview(false)}
+          onApproveAll={() => handleBulkResolve('approved')}
+          onRejectAll={() => handleBulkResolve('rejected')}
+        />
       )}
     </>
   )

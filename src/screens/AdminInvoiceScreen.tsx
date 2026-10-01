@@ -33,9 +33,10 @@ export const AdminInvoiceScreen = ({ invoiceId }: AdminInvoiceScreenProps) => {
 
   return (
     <div className="admin-invoice-screen">
-      <div className="admin-invoice-screen__header">
-        <h1 className="admin-invoice-screen__title">View Invoice</h1>
-        <Button leftIcon="arrow-down-to-line" buttonText="Download PDF" />
+      <h1 className="admin-invoice-screen__title">View Invoice</h1>
+
+      <div className="admin-invoice-screen__actions">
+        <Button leftIcon="arrow-down-to-line" buttonText="Download PDF" style={{ width: '200px' }} />
       </div>
 
       <ProfileCard

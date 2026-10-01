@@ -13,7 +13,7 @@ export interface ClientNewCARequestScreenProps {
 
 /** The client's "Request for Changes" flow, opened from an agreement's own detail screen — the same wizard as the VA's/Admin's, without Admin's "Request on behalf of" selector. */
 export const ClientNewCARequestScreen = ({ agreement, onFinish }: ClientNewCARequestScreenProps) => {
-  const recentRequest = getCARequestsForVA(agreement.vaEmail)[0]
+  const recentRequests = getCARequestsForVA(agreement.vaEmail)
   const [wizardStep, setWizardStep] = useState<1 | 2 | 3 | 4>(1)
 
   return (
@@ -23,8 +23,11 @@ export const ClientNewCARequestScreen = ({ agreement, onFinish }: ClientNewCAReq
         {wizardStep !== 4 && <Button type="tertiary" buttonText="Click to see SAM Contact Info" />}
       </div>
       <NewCARequestWizard
-        recentRequest={recentRequest}
+        vaEmail={agreement.vaEmail}
+        agreementId={agreement.id}
+        recentRequests={recentRequests}
         agreementSettings={agreement.settings}
+        requesterRole="client"
         onStepChange={setWizardStep}
         finishButtonLabel="Go to C&A Table"
         onFinish={onFinish}

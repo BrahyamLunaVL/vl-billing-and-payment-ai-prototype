@@ -13,7 +13,6 @@ const meta = {
     billingType: 'Post Pay',
     dateStart: 'Date Start 2025-04-28',
     vaName: 'Andrea Lucia Mondonedo Edwards',
-    vaHiredStatus: 'hired',
     vaTelegramHandle: '@AndreaMondonedoE',
     vaCountry: 'Peru',
     vaAka: 'Juan Diego Gomez',
@@ -28,7 +27,7 @@ type Story = StoryObj<typeof meta>;
 export const Active: Story = {};
 
 export const Terminated: Story = {
-  args: { statusLabel: 'Terminated', statusTone: 'red', vaHiredStatus: 'inactive' },
+  args: { statusLabel: 'Terminated', statusTone: 'red' },
 };
 
 export const ClickingActionsInvokesHandlers: Story = {

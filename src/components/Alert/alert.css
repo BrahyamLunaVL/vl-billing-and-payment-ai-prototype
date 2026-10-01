@@ -3,8 +3,11 @@
   --alert-color-green-text: #21a184;
   --alert-color-orange-bg: #fcefe0;
   --alert-color-orange-text: #ed9731;
-  --alert-color-red-bg: #fadcdc;
+  --alert-color-red-bg: #fdf1f1;
   --alert-color-red-text: #de1515;
+  --alert-color-red-border: #f7c5c5;
+  --alert-color-blue-bg: #ebfbfc;
+  --alert-color-blue-text: #378fce;
 
   box-sizing: border-box;
   display: flex;
@@ -12,6 +15,7 @@
   gap: 8px;
   width: 100%;
   padding: 20px;
+  border: 1px solid transparent;
   border-radius: 4px;
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
@@ -32,6 +36,12 @@
 .alert--error {
   background: var(--alert-color-red-bg);
   color: var(--alert-color-red-text);
+  border-color: var(--alert-color-red-border);
+}
+
+.alert--info {
+  background: var(--alert-color-blue-bg);
+  color: var(--alert-color-blue-text);
 }
 
 .alert__icon {

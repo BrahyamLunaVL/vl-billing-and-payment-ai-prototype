@@ -2,7 +2,8 @@ import { MOCK_CLIENT_PROFILES, type ClientProfile } from '../mocks/clients';
 import { MOCK_AGREEMENTS, resetMockAgreements, type Agreement, type AgreementSettings } from '../mocks/agreements';
 import { MOCK_VA_PROFILES } from '../mocks/vaProfiles';
 import { MOCK_USERS } from '../mocks/users';
-import { MOCK_INVOICES, groupInvoiceItems, type InvoiceGroupView } from '../mocks/invoices';
+import { MOCK_INVOICES, groupInvoiceItems, type InvoiceGroupView, type InvoiceRecord } from '../mocks/invoices';
+import { sortCARequestsByRecency } from './vaAccount';
 import {
   MOCK_CA_REQUESTS,
   resetMockCARequests,
@@ -32,6 +33,8 @@ export interface ClientAgreementView extends Agreement {
   vaPaymentMethod: string;
   vaPhoneNumber: string;
   vaHubspotId: string;
+  /** The VA's own SAM contact, e.g. "Javiera Mercado" — shown on the Admin agreements table's SAM column. */
+  samContactName: string;
   clientCompanyName: string;
   /** The client company's own payment method — shown on the Agreement screen's Company card, Client only. */
   clientPaymentMethod: string;
@@ -52,6 +55,7 @@ function joinAgreementWithVA(agreement: Agreement): ClientAgreementView {
     vaPaymentMethod: vaProfile?.paymentMethod ?? '',
     vaPhoneNumber: vaProfile?.phoneNumber ?? '',
     vaHubspotId: vaProfile?.hubspotId ?? '',
+    samContactName: vaProfile?.samContactName ?? '',
     clientCompanyName: clientProfile?.companyName ?? agreement.clientName,
     clientPaymentMethod: clientProfile?.paymentMethod ?? '',
   };
@@ -69,6 +73,26 @@ export function getAllAgreements(): ClientAgreementView[] {
 export function getAgreementById(id: string): ClientAgreementView | undefined {
   const agreement = MOCK_AGREEMENTS.find((candidate) => candidate.id === id);
   return agreement ? joinAgreementWithVA(agreement) : undefined;
+}
+
+/** An `InvoiceRecord` plus the VA display info Admin's "All Invoices" table shows alongside it. */
+export interface AdminInvoiceView extends InvoiceRecord {
+  vaLegalName: string;
+  vaPaymentEmail: string;
+  vaBillingCountry: string;
+}
+
+/** Every invoice platform-wide — the Admin table's view, unscoped to one VA/client. */
+export function getAllInvoices(): AdminInvoiceView[] {
+  return MOCK_INVOICES.map((invoice) => {
+    const vaProfile = MOCK_VA_PROFILES.find((profile) => profile.email === invoice.vaEmail);
+    return {
+      ...invoice,
+      vaLegalName: vaProfile?.legalName ?? invoice.vaEmail,
+      vaPaymentEmail: vaProfile?.paymentEmail ?? '',
+      vaBillingCountry: vaProfile?.country ?? '',
+    };
+  });
 }
 
 /** Persists edits made from the client's Agreement Settings screen — the VA's wizard reads the same record. */
@@ -117,18 +141,20 @@ export interface ClientCARequestView extends CARequest {
 
 /** Every Changes & Approvals request under this client's account (Figma's client-facing table). */
 export function getCARequestsForClient(clientEmail: string): ClientCARequestView[] {
-  return MOCK_CA_REQUESTS.filter((request) => request.clientEmail === clientEmail).map((request) => {
+  const requests = MOCK_CA_REQUESTS.filter((request) => request.clientEmail === clientEmail).map((request) => {
     const vaUser = MOCK_USERS.find((user) => user.email === request.vaEmail);
     return { ...request, vaName: vaUser?.name ?? request.vaEmail };
   });
+  return sortCARequestsByRecency(requests);
 }
 
 /** Every Changes & Approvals request platform-wide — the Admin table's view, unscoped to one client. */
 export function getAllCARequests(): ClientCARequestView[] {
-  return MOCK_CA_REQUESTS.map((request) => {
+  const requests = MOCK_CA_REQUESTS.map((request) => {
     const vaUser = MOCK_USERS.find((user) => user.email === request.vaEmail);
     return { ...request, vaName: vaUser?.name ?? request.vaEmail };
   });
+  return sortCARequestsByRecency(requests);
 }
 
 export function getCARequestByIdForClient(id: string): ClientCARequestView | undefined {

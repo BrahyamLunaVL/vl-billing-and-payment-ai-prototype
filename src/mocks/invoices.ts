@@ -4,7 +4,7 @@ export type InvoiceLineItemGroup = 'agreement' | 'extra-hours' | 'time-off';
  * Admin's "Invoice Status" chip variants (the VA's own View Invoice always
  * shows "Preview" regardless of this field — only Admin's screen reads it).
  */
-export type InvoiceStatus = 'due' | 'paid' | 'preview';
+export type InvoiceStatus = 'due' | 'paid' | 'preview' | 'refunded' | 'pending-payment' | 'payment-failed';
 
 export interface InvoiceLineItemData {
   key: string;
@@ -49,6 +49,10 @@ export interface InvoiceRecord {
   uploadedReportName?: string;
   /** Admin's "Invoice Status" chip. Defaults to 'due' for invoices that omit it. */
   status?: InvoiceStatus;
+  /** e.g. "10/5/2023, 09:14:22 AM PST" — when the invoice was approved for issuing, shown on Admin's "All Invoices" table. */
+  approvalDate: string;
+  /** Whether this is a standard recurring billing cycle, shown as a check/x-mark icon on Admin's "All Invoices" table. */
+  isRegular: boolean;
 }
 
 const INITIAL_INVOICES: InvoiceRecord[] = [
@@ -96,6 +100,199 @@ const INITIAL_INVOICES: InvoiceRecord[] = [
     uploadedReportsMessage: 'No reports uploaded',
     uploadedReportName: 'Work Report',
     status: 'due',
+    approvalDate: '10/5/2023, 09:14:22 AM PST',
+    isRegular: true,
+  },
+  {
+    id: 'inv-2',
+    vaEmail: 'va2@virtuallatinos.com',
+    clientAccountEmail: 'client@virtuallatinos.com',
+    title: 'Invoice Preview #1940-3327',
+    invoiceNumber: '10',
+    clientName: 'Bloominari, LLC',
+    clientAddress: '5425 Oberlin Drive, Suite #205, San Diego, CA, 92121, US',
+    clientEmail: 'billing@virtuallatinos.com',
+    clientPhone: '+1 (619) 604-2604',
+    invoiceDate: '9/20/2026',
+    dueDate: '9/20/2026',
+    invoicedTo: 'BiGmedia.ai, Inc.',
+    billingPeriod: '9/7/2026 - 9/20/2026',
+    items: [
+      {
+        key: '1',
+        description: 'Weekly Service from 2026-09-07 to 2026-09-13, 40 hours, rate $7.00',
+        amount: '$280.00',
+        group: 'agreement',
+      },
+      {
+        key: '2',
+        description: 'Weekly Service from 2026-09-14 to 2026-09-20, 40 hours, rate $7.00',
+        amount: '$280.00',
+        group: 'agreement',
+      },
+      {
+        key: '3',
+        description: 'Total extra hrs - 4 hrs (Pre-approved 4 · Manually approved 0), rate $8.00/hr',
+        amount: '$32.00',
+        group: 'extra-hours',
+      },
+    ],
+    totalLabel: 'Invoice Preview Total:',
+    totalAmount: '$592.00',
+    warnings: [
+      'Cannot approve invoice preview outside approval period.',
+      'Cannot upload invoice reports outside approval period.',
+      'Cannot request review outside review invoice period.',
+    ],
+    uploadedReportsMessage: 'No reports uploaded',
+    status: 'paid',
+    approvalDate: '9/20/2026, 11:02:47 AM PST',
+    isRegular: true,
+  },
+  {
+    id: 'inv-3',
+    vaEmail: 'va-no-hours@virtuallatinos.com',
+    clientAccountEmail: 'client@virtuallatinos.com',
+    title: 'Invoice Preview #1940-3328',
+    invoiceNumber: '11',
+    clientName: 'Bloominari, LLC',
+    clientAddress: '5425 Oberlin Drive, Suite #205, San Diego, CA, 92121, US',
+    clientEmail: 'billing@virtuallatinos.com',
+    clientPhone: '+1 (619) 604-2604',
+    invoiceDate: '9/20/2026',
+    dueDate: '9/20/2026',
+    invoicedTo: 'BiGmedia.ai, Inc.',
+    billingPeriod: '9/7/2026 - 9/20/2026',
+    items: [
+      {
+        key: '1',
+        description: 'Weekly Service from 2026-09-07 to 2026-09-13, 40 hours, rate $8.00',
+        amount: '$320.00',
+        group: 'agreement',
+      },
+      {
+        key: '2',
+        description: 'Weekly Service from 2026-09-14 to 2026-09-20, 40 hours, rate $8.00',
+        amount: '$320.00',
+        group: 'agreement',
+      },
+    ],
+    totalLabel: 'Invoice Preview Total:',
+    totalAmount: '$640.00',
+    warnings: [
+      'Cannot approve invoice preview outside approval period.',
+      'Cannot upload invoice reports outside approval period.',
+      'Cannot request review outside review invoice period.',
+    ],
+    uploadedReportsMessage: 'No reports uploaded',
+    status: 'preview',
+    approvalDate: '9/20/2026, 08:47:15 AM PST',
+    isRegular: true,
+  },
+  {
+    id: 'inv-4',
+    vaEmail: 'va2@virtuallatinos.com',
+    clientAccountEmail: 'client@virtuallatinos.com',
+    title: 'Invoice Preview #1940-3329',
+    invoiceNumber: '12',
+    clientName: 'Bloominari, LLC',
+    clientAddress: '5425 Oberlin Drive, Suite #205, San Diego, CA, 92121, US',
+    clientEmail: 'billing@virtuallatinos.com',
+    clientPhone: '+1 (619) 604-2604',
+    invoiceDate: '8/23/2026',
+    dueDate: '8/23/2026',
+    invoicedTo: 'BiGmedia.ai, Inc.',
+    billingPeriod: '8/10/2026 - 8/23/2026',
+    items: [
+      {
+        key: '1',
+        description: 'Weekly Service from 2026-08-10 to 2026-08-16, 40 hours, rate $7.00',
+        amount: '$280.00',
+        group: 'agreement',
+      },
+      {
+        key: '2',
+        description: 'Weekly Service from 2026-08-17 to 2026-08-23, 40 hours, rate $7.00',
+        amount: '$280.00',
+        group: 'agreement',
+      },
+    ],
+    totalLabel: 'Invoice Preview Total:',
+    totalAmount: '$560.00',
+    uploadedReportsMessage: 'No reports uploaded',
+    status: 'refunded',
+    approvalDate: '8/23/2026, 10:33:09 AM PST',
+    isRegular: true,
+  },
+  {
+    id: 'inv-5',
+    vaEmail: 'va-no-hours@virtuallatinos.com',
+    clientAccountEmail: 'client@virtuallatinos.com',
+    title: 'Invoice Preview #1940-3330',
+    invoiceNumber: '13',
+    clientName: 'Bloominari, LLC',
+    clientAddress: '5425 Oberlin Drive, Suite #205, San Diego, CA, 92121, US',
+    clientEmail: 'billing@virtuallatinos.com',
+    clientPhone: '+1 (619) 604-2604',
+    invoiceDate: '8/23/2026',
+    dueDate: '8/23/2026',
+    invoicedTo: 'BiGmedia.ai, Inc.',
+    billingPeriod: '8/10/2026 - 8/23/2026',
+    items: [
+      {
+        key: '1',
+        description: 'Weekly Service from 2026-08-10 to 2026-08-16, 40 hours, rate $8.00',
+        amount: '$320.00',
+        group: 'agreement',
+      },
+      {
+        key: '2',
+        description: 'Weekly Service from 2026-08-17 to 2026-08-23, 40 hours, rate $8.00',
+        amount: '$320.00',
+        group: 'agreement',
+      },
+    ],
+    totalLabel: 'Invoice Preview Total:',
+    totalAmount: '$640.00',
+    uploadedReportsMessage: 'No reports uploaded',
+    status: 'pending-payment',
+    approvalDate: '8/23/2026, 09:18:52 AM PST',
+    isRegular: true,
+  },
+  {
+    id: 'inv-6',
+    vaEmail: 'va2@virtuallatinos.com',
+    clientAccountEmail: 'client@virtuallatinos.com',
+    title: 'Invoice Preview #1940-3331',
+    invoiceNumber: '14',
+    clientName: 'Bloominari, LLC',
+    clientAddress: '5425 Oberlin Drive, Suite #205, San Diego, CA, 92121, US',
+    clientEmail: 'billing@virtuallatinos.com',
+    clientPhone: '+1 (619) 604-2604',
+    invoiceDate: '8/9/2026',
+    dueDate: '8/9/2026',
+    invoicedTo: 'BiGmedia.ai, Inc.',
+    billingPeriod: '7/27/2026 - 8/9/2026',
+    items: [
+      {
+        key: '1',
+        description: 'Weekly Service from 2026-07-27 to 2026-08-02, 40 hours, rate $7.00',
+        amount: '$280.00',
+        group: 'agreement',
+      },
+      {
+        key: '2',
+        description: 'Weekly Service from 2026-08-03 to 2026-08-09, 40 hours, rate $7.00',
+        amount: '$280.00',
+        group: 'agreement',
+      },
+    ],
+    totalLabel: 'Invoice Preview Total:',
+    totalAmount: '$560.00',
+    uploadedReportsMessage: 'No reports uploaded',
+    status: 'payment-failed',
+    approvalDate: '8/9/2026, 02:41:36 PM PST',
+    isRegular: true,
   },
 ];
 

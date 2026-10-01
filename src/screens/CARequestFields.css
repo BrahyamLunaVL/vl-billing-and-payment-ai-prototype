@@ -1,0 +1,33 @@
+.ca-request-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ca-request-fields__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 14px;
+  color: #263238;
+}
+
+.ca-request-fields__row--stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.ca-request-fields__label {
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.ca-request-fields__value {
+  text-align: right;
+}
+
+.ca-request-fields__value--pre {
+  white-space: pre-line;
+}

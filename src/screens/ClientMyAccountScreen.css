@@ -19,6 +19,16 @@
   width: 100%;
 }
 
+.client-my-account-screen__profile-header .icon {
+  color: #c32059;
+}
+
+.client-my-account-screen__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .client-my-account-screen__profile-name {
   margin: 0;
   font-size: 20px;
@@ -30,10 +40,6 @@
   margin: 0;
   font-size: 14px;
   color: #7a7a7a;
-}
-
-.client-my-account-screen__profile-chip {
-  margin-left: auto;
 }
 
 .client-my-account-screen__field-row {

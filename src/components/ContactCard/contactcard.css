@@ -46,15 +46,16 @@
   font-weight: 700;
 }
 
-.contact-card__access-type {
+.contact-card__access-line {
   margin: 0;
   font-size: 14px;
+}
+
+.contact-card__access-type {
   font-weight: 700;
 }
 
 .contact-card__description {
-  margin: 0;
-  font-size: 14px;
   font-weight: 400;
 }
 

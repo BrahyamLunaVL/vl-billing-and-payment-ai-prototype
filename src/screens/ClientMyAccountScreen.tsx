@@ -29,16 +29,14 @@ export const ClientMyAccountScreen = ({ user, onEditAgreement, onRequestChanges 
             <div className="client-my-account-screen__profile-header">
               <Icon name="buildings" size={40} />
               <div>
-                <h2 className="client-my-account-screen__profile-name">{profile.companyName}</h2>
+                <div className="client-my-account-screen__title-row">
+                  <h2 className="client-my-account-screen__profile-name">{profile.companyName}</h2>
+                  <Chip label={profile.enabled ? 'Enabled' : 'Disabled'} tone={profile.enabled ? 'green' : 'red'} />
+                </div>
                 <p className="client-my-account-screen__profile-description">
                   Client since {profile.clientSinceDate}
                 </p>
               </div>
-              <Chip
-                label={profile.enabled ? 'Enabled' : 'Disabled'}
-                tone={profile.enabled ? 'green' : 'red'}
-                className="client-my-account-screen__profile-chip"
-              />
             </div>
           }
         >
@@ -75,7 +73,6 @@ export const ClientMyAccountScreen = ({ user, onEditAgreement, onRequestChanges 
               billingType={agreement.billingType}
               dateStart={agreement.dateStart}
               vaName={agreement.vaName}
-              vaHiredStatus={agreement.vaHiredStatus}
               vaTelegramHandle={agreement.vaTelegramHandle}
               vaCountry={agreement.vaCountry}
               vaAka={agreement.vaAka}
@@ -97,6 +94,7 @@ export const ClientMyAccountScreen = ({ user, onEditAgreement, onRequestChanges 
                   name={contact.name}
                   accessTypeLabel={contact.accessTypeLabel}
                   description={contact.description}
+                  showCallButton={false}
                   hideDivider={index === profile.contacts.length - 1}
                 />
               ))}

@@ -49,6 +49,8 @@ export interface Agreement {
   /** e.g. "9/13/2026" — shown in the client-facing Agreement header, Client/Admin only. */
   nextPaymentDate: string;
   hubspotId: string;
+  /** e.g. "VL-Agreement-Bloominari dba Virtual Latinos-Elena R.-2025-04-28 09:14:02" — auto-generated at creation time, shown on the Admin agreements table. */
+  agreementName: string;
   /** Omit for an inactive agreement with no ongoing schedule. */
   week?: WeekDayData[];
   settings: AgreementSettings;
@@ -74,7 +76,7 @@ const DEFAULT_SETTINGS: AgreementSettings = {
   overThresholdAmount: 500,
   autoApproveExtraHours: true,
   preApprovedHoursPerWeek: 5,
-  reportBackWeeks: 12,
+  reportBackWeeks: 4,
   emailOnPreApprovedExtraHours: false,
 };
 
@@ -95,6 +97,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     startDate: '4/28/2025',
     nextPaymentDate: '9/13/2026',
     hubspotId: '44787728131',
+    agreementName: 'VL-Agreement-Bloominari dba Virtual Latinos-Elena R.-2025-04-28 09:14:02',
     status: 'active',
     week: FULL_TIME_WEEK,
     settings: { ...DEFAULT_SETTINGS },
@@ -127,6 +130,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     endDate: '1/24/2025',
     nextPaymentDate: '1/24/2025',
     hubspotId: '44787728132',
+    agreementName: 'VL-Agreement-The Matian Firm-Elena R.-2024-07-25 14:02:11',
     status: 'inactive',
     settings: { ...DEFAULT_SETTINGS, autoApproveExtraHours: false },
     clientRateRanges: [
@@ -138,6 +142,70 @@ const INITIAL_AGREEMENTS: Agreement[] = [
       '10 - 20 hours per week @ $7.00/hr',
       '21 - 30 hours per week @ $7.50/hr',
       '31 - 40 hours per week @ $8.00/hr',
+    ],
+  },
+  {
+    id: 'agr-5',
+    vaEmail: 'va2@virtuallatinos.com',
+    clientEmail: 'client@virtuallatinos.com',
+    clientName: 'Bloominari dba Virtual Latinos',
+    contactName: 'Jaime Nacach',
+    contactEmail: 'jaime@virtuallatinos.com',
+    vaRate: 'VA Rate: $9.00',
+    billedRate: '$7.00',
+    vaHourlyRate: '$9.00',
+    hoursPerWeek: '40 Hours per week',
+    billingType: 'Post Pay',
+    dateStart: 'Date Start 2024-03-04',
+    startDate: '3/4/2024',
+    nextPaymentDate: '9/13/2026',
+    hubspotId: '44787728135',
+    agreementName: 'VL-Agreement-Bloominari dba Virtual Latinos-Laura G.-2024-03-04 08:45:30',
+    status: 'active',
+    week: FULL_TIME_WEEK,
+    settings: { ...DEFAULT_SETTINGS },
+    clientRateRanges: [
+      '10 - 20 hours per week @ $18.00/hr',
+      '21 - 30 hours per week @ $17.00/hr',
+      '31 - 40 hours per week @ $32.00/hr',
+    ],
+    vaRateRanges: [
+      '10 - 20 hours per week @ $8.00/hr',
+      '21 - 30 hours per week @ $8.50/hr',
+      '31 - 40 hours per week @ $9.00/hr',
+    ],
+  },
+  {
+    id: 'agr-3',
+    vaEmail: 'va-no-hours@virtuallatinos.com',
+    clientEmail: 'client@virtuallatinos.com',
+    clientName: 'Bloominari dba Virtual Latinos',
+    contactName: 'Jaime Nacach',
+    contactEmail: 'jaime@virtuallatinos.com',
+    vaRate: 'VA Rate: $10.00',
+    billedRate: '$8.00',
+    vaHourlyRate: '$10.00',
+    hoursPerWeek: '40 Hours per week',
+    billingType: 'Post Pay',
+    dateStart: 'Date Start 2026-01-12',
+    startDate: '1/12/2026',
+    nextPaymentDate: '9/13/2026',
+    hubspotId: '44787728133',
+    agreementName: 'VL-Agreement-Bloominari dba Virtual Latinos-Camila T.-2026-01-12 10:22:47',
+    status: 'active',
+    week: FULL_TIME_WEEK,
+    // No pre-approved extra hours from the client — every extra hour this
+    // VA reports needs manual approval.
+    settings: { ...DEFAULT_SETTINGS, autoApproveExtraHours: false, preApprovedHoursPerWeek: 0 },
+    clientRateRanges: [
+      '10 - 20 hours per week @ $20.00/hr',
+      '21 - 30 hours per week @ $19.00/hr',
+      '31 - 40 hours per week @ $35.00/hr',
+    ],
+    vaRateRanges: [
+      '10 - 20 hours per week @ $9.00/hr',
+      '21 - 30 hours per week @ $9.50/hr',
+      '31 - 40 hours per week @ $10.00/hr',
     ],
   },
 ];

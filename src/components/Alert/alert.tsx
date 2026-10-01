@@ -1,7 +1,7 @@
-import { Icon } from '../Icon';
+import { Icon, type IconName } from '../Icon';
 import './alert.css';
 
-export type AlertType = 'success' | 'warning' | 'error';
+export type AlertType = 'success' | 'warning' | 'error' | 'info';
 
 export interface AlertProps {
   /** Which color treatment to use. Defaults to 'success'. */
@@ -10,6 +10,13 @@ export interface AlertProps {
   message: string;
   className?: string;
 }
+
+const ICON_BY_TYPE: Record<AlertType, IconName> = {
+  success: 'circle-check',
+  info: 'circle-info',
+  warning: 'triangle-exclamation',
+  error: 'triangle-exclamation',
+};
 
 /**
  * A static, full-width status banner (Figma's "Table Alerts" component,
@@ -22,7 +29,7 @@ export const Alert = ({ type = 'success', message, className }: AlertProps) => {
 
   return (
     <div className={classNames} role="status">
-      <Icon name="circle-check" variant="bold" size={20} className="alert__icon" />
+      <Icon name={ICON_BY_TYPE[type]} variant="regular" size={20} className="alert__icon" />
       <span className="alert__message">{message}</span>
     </div>
   );
