@@ -298,12 +298,9 @@ export const NewCARequestWizard = ({
 }: NewCARequestWizardProps) => {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [onBehalfOf, setOnBehalfOf] = useState<'client' | 'va'>('va')
-  // "Request approval for extra hours" isn't offered to the Client (or Admin
-  // acting as Client) — only the VA actually works the hours being
-  // reported, so default away from it when starting from that perspective.
-  const [requestType, setRequestType] = useState<RequestType>(
-    !showOnBehalfOf && requesterRole === 'client' ? 'time-off' : 'extra-hours',
-  )
+  // TEMP (offline V2 export): "Request approval for extra hours" is
+  // disabled for every viewer, so default to Time Off instead.
+  const [requestType, setRequestType] = useState<RequestType>('time-off')
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [hoursByDate, setHoursByDate] = useState<Record<string, number>>({})
   const [comments, setComments] = useState('')
@@ -610,7 +607,7 @@ export const NewCARequestWizard = ({
   }
 
   const handleRequestMore = () => {
-    setRequestType('extra-hours')
+    setRequestType('time-off')
     setSelectedDates([])
     setHoursByDate({})
     setComments('')
@@ -714,10 +711,7 @@ export const NewCARequestWizard = ({
                       ? 'Main Changes Requested from the Client'
                       : 'Main Changes Requested from the Virtual Assistant (VA)'}
                   </legend>
-                  {(isClientPerspective
-                    ? REQUEST_TYPE_OPTIONS.filter((option) => option.value !== 'extra-hours')
-                    : REQUEST_TYPE_OPTIONS
-                  ).map((option) => (
+                  {REQUEST_TYPE_OPTIONS.filter((option) => option.value !== 'extra-hours').map((option) => (
                     <Radio
                       key={option.value}
                       name="request-type"
