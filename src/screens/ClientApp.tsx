@@ -5,18 +5,19 @@ import { ClientMyAccountScreen } from './ClientMyAccountScreen'
 import { ClientAgreementsListScreen } from './ClientAgreementsListScreen'
 import { ClientAgreementScreen } from './ClientAgreementScreen'
 import { ClientInvoiceScreen } from './ClientInvoiceScreen'
+import { ClientNewCARequestScreen } from './ClientNewCARequestScreen'
+import { ClientChangesApprovalsScreen } from './ClientChangesApprovalsScreen'
+import { getAgreementById } from '../services/clientAccount'
 
 export interface ClientAppProps {
   user: AuthenticatedUser
 }
 
-type ClientPage = 'my-account' | 'agreements' | 'agreement' | 'client-invoice'
+type ClientPage = 'my-account' | 'agreements' | 'agreement' | 'ca-wizard' | 'changes-approvals-form' | 'client-invoice'
 
 /**
  * Owns which Client page is showing and drives the shared Sidebar's
- * selection to match. The Changes & Approvals flow isn't defined for the
- * client role yet, so there's no sidebar item for it and "Request Changes"
- * on the Agreements screens is inert (no handler passed).
+ * selection to match.
  */
 export const ClientApp = ({ user }: ClientAppProps) => {
   const [page, setPage] = useState<ClientPage>('my-account')
@@ -30,6 +31,7 @@ export const ClientApp = ({ user }: ClientAppProps) => {
     if (key === 'my-account') setPage('my-account')
     else if (key === 'agreements') setPage('agreements')
     else if (key === 'client-invoice') setPage('client-invoice')
+    else if (key === 'changes-approvals-form') setPage('changes-approvals-form')
   }
 
   const handleViewAgreement = (agreementId: string) => {
@@ -43,15 +45,46 @@ export const ClientApp = ({ user }: ClientAppProps) => {
     setPage(agreementOrigin)
   }
 
+  const handleRequestChangesForAgreement = (agreementId: string) => {
+    setSelectedAgreementId(agreementId)
+    setPage('ca-wizard')
+  }
+
+  const handleFinishWizard = () => {
+    setSelectedSidebarItem('changes-approvals-form')
+    setPage('changes-approvals-form')
+  }
+
+  const selectedAgreement = selectedAgreementId ? getAgreementById(selectedAgreementId) : undefined
+
   return (
     <ClientAppShell user={user} selectedSidebarItem={selectedSidebarItem} onSelectSidebarItem={handleSelectSidebarItem}>
-      {page === 'my-account' && <ClientMyAccountScreen user={user} onEditAgreement={handleViewAgreement} />}
+      {page === 'my-account' && (
+        <ClientMyAccountScreen
+          user={user}
+          onEditAgreement={handleViewAgreement}
+          onRequestChanges={handleRequestChangesForAgreement}
+        />
+      )}
       {page === 'agreements' && (
-        <ClientAgreementsListScreen user={user} onEditAgreement={handleViewAgreement} />
+        <ClientAgreementsListScreen
+          user={user}
+          onEditAgreement={handleViewAgreement}
+          onRequestChanges={handleRequestChangesForAgreement}
+        />
       )}
       {page === 'agreement' && selectedAgreementId && (
-        <ClientAgreementScreen user={user} agreementId={selectedAgreementId} onBack={handleBackFromAgreement} />
+        <ClientAgreementScreen
+          user={user}
+          agreementId={selectedAgreementId}
+          onBack={handleBackFromAgreement}
+          onRequestChanges={() => setPage('ca-wizard')}
+        />
       )}
+      {page === 'ca-wizard' && selectedAgreement && (
+        <ClientNewCARequestScreen agreement={selectedAgreement} onFinish={handleFinishWizard} />
+      )}
+      {page === 'changes-approvals-form' && <ClientChangesApprovalsScreen user={user} />}
       {page === 'client-invoice' && <ClientInvoiceScreen user={user} />}
     </ClientAppShell>
   )
