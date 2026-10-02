@@ -7,6 +7,9 @@ import { AdminNewCARequestScreen } from './AdminNewCARequestScreen'
 import { AdminInvoicesListScreen } from './AdminInvoicesListScreen'
 import { AdminInvoiceScreen } from './AdminInvoiceScreen'
 import { ClientChangesApprovalsScreen } from './ClientChangesApprovalsScreen'
+import { AdminVAsListScreen } from './AdminVAsListScreen'
+import { AdminVAFormScreen } from './AdminVAFormScreen'
+import { AdminAgreementFormScreen } from './AdminAgreementFormScreen'
 import { AdminPlaceholderScreen } from './AdminPlaceholderScreen'
 import { getAgreementById } from '../services/clientAccount'
 
@@ -17,9 +20,11 @@ export interface AdminAppProps {
 type AdminPage =
   | 'agreements'
   | 'agreement'
+  | 'agreement-form'
   | 'ca-wizard'
   | 'users'
   | 'vas'
+  | 'va-form'
   | 'clients'
   | 'va-invoice'
   | 'va-invoice-detail'
@@ -35,12 +40,19 @@ type AdminPage =
 const PLACEHOLDER_TITLES: Record<
   Exclude<
     AdminPage,
-    'agreements' | 'agreement' | 'ca-wizard' | 'changes-approvals-form' | 'va-invoice' | 'va-invoice-detail'
+    | 'agreements'
+    | 'agreement'
+    | 'agreement-form'
+    | 'ca-wizard'
+    | 'changes-approvals-form'
+    | 'va-invoice'
+    | 'va-invoice-detail'
+    | 'vas'
+    | 'va-form'
   >,
   string
 > = {
   users: 'Users',
-  vas: 'VAs',
   clients: 'Clients',
   'va-invoice-claims': 'VA Invoice Claims',
   'client-invoice': 'Client Invoice',
@@ -57,6 +69,10 @@ export const AdminApp = ({ user }: AdminAppProps) => {
   const [selectedSidebarItem, setSelectedSidebarItem] = useState('agreements')
   const [selectedAgreementId, setSelectedAgreementId] = useState<string | null>(null)
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
+  const [vaFormMode, setVaFormMode] = useState<'create' | 'edit'>('create')
+  const [editingVAEmail, setEditingVAEmail] = useState<string | undefined>(undefined)
+  const [agreementFormMode, setAgreementFormMode] = useState<'create' | 'edit'>('create')
+  const [editingAgreementId, setEditingAgreementId] = useState<string | undefined>(undefined)
 
   const handleSelectSidebarItem = (key: string) => {
     setSelectedSidebarItem(key)
@@ -85,12 +101,50 @@ export const AdminApp = ({ user }: AdminAppProps) => {
 
   const selectedAgreement = selectedAgreementId ? getAgreementById(selectedAgreementId) : undefined
 
+  const handleNewVA = () => {
+    setVaFormMode('create')
+    setEditingVAEmail(undefined)
+    setPage('va-form')
+  }
+
+  const handleEditVA = (vaEmail: string) => {
+    setVaFormMode('edit')
+    setEditingVAEmail(vaEmail)
+    setPage('va-form')
+  }
+
+  const handleVAFormDone = () => setPage('vas')
+
+  const handleNewAgreement = () => {
+    setAgreementFormMode('create')
+    setEditingAgreementId(undefined)
+    setPage('agreement-form')
+  }
+
+  const handleEditAgreement = (agreementId: string) => {
+    setAgreementFormMode('edit')
+    setEditingAgreementId(agreementId)
+    setPage('agreement-form')
+  }
+
+  const handleAgreementFormDone = () => setPage('agreements')
+
   return (
     <AdminAppShell user={user} selectedSidebarItem={selectedSidebarItem} onSelectSidebarItem={handleSelectSidebarItem}>
       {page === 'agreements' && (
         <AdminAgreementsListScreen
           onViewAgreement={handleViewAgreement}
           onRequestChanges={handleRequestChangesForAgreement}
+          onNewAgreement={handleNewAgreement}
+          onEditAgreement={handleEditAgreement}
+        />
+      )}
+      {page === 'agreement-form' && (
+        <AdminAgreementFormScreen
+          mode={agreementFormMode}
+          agreementId={editingAgreementId}
+          onCancel={handleAgreementFormDone}
+          onSaved={handleAgreementFormDone}
         />
       )}
       {page === 'agreement' && selectedAgreementId && (
@@ -108,12 +162,19 @@ export const AdminApp = ({ user }: AdminAppProps) => {
       {page === 'changes-approvals-form' && <ClientChangesApprovalsScreen user={user} scope="admin" />}
       {page === 'va-invoice' && <AdminInvoicesListScreen onViewInvoice={handleViewInvoice} />}
       {page === 'va-invoice-detail' && selectedInvoiceId && <AdminInvoiceScreen invoiceId={selectedInvoiceId} />}
+      {page === 'vas' && <AdminVAsListScreen onNewVA={handleNewVA} onEditVA={handleEditVA} />}
+      {page === 'va-form' && (
+        <AdminVAFormScreen mode={vaFormMode} vaEmail={editingVAEmail} onCancel={handleVAFormDone} onSaved={handleVAFormDone} />
+      )}
       {page !== 'agreements' &&
         page !== 'agreement' &&
+        page !== 'agreement-form' &&
         page !== 'ca-wizard' &&
         page !== 'changes-approvals-form' &&
         page !== 'va-invoice' &&
-        page !== 'va-invoice-detail' && <AdminPlaceholderScreen title={PLACEHOLDER_TITLES[page]} />}
+        page !== 'va-invoice-detail' &&
+        page !== 'vas' &&
+        page !== 'va-form' && <AdminPlaceholderScreen title={PLACEHOLDER_TITLES[page]} />}
     </AdminAppShell>
   )
 }

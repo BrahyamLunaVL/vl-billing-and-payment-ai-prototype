@@ -1,9 +1,16 @@
 import { MOCK_CLIENT_PROFILES, type ClientProfile } from '../mocks/clients';
-import { MOCK_AGREEMENTS, resetMockAgreements, type Agreement, type AgreementSettings } from '../mocks/agreements';
+import {
+  MOCK_AGREEMENTS,
+  resetMockAgreements,
+  DEFAULT_AGREEMENT_SETTINGS,
+  type Agreement,
+  type AgreementSettings,
+  type AgreementStatus,
+} from '../mocks/agreements';
 import { MOCK_VA_PROFILES } from '../mocks/vaProfiles';
 import { MOCK_USERS } from '../mocks/users';
 import { MOCK_INVOICES, groupInvoiceItems, type InvoiceGroupView, type InvoiceRecord } from '../mocks/invoices';
-import { sortCARequestsByRecency } from './vaAccount';
+import { sortCARequestsByRecency, shortenVAName } from './vaAccount';
 import {
   MOCK_CA_REQUESTS,
   resetMockCARequests,
@@ -55,7 +62,7 @@ function joinAgreementWithVA(agreement: Agreement): ClientAgreementView {
     vaPaymentMethod: vaProfile?.paymentMethod ?? '',
     vaPhoneNumber: vaProfile?.phoneNumber ?? '',
     vaHubspotId: vaProfile?.hubspotId ?? '',
-    samContactName: vaProfile?.samContactName ?? '',
+    samContactName: agreement.samContactName ?? vaProfile?.samContactName ?? '',
     clientCompanyName: clientProfile?.companyName ?? agreement.clientName,
     clientPaymentMethod: clientProfile?.paymentMethod ?? '',
   };
@@ -73,6 +80,160 @@ export function getAllAgreements(): ClientAgreementView[] {
 export function getAgreementById(id: string): ClientAgreementView | undefined {
   const agreement = MOCK_AGREEMENTS.find((candidate) => candidate.id === id);
   return agreement ? joinAgreementWithVA(agreement) : undefined;
+}
+
+export interface ClientCompanyOption {
+  clientName: string;
+  clientEmail: string;
+  contactName: string;
+  contactEmail: string;
+}
+
+/**
+ * The "Client" select's options on the Create/Edit Agreement form — the
+ * distinct company identities already in use across existing agreements
+ * (this prototype's single client login, `client@virtuallatinos.com`, acts
+ * as several different companies depending on the agreement, e.g.
+ * "Bloominari dba Virtual Latinos" vs "The Matian Firm").
+ */
+export function getAllClientCompanies(): ClientCompanyOption[] {
+  const seen = new Set<string>();
+  const companies: ClientCompanyOption[] = [];
+  for (const agreement of MOCK_AGREEMENTS) {
+    if (seen.has(agreement.clientName)) continue;
+    seen.add(agreement.clientName);
+    companies.push({
+      clientName: agreement.clientName,
+      clientEmail: agreement.clientEmail,
+      contactName: agreement.contactName,
+      contactEmail: agreement.contactEmail,
+    });
+  }
+  return companies;
+}
+
+function nextAgreementId(): string {
+  const maxNum = MOCK_AGREEMENTS.reduce((max, agreement) => {
+    const match = /^agr-(\d+)$/.exec(agreement.id);
+    return match ? Math.max(max, Number(match[1])) : max;
+  }, 0);
+  return `agr-${maxNum + 1}`;
+}
+
+/** Everything Admin's Create/Edit Agreement form collects. */
+export interface SaveAgreementInput {
+  agreementName: string;
+  samContactName: string;
+  vaEmail: string;
+  clientName: string;
+  clientEmail: string;
+  contactName: string;
+  contactEmail: string;
+  startDateISO: string;
+  endDateISO?: string;
+  received: boolean;
+  status: AgreementStatus;
+  billingType: string;
+  clientBillingFrequencyType?: string;
+  clientBillingFrequencyQty?: string;
+  vaInvoicingFrequencyType?: string;
+  vaInvoicingFrequencyQty?: string;
+  clientRateRanges: string[];
+  vaRateRanges: string[];
+  billedRate: string;
+  vaHourlyRate: string;
+  hoursPerWeek?: string;
+  week: Agreement['week'];
+  firstEffectiveDay?: string;
+}
+
+function formatMDY(iso: string): string {
+  const [year, month, day] = iso.split('-').map(Number);
+  return `${month}/${day}/${year}`;
+}
+
+/** Admin's "Save" on Create New Agreement — pushes a new record onto `MOCK_AGREEMENTS` so it shows up immediately in the "All Agreements" table. */
+export function createAgreement(input: SaveAgreementInput): Agreement {
+  const vaUser = MOCK_USERS.find((user) => user.email === input.vaEmail);
+  const agreement: Agreement = {
+    id: nextAgreementId(),
+    vaEmail: input.vaEmail,
+    clientEmail: input.clientEmail,
+    clientName: input.clientName,
+    contactName: input.contactName,
+    contactEmail: input.contactEmail,
+    vaRate: `VA Rate: ${input.vaHourlyRate}`,
+    billedRate: input.billedRate,
+    vaHourlyRate: input.vaHourlyRate,
+    hoursPerWeek: input.hoursPerWeek ?? '',
+    billingType: input.billingType,
+    status: input.status,
+    dateStart: `Date Start ${input.startDateISO}`,
+    dateEnd: input.endDateISO ? `Date End: ${input.endDateISO}` : undefined,
+    startDate: formatMDY(input.startDateISO),
+    endDate: input.endDateISO ? formatMDY(input.endDateISO) : undefined,
+    nextPaymentDate: formatMDY(input.startDateISO),
+    hubspotId: String(Date.now()),
+    agreementName: input.agreementName,
+    week: input.week,
+    settings: { ...DEFAULT_AGREEMENT_SETTINGS },
+    clientRateRanges: input.clientRateRanges,
+    vaRateRanges: input.vaRateRanges,
+    samContactName: input.samContactName,
+    received: input.received,
+    clientBillingFrequencyType: input.clientBillingFrequencyType,
+    clientBillingFrequencyQty: input.clientBillingFrequencyQty,
+    vaInvoicingFrequencyType: input.vaInvoicingFrequencyType,
+    vaInvoicingFrequencyQty: input.vaInvoicingFrequencyQty,
+    initialClientRate: input.billedRate,
+    initialVARate: input.vaHourlyRate,
+    initialWeeklyHours: input.hoursPerWeek,
+  };
+  MOCK_AGREEMENTS.push(agreement);
+  if (vaUser) {
+    const vaProfile = MOCK_VA_PROFILES.find((profile) => profile.email === input.vaEmail);
+    if (vaProfile) vaProfile.samContactName = input.samContactName;
+  }
+  return agreement;
+}
+
+/** Admin's "Save" on Editing Agreement — VA/Client stay fixed (the form disables them), everything else can change. */
+export function updateAgreement(agreementId: string, input: SaveAgreementInput): void {
+  const agreement = MOCK_AGREEMENTS.find((candidate) => candidate.id === agreementId);
+  if (!agreement) return;
+
+  agreement.agreementName = input.agreementName;
+  agreement.samContactName = input.samContactName;
+  agreement.status = input.status;
+  agreement.received = input.received;
+  agreement.billingType = input.billingType;
+  agreement.dateStart = `Date Start ${input.startDateISO}`;
+  agreement.dateEnd = input.endDateISO ? `Date End: ${input.endDateISO}` : undefined;
+  agreement.startDate = formatMDY(input.startDateISO);
+  agreement.endDate = input.endDateISO ? formatMDY(input.endDateISO) : undefined;
+  agreement.clientBillingFrequencyType = input.clientBillingFrequencyType;
+  agreement.clientBillingFrequencyQty = input.clientBillingFrequencyQty;
+  agreement.vaInvoicingFrequencyType = input.vaInvoicingFrequencyType;
+  agreement.vaInvoicingFrequencyQty = input.vaInvoicingFrequencyQty;
+  agreement.clientRateRanges = input.clientRateRanges;
+  agreement.vaRateRanges = input.vaRateRanges;
+  agreement.billedRate = input.billedRate;
+  agreement.vaHourlyRate = input.vaHourlyRate;
+  agreement.vaRate = `VA Rate: ${input.vaHourlyRate}`;
+  agreement.hoursPerWeek = input.hoursPerWeek ?? '';
+  agreement.week = input.week;
+  agreement.firstEffectiveDay = input.firstEffectiveDay;
+
+  const vaProfile = MOCK_VA_PROFILES.find((profile) => profile.email === agreement.vaEmail);
+  if (vaProfile) vaProfile.samContactName = input.samContactName;
+}
+
+/** "Elena Ruiz" + "Bloominari dba Virtual Latinos" -> "VL-Agreement-Bloominari dba Virtual Latinos-Elena R.-2026-04-08 09:14:02", matching the existing seeded agreements' own format. */
+export function generateAgreementName(clientName: string, vaName: string): string {
+  const now = new Date();
+  const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const timePart = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+  return `VL-Agreement-${clientName}-${shortenVAName(vaName)}-${datePart} ${timePart}`;
 }
 
 /** An `InvoiceRecord` plus the VA display info Admin's "All Invoices" table shows alongside it. */

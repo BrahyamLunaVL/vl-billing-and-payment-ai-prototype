@@ -1,0 +1,146 @@
+.admin-agreement-form-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1100px;
+}
+
+.admin-agreement-form-screen__title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.admin-agreement-form-screen__card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: #ffffff;
+  border: 1px solid #ececef;
+  border-radius: 8px;
+  box-shadow: 0px 4px 3px 0px rgba(0, 0, 0, 0.12);
+  padding: 20px;
+}
+
+.admin-agreement-form-screen__section-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.admin-agreement-form-screen__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.admin-agreement-form-screen__field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.admin-agreement-form-screen__field--full {
+  flex: 1 1 100%;
+}
+
+.admin-agreement-form-screen__checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.admin-agreement-form-screen__note-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.admin-agreement-form-screen__note-text {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #263238;
+}
+
+.admin-agreement-form-screen__hours-table {
+  border: 1px solid #ececef;
+  border-radius: 8px;
+  box-shadow: 2px 10px 50px 0px rgba(187, 157, 181, 0.2);
+  overflow: hidden;
+}
+
+.admin-agreement-form-screen__hours-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ececef;
+  padding: 16px 52px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.admin-agreement-form-screen__hours-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 52px;
+  border-bottom: 1px solid #ececef;
+  background: #ffffff;
+}
+
+.admin-agreement-form-screen__hours-row:last-of-type {
+  border-bottom: none;
+}
+
+.admin-agreement-form-screen__hours-day {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 190px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #263238;
+}
+
+.admin-agreement-form-screen__hours-input {
+  width: 200px;
+  flex: 0 0 auto;
+}
+
+.admin-agreement-form-screen__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.admin-agreement-form-screen__confirm-popup {
+  width: 480px;
+  max-width: calc(100vw - 32px);
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0px 4px 3px 0px rgba(0, 0, 0, 0.12);
+}
+
+.admin-agreement-form-screen__confirm-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #c32059;
+}
+
+.admin-agreement-form-screen__confirm-body {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: #263238;
+}
+
+.admin-agreement-form-screen__confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}

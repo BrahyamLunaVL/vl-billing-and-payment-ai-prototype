@@ -58,6 +58,20 @@ export interface Agreement {
   clientRateRanges: string[];
   /** e.g. "10 - 20 hours per week @ $10.00/hr" — shown by the VA card's "View VA Rate ranges" dropdown. */
   vaRateRanges: string[];
+  /** Per-agreement SAM assignment set from the Create/Edit Agreement form. Falls back to the VA's own profile `samContactName` when unset (older seeded agreements). */
+  samContactName?: string;
+  /** "Received" checkbox on the Create/Edit Agreement form — no other behavior tied to it yet. */
+  received?: boolean;
+  clientBillingFrequencyType?: string;
+  clientBillingFrequencyQty?: string;
+  vaInvoicingFrequencyType?: string;
+  vaInvoicingFrequencyQty?: string;
+  /** Captured once at creation time — shown read-only on the Edit form so Admin can see what the rate/hours were when the agreement started. */
+  initialClientRate?: string;
+  initialVARate?: string;
+  initialWeeklyHours?: string;
+  /** "FIRST Effective Day of new Work Hours Per Day" — Edit form only, not yet wired to any schedule-change logic. */
+  firstEffectiveDay?: string;
 }
 
 const FULL_TIME_WEEK: WeekDayData[] = [
@@ -70,7 +84,8 @@ const FULL_TIME_WEEK: WeekDayData[] = [
   { key: 'sun', dayLetter: 'S', value: '0 hrs', disabled: true },
 ];
 
-const DEFAULT_SETTINGS: AgreementSettings = {
+/** Default `AgreementSettings` for a newly created agreement (Admin's Create Agreement form). */
+export const DEFAULT_AGREEMENT_SETTINGS: AgreementSettings = {
   autoApproveChanges: false,
   notifyOverThreshold: false,
   overThresholdAmount: 500,
@@ -100,7 +115,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     agreementName: 'VL-Agreement-Bloominari dba Virtual Latinos-Elena R.-2025-04-28 09:14:02',
     status: 'active',
     week: FULL_TIME_WEEK,
-    settings: { ...DEFAULT_SETTINGS },
+    settings: { ...DEFAULT_AGREEMENT_SETTINGS },
     clientRateRanges: [
       '10 - 20 hours per week @ $20.00/hr',
       '21 - 30 hours per week @ $19.00/hr',
@@ -132,7 +147,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     hubspotId: '44787728132',
     agreementName: 'VL-Agreement-The Matian Firm-Daniela F.-2024-07-25 14:02:11',
     status: 'inactive',
-    settings: { ...DEFAULT_SETTINGS, autoApproveExtraHours: false },
+    settings: { ...DEFAULT_AGREEMENT_SETTINGS, autoApproveExtraHours: false },
     clientRateRanges: [
       '10 - 20 hours per week @ $15.00/hr',
       '21 - 30 hours per week @ $16.00/hr',
@@ -163,7 +178,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     agreementName: 'VL-Agreement-Bloominari dba Virtual Latinos-Laura G.-2024-03-04 08:45:30',
     status: 'active',
     week: FULL_TIME_WEEK,
-    settings: { ...DEFAULT_SETTINGS },
+    settings: { ...DEFAULT_AGREEMENT_SETTINGS },
     clientRateRanges: [
       '10 - 20 hours per week @ $18.00/hr',
       '21 - 30 hours per week @ $17.00/hr',
@@ -196,7 +211,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     week: FULL_TIME_WEEK,
     // No pre-approved extra hours from the client — every extra hour this
     // VA reports needs manual approval.
-    settings: { ...DEFAULT_SETTINGS, autoApproveExtraHours: false, preApprovedHoursPerWeek: 0 },
+    settings: { ...DEFAULT_AGREEMENT_SETTINGS, autoApproveExtraHours: false, preApprovedHoursPerWeek: 0 },
     clientRateRanges: [
       '10 - 20 hours per week @ $20.00/hr',
       '21 - 30 hours per week @ $19.00/hr',

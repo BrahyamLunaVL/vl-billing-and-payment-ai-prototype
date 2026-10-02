@@ -13,7 +13,9 @@ import {
   Button,
   Radio,
   Select,
+  Switch,
   Week,
+  type AlertType,
   type WeekDayData,
 } from '../components'
 import {
@@ -25,6 +27,7 @@ import {
   getScheduledHoursForDate,
   getTimeOffRequestedDatesForVA,
   createTimeOffCARequest,
+  createChangeBaseHoursCARequest,
   parseHoursValue,
   type CARequest,
 } from '../services/vaAccount'
@@ -78,6 +81,36 @@ const CLIENT_RESPONSE_OPTIONS = [
   "Client told me they can't approve it (but I need to take time off anyways)",
   'Other',
 ]
+
+interface DayRow {
+  key: string
+  dayLetter: string
+  label: string
+}
+
+/** Monday-first, matching `WeekDayData.key` on every `Agreement.week` entry. */
+const DAY_ROWS: DayRow[] = [
+  { key: 'mon', dayLetter: 'M', label: 'Monday' },
+  { key: 'tue', dayLetter: 'T', label: 'Tuesday' },
+  { key: 'wed', dayLetter: 'W', label: 'Wednesday' },
+  { key: 'thu', dayLetter: 'T', label: 'Thursday' },
+  { key: 'fri', dayLetter: 'F', label: 'Friday' },
+  { key: 'sat', dayLetter: 'S', label: 'Saturday' },
+  { key: 'sun', dayLetter: 'S', label: 'Sunday' },
+]
+
+/** Seeds the "change base hours" day table from the agreement's own current schedule, per day. */
+function buildDayStateFromWeek(week: WeekDayData[]): { enabled: Record<string, boolean>; hours: Record<string, string> } {
+  const enabled: Record<string, boolean> = {}
+  const hours: Record<string, string> = {}
+  for (const day of DAY_ROWS) {
+    const match = week.find((candidate) => candidate.key === day.key)
+    enabled[day.key] = match ? !match.disabled : false
+    const parsed = match ? parseHoursValue(match.value) : 0
+    hours[day.key] = String(parsed || 0).replace(/^0$/, '0.0')
+  }
+  return { enabled, hours }
+}
 
 /** Mon-Fri 8hrs / Sat-Sun off — used when an agreement has no `week` schedule of its own. */
 const DEFAULT_WORKING_WEEK: WeekDayData[] = [
@@ -258,6 +291,12 @@ export const NewCARequestWizard = ({
   const [hoursByDate, setHoursByDate] = useState<Record<string, number>>({})
   const [comments, setComments] = useState('')
 
+  // The Time Off and "change base hours" forms' copy talks about "your VA"
+  // from the client's point of view (Client's own screen, or Admin filling
+  // it out on the client's behalf) vs. "you"/"your" from the VA's own point
+  // of view (VA's own screen, or Admin filling it out on the VA's behalf).
+  const isClientPerspective = showOnBehalfOf ? onBehalfOf === 'client' : requesterRole === 'client'
+
   const [timeOffMode, setTimeOffMode] = useState<'consecutive' | 'non-consecutive'>('consecutive')
   const [timeOffPaid, setTimeOffPaid] = useState<'paid' | 'non-paid' | 'paid-replacing-hours'>('paid')
   const [makeUpHoursTiming, setMakeUpHoursTiming] = useState(MAKE_UP_HOURS_OPTIONS[0])
@@ -265,6 +304,12 @@ export const NewCARequestWizard = ({
   const [timeOffDates, setTimeOffDates] = useState<string[]>([])
   const [timeOffHoursByDate, setTimeOffHoursByDate] = useState<Record<string, number>>({})
   const [timeOffRangeAnchor, setTimeOffRangeAnchor] = useState<string | null>(null)
+
+  const [newBaseHours, setNewBaseHours] = useState('')
+  const [baseHoursFirstEffectiveDay, setBaseHoursFirstEffectiveDay] = useState('')
+  const initialBaseHoursDayState = buildDayStateFromWeek(agreementWeek)
+  const [baseHoursDayEnabled, setBaseHoursDayEnabled] = useState(initialBaseHoursDayState.enabled)
+  const [baseHoursDayHours, setBaseHoursDayHours] = useState(initialBaseHoursDayState.hours)
 
   useEffect(() => {
     onStepChange?.(step)
@@ -307,7 +352,11 @@ export const NewCARequestWizard = ({
         ? timeOffDates.length > 0 &&
           timeOffDates.reduce((sum, date) => sum + (timeOffHoursByDate[date] ?? 0), 0) > 0 &&
           timeOffDates.length <= MAX_TIME_OFF_DAYS
-        : true
+        : requestType === 'change-base-hours'
+          ? isClientPerspective
+            ? (parseFloat(newBaseHours) || 0) > 0 && baseHoursFirstEffectiveDay !== ''
+            : baseHoursFirstEffectiveDay !== ''
+          : true
   const weekGroups = buildWeekGroups(
     selectedDates,
     hoursByDate,
@@ -451,11 +500,42 @@ export const NewCARequestWizard = ({
     0,
   )
 
-  // The Time Off form's copy talks about "your VA" from the client's point of
-  // view (Client's own screen, or Admin filling it out on the client's
-  // behalf) vs. "you"/"your" from the VA's own point of view (VA's own
-  // screen, or Admin filling it out on the VA's behalf).
-  const isClientPerspective = showOnBehalfOf ? onBehalfOf === 'client' : requesterRole === 'client'
+  const handleToggleBaseHoursDay = (key: string, checked: boolean) => {
+    setBaseHoursDayEnabled((prev) => ({ ...prev, [key]: checked }))
+  }
+
+  const handleBaseHoursDayHoursChange = (key: string, value: string) => {
+    setBaseHoursDayHours((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const totalBaseHoursEntered = DAY_ROWS.reduce(
+    (sum, day) => (baseHoursDayEnabled[day.key] ? sum + (parseFloat(baseHoursDayHours[day.key]) || 0) : sum),
+    0,
+  )
+  // The VA's own version of this form has no "New Base Hours/Week" field at
+  // all — they're only redistributing hours across days, so the table
+  // checks against their current total instead of a separately-requested one.
+  const targetBaseHours = isClientPerspective ? parseFloat(newBaseHours) || 0 : workingHoursPerWeek
+
+  let baseHoursAlert: { type: AlertType; message: string } | null = null
+  if (targetBaseHours > 0) {
+    if (totalBaseHoursEntered === targetBaseHours) {
+      baseHoursAlert = {
+        type: isClientPerspective ? 'info' : 'success',
+        message: `${totalBaseHoursEntered}/${targetBaseHours} hours/week`,
+      }
+    } else if (totalBaseHoursEntered > targetBaseHours) {
+      baseHoursAlert = {
+        type: 'error',
+        message: `${totalBaseHoursEntered}/${targetBaseHours} hours/week You have added too many hours. Make sure the hours match the weekly hours on your agreement.`,
+      }
+    } else {
+      baseHoursAlert = {
+        type: 'warning',
+        message: `${totalBaseHoursEntered}/${targetBaseHours} hours/week You have added too few hours. Make sure the hours match the weekly hours on your agreement.`,
+      }
+    }
+  }
 
   const handleSubmit = () => {
     if (requestType === 'extra-hours' && agreementId) {
@@ -484,6 +564,21 @@ export const NewCARequestWizard = ({
         requesterRole: showOnBehalfOf ? onBehalfOf : requesterRole,
       })
     }
+    if (requestType === 'change-base-hours' && agreementId) {
+      const scheduleSummary = DAY_ROWS.filter((day) => baseHoursDayEnabled[day.key])
+        .map((day) => `${day.label}: ${baseHoursDayHours[day.key] || '0.0'} hrs`)
+        .join('\n')
+      createChangeBaseHoursCARequest({
+        vaEmail,
+        agreementId,
+        currentHoursPerWeek: workingHoursPerWeek,
+        newHoursPerWeek: isClientPerspective ? targetBaseHours : totalBaseHoursEntered,
+        scheduleSummary,
+        firstEffectiveDay: baseHoursFirstEffectiveDay || undefined,
+        comments,
+        requesterRole: showOnBehalfOf ? onBehalfOf : requesterRole,
+      })
+    }
     setStep(4)
   }
 
@@ -497,6 +592,11 @@ export const NewCARequestWizard = ({
     setTimeOffPaid('paid')
     setMakeUpHoursTiming(MAKE_UP_HOURS_OPTIONS[0])
     setClientResponse(CLIENT_RESPONSE_OPTIONS[0])
+    setNewBaseHours('')
+    setBaseHoursFirstEffectiveDay('')
+    const resetDayState = buildDayStateFromWeek(agreementWeek)
+    setBaseHoursDayEnabled(resetDayState.enabled)
+    setBaseHoursDayHours(resetDayState.hours)
     setStep(1)
   }
 
@@ -610,7 +710,7 @@ export const NewCARequestWizard = ({
         </div>
       )}
 
-      {step === 2 && requestType !== 'extra-hours' && requestType !== 'time-off' && (
+      {step === 2 && requestType !== 'extra-hours' && requestType !== 'time-off' && requestType !== 'change-base-hours' && (
         <ProfileCard>
           <p className="ca-wizard__description">
             This request type isn&apos;t available in the prototype yet — only &quot;Request approval
@@ -1184,6 +1284,127 @@ export const NewCARequestWizard = ({
             </div>
           </div>
         </>
+      )}
+
+      {step === 2 && requestType === 'change-base-hours' && (
+        <div className="ca-wizard__row">
+          <div className="ca-wizard__column ca-wizard__column--narrow">
+            <ProfileCard>
+              <div className="ca-wizard__card-body">
+                <h3 className="ca-wizard__subheading">
+                  {isClientPerspective
+                    ? 'Change Base Work Hours / Week'
+                    : 'Request approval for agreement Work Hours Per Day change'}
+                </h3>
+                <p className="ca-wizard__description">
+                  {isClientPerspective
+                    ? "Details of the new base hours/week you'd like your VA to work."
+                    : 'Details of the request to change the base hours/day to work.'}
+                </p>
+                <div className="ca-wizard__info-card ca-wizard__info-card--purple">
+                  <span>Current Invoice period from:</span>
+                  <strong>Aug 17 – 30, 2026</strong>
+                </div>
+                <div className="ca-wizard__info-card ca-wizard__info-card--purple">
+                  <span>Requesting for:</span>
+                  <strong>Bloominari dba Virtual Latinos</strong>
+                </div>
+                <div className="ca-wizard__info-card ca-wizard__info-card--orange">
+                  <strong>Your deadline is August 25 at 11:59 PM PT.</strong>
+                  <span>Once deadline is over, your changes will take effect on the next invoice period.</span>
+                </div>
+              </div>
+            </ProfileCard>
+          </div>
+
+          <div className="ca-wizard__column">
+            <ProfileCard>
+              <div className="ca-wizard__card-body">
+                <div className="ca-wizard__current-hours-box">
+                  <p className="ca-wizard__current-hours-title">Current Base Hours/Week</p>
+                  <div className="ca-wizard__current-hours-value-row">
+                    <span className="ca-wizard__current-hours-value">{workingHoursPerWeek}</span>
+                    <span className="ca-wizard__current-hours-suffix">Hours/week</span>
+                  </div>
+                </div>
+
+                {isClientPerspective && (
+                  <FormField
+                    label="New Base Hours/Week you&apos;d like to request to work for your VA?"
+                    description="This will be the new base minimum hours/week your VA will work."
+                  >
+                    <Input
+                      type="number"
+                      min={1}
+                      value={newBaseHours}
+                      onChange={(event) => setNewBaseHours(event.target.value)}
+                      placeholder="Enter new base hours/week"
+                    />
+                  </FormField>
+                )}
+
+                <FormField
+                  label={isClientPerspective ? 'Days your VA is available to work' : 'Days you are available to work'}
+                  description={
+                    isClientPerspective
+                      ? 'Select the days of the week your VA is available to work as VA'
+                      : 'Select the days of the week you are available to work as VA'
+                  }
+                  helpText="Note: Only multiples of 0.25 are allowed into the hours per day fields: e.g: 4.25, 6.5, 7.75, 8"
+                >
+                  <div className="ca-wizard__hours-table">
+                    <div className="ca-wizard__hours-header">
+                      <span>Selected work day</span>
+                      <span>Hours Per Day</span>
+                    </div>
+                    {DAY_ROWS.map((day) => (
+                      <div key={day.key} className="ca-wizard__hours-row">
+                        <div className="ca-wizard__hours-day">
+                          <Switch
+                            checked={baseHoursDayEnabled[day.key]}
+                            onChange={(checked) => handleToggleBaseHoursDay(day.key, checked)}
+                            aria-label={`Toggle ${day.label}`}
+                          />
+                          <span>{day.label}</span>
+                        </div>
+                        <Input
+                          value={baseHoursDayHours[day.key]}
+                          onChange={(event) => handleBaseHoursDayHoursChange(day.key, event.target.value)}
+                          disabled={!baseHoursDayEnabled[day.key]}
+                          rightText="Hrs"
+                          className="ca-wizard__hours-input"
+                          type="number"
+                          step={0.25}
+                        />
+                      </div>
+                    ))}
+                    {baseHoursAlert && <Alert type={baseHoursAlert.type} message={baseHoursAlert.message} />}
+                  </div>
+                </FormField>
+
+                <FormField
+                  label="First Effective Day of new Work Hours Per Day"
+                  description={
+                    isClientPerspective
+                      ? "First day your VA would like to start working the new base hours/week. Must be on a Monday."
+                      : "First day you'd like to start working the new base hours/week. Must be on a Monday."
+                  }
+                  helpText="*Please note that you are unable to request changes before current Invoice period."
+                >
+                  <Input
+                    type="date"
+                    value={baseHoursFirstEffectiveDay}
+                    onChange={(event) => setBaseHoursFirstEffectiveDay(event.target.value)}
+                  />
+                </FormField>
+
+                <div className="ca-wizard__actions">
+                  <Button buttonText="Next" onClick={() => setStep(3)} disabled={!canGoNext} />
+                </div>
+              </div>
+            </ProfileCard>
+          </div>
+        </div>
       )}
 
       {step === 3 && (

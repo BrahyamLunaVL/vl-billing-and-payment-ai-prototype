@@ -9,6 +9,7 @@ import {
   type CARequestDayGroup,
 } from '../mocks/caRequests';
 import { MOCK_USERS } from '../mocks/users';
+import vaPhoto from '../assets/users/va.jpg';
 import {
   MOCK_INVOICES,
   groupInvoiceItems,
@@ -82,6 +83,129 @@ export function getVAProfile(email: string): VAProfile | undefined {
 
 export function getAgreementsForVA(email: string): Agreement[] {
   return MOCK_AGREEMENTS.filter((agreement) => agreement.vaEmail === email);
+}
+
+/** Admin's "VAs" table row — every VA user joined with their profile, in one flat shape the Table component can sort/render directly. */
+export interface AdminVAView {
+  id: string;
+  email: string;
+  legalName: string;
+  /** Whether the login itself is enabled — distinct from `hiredStatus` (e.g. a hired VA whose account was disabled). */
+  isActive: boolean;
+  hiredStatus: VAProfile['hiredStatus'];
+  telegramHandle: string;
+  samContactName: string;
+  paymentMethod: string;
+  country: string;
+}
+
+/** Every VA across the platform (Admin's own "VAs — All VAs" table), not scoped to any one client. */
+export function getAllVAs(): AdminVAView[] {
+  return MOCK_USERS.filter((user) => user.role === 'va').map((user, index) => {
+    const profile = MOCK_VA_PROFILES.find((candidate) => candidate.email === user.email);
+    return {
+      id: String(101 + index),
+      email: user.email,
+      legalName: profile?.legalName ?? user.name,
+      isActive: !user.disabled,
+      hiredStatus: profile?.hiredStatus ?? 'hired',
+      telegramHandle: profile?.telegramHandle ?? '',
+      samContactName: profile?.samContactName ?? '',
+      paymentMethod: profile?.paymentMethod ?? '',
+      country: profile?.country ?? '',
+    };
+  });
+}
+
+/** Everything Admin's Create/Edit VA form collects — shared between both modes. */
+export interface SaveVAInput {
+  aka: string;
+  legalName: string;
+  email: string;
+  paymentMethod: string;
+  hubspotId?: string;
+  firstName?: string;
+  lastName?: string;
+  surName?: string;
+  countryResidence?: string;
+  countryCitizenship?: string;
+  countryBilling?: string;
+  billingAddress?: string;
+  telegramHandle?: string;
+  phoneNumber?: string;
+  paymentEmail?: string;
+  workEmail?: string;
+  samContactName?: string;
+  shortIntro?: string;
+}
+
+/** Admin's "Save" on Create New VA — adds a new login (`MOCK_USERS`) and profile (`MOCK_VA_PROFILES`) so it shows up immediately in the "All VAs" table. */
+export function createVA(input: SaveVAInput): void {
+  MOCK_USERS.push({
+    email: input.email,
+    password: 'VL-Testing-2026',
+    name: input.legalName,
+    role: 'va',
+    photo: vaPhoto,
+  });
+
+  MOCK_VA_PROFILES.push({
+    email: input.email,
+    legalName: input.legalName,
+    vaSinceDate: new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
+    samContactName: input.samContactName ?? '',
+    telegramHandle: input.telegramHandle ?? '',
+    paymentEmail: input.paymentEmail ?? '',
+    paymentMethod: input.paymentMethod,
+    hiredStatus: 'hired',
+    country: input.countryResidence ?? '',
+    aka: input.aka,
+    phoneNumber: input.phoneNumber ?? '',
+    hubspotId: input.hubspotId ?? '',
+    firstName: input.firstName,
+    lastName: input.lastName,
+    surName: input.surName,
+    countryCitizenship: input.countryCitizenship,
+    countryBilling: input.countryBilling,
+    billingAddress: input.billingAddress,
+    workEmail: input.workEmail,
+    shortIntro: input.shortIntro,
+  });
+}
+
+/**
+ * Admin's "Save" on Editing VA. Looks the existing records up by
+ * `originalEmail` (the row being edited) rather than `input.email`, since
+ * the form lets Admin change the email itself.
+ */
+export function updateVA(originalEmail: string, input: SaveVAInput): void {
+  const user = MOCK_USERS.find((candidate) => candidate.email === originalEmail);
+  if (user) {
+    user.email = input.email;
+    user.name = input.legalName;
+  }
+
+  const profile = MOCK_VA_PROFILES.find((candidate) => candidate.email === originalEmail);
+  if (profile) {
+    profile.email = input.email;
+    profile.legalName = input.legalName;
+    profile.aka = input.aka;
+    profile.paymentMethod = input.paymentMethod;
+    profile.hubspotId = input.hubspotId ?? '';
+    profile.firstName = input.firstName;
+    profile.lastName = input.lastName;
+    profile.surName = input.surName;
+    profile.country = input.countryResidence ?? '';
+    profile.countryCitizenship = input.countryCitizenship;
+    profile.countryBilling = input.countryBilling;
+    profile.billingAddress = input.billingAddress;
+    profile.telegramHandle = input.telegramHandle ?? '';
+    profile.phoneNumber = input.phoneNumber ?? '';
+    profile.paymentEmail = input.paymentEmail ?? '';
+    profile.workEmail = input.workEmail;
+    profile.samContactName = input.samContactName ?? '';
+    profile.shortIntro = input.shortIntro;
+  }
 }
 
 function parseRequestedDate(request: CARequest): number {
@@ -271,8 +395,8 @@ function formatWeekLabel(weekStart: Date, weekEnd: Date): string {
   return `Week from ${formatShortDate(weekStart)} to ${formatShortDate(weekEnd)}, ${weekEnd.getFullYear()}`;
 }
 
-/** "Elena Ruiz" -> "Elena R." — matches the short-name style already used in the "Agreement" detail line. */
-function shortenVAName(fullName: string): string {
+/** "Elena Ruiz" -> "Elena R." — matches the short-name style already used in the "Agreement" detail line and in auto-generated agreement names. */
+export function shortenVAName(fullName: string): string {
   const parts = fullName.trim().split(/\s+/);
   if (parts.length < 2) return fullName;
   return `${parts[0]} ${parts[parts.length - 1].charAt(0)}.`;
@@ -478,6 +602,62 @@ export function createTimeOffCARequest(input: CreateTimeOffRequestInput): CARequ
     comments: comments.trim() || undefined,
     timeOffByDate: selectedDates.map((date) => ({ date, hours: hoursByDate[date] ?? 0 })),
     ...(autoApproved ? { resolvedBy: 'Auto-Approval System', resolvedDate: todayNumeric } : {}),
+  };
+
+  MOCK_CA_REQUESTS.unshift(request);
+  return request;
+}
+
+export interface CreateChangeBaseHoursRequestInput {
+  vaEmail: string;
+  agreementId: string;
+  currentHoursPerWeek: number;
+  newHoursPerWeek: number;
+  /** Pre-formatted "Monday: 8 hrs" lines for the enabled days of the newly requested schedule, newline-joined. */
+  scheduleSummary: string;
+  /** ISO date, e.g. "2026-09-14". */
+  firstEffectiveDay?: string;
+  comments: string;
+  requesterRole: 'va' | 'client';
+}
+
+/**
+ * Persists a "Request approval for changing base hours/week worked"
+ * submission. Unlike extra hours/time off, there's no auto-approval rule
+ * for this request type — changing the agreement's own base schedule always
+ * needs the client's manual review. Approving it doesn't yet mutate the
+ * agreement's actual `week`/`hoursPerWeek` (out of scope here, same as the
+ * other request types' own `appliedBillingPeriod` staying unset until a
+ * real invoice cycle exists).
+ */
+export function createChangeBaseHoursCARequest(input: CreateChangeBaseHoursRequestInput): CARequest {
+  const { vaEmail, agreementId, currentHoursPerWeek, newHoursPerWeek, scheduleSummary, firstEffectiveDay, comments, requesterRole } =
+    input;
+  const agreement = MOCK_AGREEMENTS.find((candidate) => candidate.id === agreementId);
+  const todayLong = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+  const details: CARequestDetail[] = [
+    { label: 'Current Base Hours/Week', value: `${currentHoursPerWeek} Hours/week` },
+    { label: 'New Base Hours/Week', value: `${newHoursPerWeek} Hours/week` },
+    { label: 'New Weekly Schedule', value: scheduleSummary, fullWidth: true },
+    ...(firstEffectiveDay
+      ? [{ label: 'First Effective Day', value: formatWeekdayMDY(firstEffectiveDay), fullWidth: true }]
+      : []),
+  ];
+
+  const request: CARequest = {
+    id: nextCARequestId(),
+    vaEmail,
+    clientEmail: agreement?.clientEmail ?? '',
+    title: 'Request approval for changing base hours/week worked',
+    date: todayLong,
+    status: 'new',
+    clientName: agreement?.clientName ?? 'LTM Innovation',
+    requestedBy: 'you',
+    requestedByRole: requesterRole,
+    requestedDate: todayLong,
+    details,
+    comments: comments.trim() || undefined,
   };
 
   MOCK_CA_REQUESTS.unshift(request);

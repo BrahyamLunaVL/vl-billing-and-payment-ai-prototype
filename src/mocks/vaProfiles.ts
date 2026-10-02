@@ -9,13 +9,23 @@ export interface VAProfile {
   paymentEmail: string;
   paymentMethod: string;
   hiredStatus: 'hired' | 'inactive';
-  /** Shown on the client-facing agreement card, e.g. "Peru" — also used for the Country Billing/Citizenship/Residence rows on the client's Agreement screen, which are all the same value in practice. */
+  /** Country where the VA lives — shown on the client-facing agreement card, e.g. "Peru". */
   country: string;
   /** The VA's preferred/alias name, shown to clients as "AKA: ...". */
   aka: string;
   phoneNumber: string;
   /** The VA's own HubSpot contact ID — distinct from the agreement's own HubSpot ID. */
   hubspotId: string;
+  firstName?: string;
+  lastName?: string;
+  surName?: string;
+  /** Defaults to matching `country` for VAs created before this field existed. */
+  countryCitizenship?: string;
+  /** Defaults to matching `country` for VAs created before this field existed. */
+  countryBilling?: string;
+  billingAddress?: string;
+  workEmail?: string;
+  shortIntro?: string;
 }
 
 const INITIAL_VA_PROFILES: VAProfile[] = [
@@ -32,6 +42,11 @@ const INITIAL_VA_PROFILES: VAProfile[] = [
     aka: 'Elena R.',
     phoneNumber: '+51 984 123 456',
     hubspotId: '124318284947',
+    firstName: 'Elena',
+    lastName: 'Ruiz',
+    countryCitizenship: 'Peru',
+    countryBilling: 'Peru',
+    workEmail: 'elena.ruiz@virtuallatinos.com',
   },
   {
     email: 'va2@virtuallatinos.com',
@@ -46,6 +61,11 @@ const INITIAL_VA_PROFILES: VAProfile[] = [
     aka: 'Laura G.',
     phoneNumber: '+57 300 462 1845',
     hubspotId: '124318284948',
+    firstName: 'Laura',
+    lastName: 'Gomez',
+    countryCitizenship: 'Colombia',
+    countryBilling: 'Colombia',
+    workEmail: 'laura.gomez@virtuallatinos.com',
   },
   {
     email: 'va-no-hours@virtuallatinos.com',
@@ -60,6 +80,11 @@ const INITIAL_VA_PROFILES: VAProfile[] = [
     aka: 'Camila T.',
     phoneNumber: '+52 55 1234 5678',
     hubspotId: '124318284949',
+    firstName: 'Camila',
+    lastName: 'Torres',
+    countryCitizenship: 'Mexico',
+    countryBilling: 'Mexico',
+    workEmail: 'camila.torres@virtuallatinos.com',
   },
   {
     email: 'va3@virtuallatinos.com',
@@ -74,6 +99,11 @@ const INITIAL_VA_PROFILES: VAProfile[] = [
     aka: 'Daniela F.',
     phoneNumber: '+54 11 2345 6789',
     hubspotId: '124318284950',
+    firstName: 'Daniela',
+    lastName: 'Flores',
+    countryCitizenship: 'Argentina',
+    countryBilling: 'Argentina',
+    workEmail: 'daniela.flores@virtuallatinos.com',
   },
 ];
 

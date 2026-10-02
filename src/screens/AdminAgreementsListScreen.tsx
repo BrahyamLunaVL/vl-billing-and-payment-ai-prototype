@@ -8,6 +8,8 @@ import './AdminAgreementsListScreen.css'
 export interface AdminAgreementsListScreenProps {
   onViewAgreement: (agreementId: string) => void
   onRequestChanges: (agreementId: string) => void
+  onNewAgreement: () => void
+  onEditAgreement: (agreementId: string) => void
 }
 
 type SortDirection = 'asc' | 'desc'
@@ -19,6 +21,7 @@ function compareValues(a: string, b: string, direction: SortDirection): number {
 
 interface AgreementActionsMenuProps {
   onView: () => void
+  onEdit: () => void
   onRequestChanges: () => void
 }
 
@@ -42,7 +45,7 @@ function weekDayValue(row: ClientAgreementView, index: number): string {
  * z-index. That's exactly what happens for a short table or a dropdown
  * opened from one of the last rows.
  */
-function AgreementActionsMenu({ onView, onRequestChanges }: AgreementActionsMenuProps) {
+function AgreementActionsMenu({ onView, onEdit, onRequestChanges }: AgreementActionsMenuProps) {
   const [open, setOpen] = useState(false)
   const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -103,7 +106,13 @@ function AgreementActionsMenu({ onView, onRequestChanges }: AgreementActionsMenu
                   onView()
                 }}
               />
-              <DropdownOption text="Edit" onClick={() => setOpen(false)} />
+              <DropdownOption
+                text="Edit"
+                onClick={() => {
+                  setOpen(false)
+                  onEdit()
+                }}
+              />
               <DropdownOption
                 text="Request for Changes"
                 onClick={() => {
@@ -122,12 +131,18 @@ function AgreementActionsMenu({ onView, onRequestChanges }: AgreementActionsMenu
 /**
  * Admin's "Agreements" table (Figma's "Admin - Agreements - All Agreements"):
  * every agreement platform-wide, sortable/paginated, with a per-row "Select
- * Action" menu whose "View" opens the agreement's own detail screen and
- * "Request for Changes" opens that agreement's own Request Changes wizard
- * directly — "Edit" stays decorative, same as this prototype's other
- * not-yet-designed actions.
+ * Action" menu whose "View" opens the agreement's own detail screen, "Edit"
+ * opens the shared Create/Edit Agreement form pre-filled with that row, and
+ * "Request for Changes" opens that agreement's own Request Changes wizard.
+ * "Change SAM" only unlocks once at least one row is checked; "New
+ * Agreement" opens the same form in create mode.
  */
-export const AdminAgreementsListScreen = ({ onViewAgreement, onRequestChanges }: AdminAgreementsListScreenProps) => {
+export const AdminAgreementsListScreen = ({
+  onViewAgreement,
+  onRequestChanges,
+  onNewAgreement,
+  onEditAgreement,
+}: AdminAgreementsListScreenProps) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [sortKey, setSortKey] = useState<string | undefined>(undefined)
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
@@ -165,7 +180,7 @@ export const AdminAgreementsListScreen = ({ onViewAgreement, onRequestChanges }:
 
   const handleToggleAll = () => {
     setSelectedIds((prev) => {
-      const allOnPageSelected = pageRows.every((row) => prev.has(row.id))
+      const allOnPageSelected = pageRows.length > 0 && pageRows.every((row) => prev.has(row.id))
       if (allOnPageSelected) return new Set()
       return new Set(pageRows.map((row) => row.id))
     })
@@ -177,7 +192,11 @@ export const AdminAgreementsListScreen = ({ onViewAgreement, onRequestChanges }:
       label: 'ACTIONS',
       width: 160,
       render: (row) => (
-        <AgreementActionsMenu onView={() => onViewAgreement(row.id)} onRequestChanges={() => onRequestChanges(row.id)} />
+        <AgreementActionsMenu
+          onView={() => onViewAgreement(row.id)}
+          onEdit={() => onEditAgreement(row.id)}
+          onRequestChanges={() => onRequestChanges(row.id)}
+        />
       ),
     },
     {
@@ -228,8 +247,8 @@ export const AdminAgreementsListScreen = ({ onViewAgreement, onRequestChanges }:
       <div className="admin-agreements-list-screen__header">
         <h1 className="admin-agreements-list-screen__title">Agreements</h1>
         <div className="admin-agreements-list-screen__header-actions">
-          <Button type="secondary" leftIcon="pencil" buttonText="Change SAM" disabled />
-          <Button leftIcon="plus" buttonText="New Agreement" />
+          <Button type="secondary" leftIcon="pencil" buttonText="Change SAM" disabled={selectedIds.size === 0} />
+          <Button leftIcon="plus" buttonText="New Agreement" onClick={onNewAgreement} />
         </div>
       </div>
 
