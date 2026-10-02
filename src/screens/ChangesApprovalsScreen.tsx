@@ -111,10 +111,12 @@ export const ChangesApprovalsScreen = ({ user, openWizard = false, onFinishWizar
           agreementId={activeAgreement?.id}
           recentRequests={requests}
           agreementSettings={activeAgreement?.settings}
+          agreementWeek={activeAgreement?.week}
           requesterRole="va"
           onStepChange={setWizardStep}
           finishButtonLabel="Go My Account"
           onFinish={onFinishWizard}
+          onViewChangesApprovals={() => setShowWizard(false)}
         />
       ) : (
         <>

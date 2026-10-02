@@ -31,3 +31,16 @@
 .ca-request-fields__value--pre {
   white-space: pre-line;
 }
+
+.ca-request-fields__link {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-size: 14px;
+  color: #378fce;
+  text-decoration: underline;
+  cursor: pointer;
+}

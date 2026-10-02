@@ -106,6 +106,75 @@
   color: #263238;
 }
 
+.ca-wizard__radio-option {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.ca-wizard__radio-option-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.ca-wizard__radio-option-circle {
+  box-sizing: border-box;
+  position: relative;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  border: 2px solid #d5d7dd;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.ca-wizard__radio-option-input:checked ~ .ca-wizard__radio-option-circle {
+  border-color: #c32059;
+}
+
+.ca-wizard__radio-option-input:checked ~ .ca-wizard__radio-option-circle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c32059;
+  transform: translate(-50%, -50%);
+}
+
+.ca-wizard__radio-option-input:focus-visible ~ .ca-wizard__radio-option-circle {
+  outline: 2px solid #c32059;
+  outline-offset: 2px;
+}
+
+.ca-wizard__radio-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ca-wizard__radio-option-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #263238;
+}
+
+.ca-wizard__radio-option-description {
+  font-size: 12px;
+  color: #98a4ae;
+}
+
 .ca-wizard__radio-group {
   display: flex;
   flex-direction: column;
@@ -423,6 +492,59 @@
 
 .ca-wizard__success-icon {
   color: #c32059;
+}
+
+.ca-wizard__note {
+  margin: 0;
+  font-size: 14px;
+  font-style: italic;
+  color: #263238;
+}
+
+.ca-wizard__note strong {
+  color: #de1515;
+  font-style: italic;
+}
+
+.ca-wizard__radio-option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ca-wizard__schedule-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 18px;
+  border-radius: 8px;
+  background: #f6f6f7;
+}
+
+.ca-wizard__schedule-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.ca-wizard__schedule-stat {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ca-wizard__inline-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-weight: 700;
+  color: #378fce;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .ca-wizard__finish-actions {

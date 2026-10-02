@@ -1,4 +1,4 @@
-import type { ChipTone } from '../components';
+import type { ChipTone, WeekDayData } from '../components';
 import { MOCK_VA_PROFILES, type VAProfile } from '../mocks/vaProfiles';
 import { MOCK_AGREEMENTS, type Agreement, type AgreementStatus } from '../mocks/agreements';
 import {
@@ -9,12 +9,21 @@ import {
   type CARequestDayGroup,
 } from '../mocks/caRequests';
 import { MOCK_USERS } from '../mocks/users';
-import { MOCK_INVOICES, groupInvoiceItems, type InvoiceRecord, type InvoiceGroupView, type InvoiceStatus } from '../mocks/invoices';
+import {
+  MOCK_INVOICES,
+  groupInvoiceItems,
+  getVAInvoiceBucket,
+  type InvoiceRecord,
+  type InvoiceGroupView,
+  type InvoiceStatus,
+  type VAInvoiceBucket,
+} from '../mocks/invoices';
 
 export type { VAProfile } from '../mocks/vaProfiles';
 export type { Agreement, AgreementStatus } from '../mocks/agreements';
 export type { CARequest, CARequestStatus, CARequestDetail, CARequestDayGroup } from '../mocks/caRequests';
-export type { InvoiceRecord, InvoiceLineItemData, InvoiceGroupView, InvoiceStatus } from '../mocks/invoices';
+export type { InvoiceRecord, InvoiceLineItemData, InvoiceGroupView, InvoiceStatus, VAInvoiceBucket } from '../mocks/invoices';
+export { formatApprovedMessage, canTakeInvoiceAction, approveInvoice } from '../mocks/invoices';
 
 /** Shared status -> display label/color mappings, so every screen that shows one of these statuses agrees. */
 export const AGREEMENT_STATUS_LABEL: Record<AgreementStatus, string> = {
@@ -43,6 +52,7 @@ export const CA_STATUS_TONE: Record<CARequestStatus, ChipTone> = {
 
 /** Admin's "Invoice Status" chip — the VA's own View Invoice always hardcodes "Preview" instead of reading this. */
 export const INVOICE_STATUS_LABEL: Record<InvoiceStatus, string> = {
+  new: 'New',
   due: 'Due',
   paid: 'Paid',
   preview: 'Preview',
@@ -52,6 +62,7 @@ export const INVOICE_STATUS_LABEL: Record<InvoiceStatus, string> = {
 };
 
 export const INVOICE_STATUS_TONE: Record<InvoiceStatus, ChipTone> = {
+  new: 'purple',
   due: 'purple',
   paid: 'green',
   preview: 'blue',
@@ -126,6 +137,40 @@ export function getExtraHoursTakenForWeek(vaEmail: string, weekStartISO: string,
     .flatMap((request) => request.extraHoursByDate ?? [])
     .filter((entry) => entry.date >= weekStartISO && entry.date <= weekEndISO)
     .reduce((sum, entry) => sum + entry.hours, 0);
+}
+
+/** "8 hrs" -> 8. */
+export function parseHoursValue(value: string): number {
+  const match = /(\d+(?:\.\d+)?)/.exec(value);
+  return match ? Number(match[1]) : 0;
+}
+
+/**
+ * How many hours a VA is scheduled to work on a given date, per their
+ * agreement's weekly schedule (`Agreement.week`, Monday-first) — 0 for a
+ * disabled/non-working day, or when no schedule is known at all. Drives both
+ * which days the Time Off calendar allows selecting and each selected day's
+ * own max-hours cap.
+ */
+export function getScheduledHoursForDate(dateISO: string, week: WeekDayData[] | undefined): number {
+  if (!week || week.length !== 7) return 0;
+  const date = parseISODate(dateISO);
+  const weekdayIndex = (date.getDay() + 6) % 7;
+  const day = week[weekdayIndex];
+  if (!day || day.disabled) return 0;
+  return parseHoursValue(day.value);
+}
+
+/**
+ * Every date this VA has ever requested time off for, across ALL of their
+ * time-off requests regardless of status — a date stays "already requested"
+ * even if that earlier request was rejected, since it still occupied that
+ * slot once (the VA would resubmit the same date in a new request otherwise).
+ */
+export function getTimeOffRequestedDatesForVA(vaEmail: string): string[] {
+  return MOCK_CA_REQUESTS.filter((request) => request.vaEmail === vaEmail)
+    .flatMap((request) => request.timeOffByDate ?? [])
+    .map((entry) => entry.date);
 }
 
 function parseISODate(iso: string): Date {
@@ -354,6 +399,91 @@ export function createExtraHoursCARequest(input: CreateExtraHoursRequestInput): 
   return request;
 }
 
+export type TimeOffPaidType = 'paid' | 'non-paid' | 'paid-replacing-hours';
+
+const TIME_OFF_PAID_TYPE_LABEL: Record<TimeOffPaidType, string> = {
+  paid: 'Paid',
+  'non-paid': 'Non-Paid',
+  'paid-replacing-hours': 'Paid-Replacing Hours',
+};
+
+export interface CreateTimeOffRequestInput {
+  vaEmail: string;
+  agreementId: string;
+  mode: 'consecutive' | 'non-consecutive';
+  paidType: TimeOffPaidType;
+  /** Only meaningful when `paidType` is 'paid-replacing-hours'. */
+  makeUpHoursTiming?: string;
+  clientResponse: string;
+  selectedDates: string[];
+  hoursByDate: Record<string, number>;
+  comments: string;
+  requesterRole: 'va' | 'client';
+}
+
+/**
+ * Persists a "Request approval for time off" submission. A VA's own request
+ * always needs the client's manual review (`status: 'new'`); a request made
+ * by (or on behalf of) the client is the client approving their own ask, so
+ * it's auto-approved immediately — same idea as extra hours' auto-approval,
+ * just keyed off who's submitting rather than a pre-approved-hours rule.
+ */
+export function createTimeOffCARequest(input: CreateTimeOffRequestInput): CARequest {
+  const {
+    vaEmail,
+    agreementId,
+    mode,
+    paidType,
+    makeUpHoursTiming,
+    selectedDates,
+    hoursByDate,
+    comments,
+    requesterRole,
+  } = input;
+  const agreement = MOCK_AGREEMENTS.find((candidate) => candidate.id === agreementId);
+
+  const totalHours = selectedDates.reduce((sum, date) => sum + (hoursByDate[date] ?? 0), 0);
+  const sortedDates = [...selectedDates].sort();
+  const todayLong = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const todayNumeric = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+  const autoApproved = requesterRole === 'client';
+
+  const details: CARequestDetail[] = [
+    { label: 'Request Type', value: mode === 'consecutive' ? 'Consecutive days' : 'Non-consecutive days' },
+    { label: 'Paid or Non-Paid', value: TIME_OFF_PAID_TYPE_LABEL[paidType] },
+    ...(paidType === 'paid-replacing-hours' && makeUpHoursTiming
+      ? [{ label: 'Make-up Hours Timing', value: makeUpHoursTiming, fullWidth: true }]
+      : []),
+    { label: 'Total Hours Requested', value: `${totalHours} Hours` },
+    { label: 'Total Days Requested', value: `${sortedDates.length} Days` },
+    {
+      label: 'Dates Requested',
+      value: sortedDates.map((date) => `${formatWeekdayMDY(date)} (${hoursByDate[date] ?? 0} Hours)`).join('\n'),
+      fullWidth: true,
+    },
+  ];
+
+  const request: CARequest = {
+    id: nextCARequestId(),
+    vaEmail,
+    clientEmail: agreement?.clientEmail ?? '',
+    title: 'Request approval for time off',
+    date: todayLong,
+    status: autoApproved ? 'approved' : 'new',
+    clientName: 'LTM Innovation',
+    requestedBy: 'you',
+    requestedByRole: requesterRole,
+    requestedDate: todayLong,
+    details,
+    comments: comments.trim() || undefined,
+    timeOffByDate: selectedDates.map((date) => ({ date, hours: hoursByDate[date] ?? 0 })),
+    ...(autoApproved ? { resolvedBy: 'Auto-Approval System', resolvedDate: todayNumeric } : {}),
+  };
+
+  MOCK_CA_REQUESTS.unshift(request);
+  return request;
+}
+
 export function getInvoicesForVA(email: string): InvoiceRecord[] {
   return MOCK_INVOICES.filter((invoice) => invoice.vaEmail === email);
 }
@@ -367,12 +497,20 @@ export interface VAInvoiceBreakdown {
   groups: InvoiceGroupView[];
 }
 
-/** Each of the VA's invoices, its line items split into the same Agreement/Extra Hours/Time Off groups the client's invoice screens use. */
-export function getInvoiceBreakdownForVA(email: string): VAInvoiceBreakdown[] {
-  return getInvoicesForVA(email).map((invoice) => ({
-    invoice,
-    groups: groupInvoiceItems(invoice.items),
-  }));
+/**
+ * Each of the VA's invoices, its line items split into the same Agreement/
+ * Extra Hours/Time Off groups the client's invoice screens use. Pass
+ * `bucket` to scope this to just one of My Account's three Invoices tabs
+ * (Invoice Preview/Pending Approval/Previously Approved) — see
+ * `getVAInvoiceBucket`.
+ */
+export function getInvoiceBreakdownForVA(email: string, bucket?: VAInvoiceBucket): VAInvoiceBreakdown[] {
+  return getInvoicesForVA(email)
+    .filter((invoice) => bucket === undefined || getVAInvoiceBucket(invoice) === bucket)
+    .map((invoice) => ({
+      invoice,
+      groups: groupInvoiceItems(invoice.items),
+    }));
 }
 
 /** A single invoice's line items split into groups, for the full "View Invoice" page. */

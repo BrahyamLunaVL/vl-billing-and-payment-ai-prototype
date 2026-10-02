@@ -11,6 +11,7 @@ import {
 import { CA_STATUS_LABEL, CA_STATUS_TONE } from '../services/vaAccount'
 import { CARequestDetailsModal } from './CARequestDetailsModal'
 import { SelectedRequestsModal } from './SelectedRequestsModal'
+import { CADetailsView } from './CADetailsView'
 import './ClientChangesApprovalsScreen.css'
 
 export interface ClientChangesApprovalsScreenProps {
@@ -44,6 +45,10 @@ export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientC
   const [viewingRequestId, setViewingRequestId] = useState<string | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
   const [showBulkReview, setShowBulkReview] = useState(false)
+  // "Link to Request" (inside the View modal) replaces this whole screen
+  // with the VA's own read-only summary card — same blank-page-plus-card
+  // layout as the VA's own My Account, just within this role's sidebar.
+  const [summaryRequestId, setSummaryRequestId] = useState<string | null>(null)
   // Forces a re-read of the mutable mock after an approve/reject action —
   // `getCARequestsForClient` always reads the live array, so bumping this
   // to trigger a re-render is all a "refresh" needs to be.
@@ -60,6 +65,7 @@ export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientC
   const totalRows = sorted.length
   const pageRows = sorted.slice((page - 1) * pageSize, page * pageSize)
   const viewingRequest = viewingRequestId ? allRequests.find((request) => request.id === viewingRequestId) : undefined
+  const summaryRequest = summaryRequestId ? allRequests.find((request) => request.id === summaryRequestId) : undefined
   const selectedRequests = allRequests.filter((request) => selectedIds.has(request.id))
 
   const handleSort = (key: string) => {
@@ -156,6 +162,22 @@ export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientC
     },
   ]
 
+  if (summaryRequest) {
+    return (
+      <>
+        <div className="client-ca-screen__header">
+          <Button
+            type="primary"
+            leftIcon="chevron-left"
+            buttonText="Back to Changes & Approvals"
+            onClick={() => setSummaryRequestId(null)}
+          />
+        </div>
+        <CADetailsView request={summaryRequest} />
+      </>
+    )
+  }
+
   return (
     <>
       <div className="client-ca-screen__header">
@@ -242,6 +264,10 @@ export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientC
           onClose={() => setViewingRequestId(null)}
           onApprove={() => handleResolve(viewingRequest.id, 'approved')}
           onReject={() => handleResolve(viewingRequest.id, 'rejected')}
+          onViewSummary={() => {
+            setViewingRequestId(null)
+            setSummaryRequestId(viewingRequest.id)
+          }}
         />
       )}
 

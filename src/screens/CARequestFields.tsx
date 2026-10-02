@@ -4,6 +4,8 @@ import './CARequestFields.css'
 
 export interface CARequestFieldsProps {
   request: ClientCARequestView
+  /** "Link to Request" — shows the VA's own read-only summary card for this same request, in place of this view. Omit to hide the link (e.g. the bulk review modal, which doesn't support swapping its per-item view). */
+  onViewSummary?: () => void
 }
 
 /**
@@ -12,7 +14,7 @@ export interface CARequestFieldsProps {
  * status — shared by the "View" details modal and each item of the bulk
  * "Review Request" modal so both present a request's data identically.
  */
-export const CARequestFields = ({ request }: CARequestFieldsProps) => {
+export const CARequestFields = ({ request, onViewSummary }: CARequestFieldsProps) => {
   const isPending = request.status === 'new'
 
   return (
@@ -68,6 +70,14 @@ export const CARequestFields = ({ request }: CARequestFieldsProps) => {
             </div>
           )}
         </>
+      )}
+      {onViewSummary && (
+        <div className="ca-request-fields__row">
+          <span className="ca-request-fields__label">Link to Request</span>
+          <button type="button" className="ca-request-fields__link" onClick={onViewSummary}>
+            Link to original request
+          </button>
+        </div>
       )}
     </div>
   )

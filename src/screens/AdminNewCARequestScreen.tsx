@@ -27,6 +27,7 @@ export const AdminNewCARequestScreen = ({ agreement, onFinish }: AdminNewCAReque
         agreementId={agreement.id}
         recentRequests={recentRequests}
         agreementSettings={agreement.settings}
+        agreementWeek={agreement.week}
         showOnBehalfOf
         onStepChange={setWizardStep}
         finishButtonLabel="Go to C&A Table"

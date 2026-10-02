@@ -63,6 +63,8 @@ export interface CARequest {
    * source for the per-week pre-approved-hours math.
    */
   extraHoursByDate?: { date: string; hours: number }[];
+  /** Structured per-date hours for time-off requests, mirroring `extraHoursByDate` — used to flag dates a VA already requested time off for in an earlier request. */
+  timeOffByDate?: { date: string; hours: number }[];
 }
 
 /**

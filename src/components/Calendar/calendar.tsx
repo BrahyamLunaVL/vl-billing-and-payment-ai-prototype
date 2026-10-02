@@ -19,13 +19,23 @@ const MONTH_LABELS = [
 ];
 
 export interface CalendarProps {
-  /** ISO 'YYYY-MM-DD' dates currently selected. */
+  /** ISO 'YYYY-MM-DD' dates currently selected — rendered as solid filled days. */
   selectedDates: string[];
   onToggleDate: (date: string) => void;
   /** ISO date, inclusive lower bound for selectable days. */
   minDate: string;
   /** ISO date, inclusive upper bound for selectable days. */
   maxDate: string;
+  /**
+   * ISO dates strictly between a selected range's two endpoints — rendered
+   * with a light fill instead of `selectedDates`' solid one (e.g. the days
+   * "inside" a Time Off date range, as opposed to its start/end days).
+   */
+  inRangeDates?: string[];
+  /** Extra per-day disable check beyond `minDate`/`maxDate`, e.g. a VA's non-working weekdays. */
+  isDayDisabled?: (date: string) => boolean;
+  /** ISO date for the month initially shown. Defaults to `maxDate`'s month (right for a past-only range like Extra Hours, where that's the most relevant month) — pass today's date for a range that also extends into the future. */
+  initialViewDate?: string;
   className?: string;
 }
 
@@ -49,11 +59,21 @@ function toISODate(date: Date): string {
  * caller owns selection state, same pattern as every other control in this
  * library).
  */
-export const Calendar = ({ selectedDates, onToggleDate, minDate, maxDate, className }: CalendarProps) => {
+export const Calendar = ({
+  selectedDates,
+  onToggleDate,
+  minDate,
+  maxDate,
+  inRangeDates,
+  isDayDisabled,
+  initialViewDate,
+  className,
+}: CalendarProps) => {
   const min = parseISODate(minDate);
   const max = parseISODate(maxDate);
-  const [viewedYear, setViewedYear] = useState(max.getFullYear());
-  const [viewedMonth, setViewedMonth] = useState(max.getMonth());
+  const initialView = initialViewDate ? parseISODate(initialViewDate) : max;
+  const [viewedYear, setViewedYear] = useState(initialView.getFullYear());
+  const [viewedMonth, setViewedMonth] = useState(initialView.getMonth());
 
   const todayISO = toISODate(new Date());
   const minMonthStart = new Date(min.getFullYear(), min.getMonth(), 1);
@@ -141,12 +161,14 @@ export const Calendar = ({ selectedDates, onToggleDate, minDate, maxDate, classN
         {days.map((day) => {
           const iso = toISODate(day);
           const inMonth = day.getMonth() === viewedMonth;
-          const disabled = !inMonth || iso < minDate || iso > maxDate;
+          const disabled = !inMonth || iso < minDate || iso > maxDate || (isDayDisabled?.(iso) ?? false);
           const selected = selectedDates.includes(iso);
+          const inRange = !selected && (inRangeDates?.includes(iso) ?? false);
           const dayClassNames = [
             'calendar__day',
             !inMonth && 'calendar__day--outside',
             selected && 'calendar__day--selected',
+            inRange && 'calendar__day--in-range',
             iso === todayISO && 'calendar__day--today',
           ]
             .filter(Boolean)

@@ -8,6 +8,8 @@ export interface CARequestDetailsModalProps {
   onClose: () => void
   onApprove: () => void
   onReject: () => void
+  /** "Link to Request" — closes this modal and shows the VA's own read-only summary card as its own full page instead. Omit to hide the link. */
+  onViewSummary?: () => void
 }
 
 /**
@@ -18,7 +20,7 @@ export interface CARequestDetailsModalProps {
  * Manual Approval variants, driven by `status` rather than two separate
  * hardcoded layouts.
  */
-export const CARequestDetailsModal = ({ request, onClose, onApprove, onReject }: CARequestDetailsModalProps) => {
+export const CARequestDetailsModal = ({ request, onClose, onApprove, onReject, onViewSummary }: CARequestDetailsModalProps) => {
   const isPending = request.status === 'new'
 
   return (
@@ -33,7 +35,7 @@ export const CARequestDetailsModal = ({ request, onClose, onApprove, onReject }:
           </button>
         </div>
         <div className="ca-request-details-modal__body">
-          <CARequestFields request={request} />
+          <CARequestFields request={request} onViewSummary={onViewSummary} />
         </div>
         <div className="ca-request-details-modal__footer">
           {isPending ? (

@@ -12,6 +12,9 @@ import {
   Icon,
   Button,
   Radio,
+  Select,
+  Week,
+  type WeekDayData,
 } from '../components'
 import {
   CA_STATUS_LABEL,
@@ -19,6 +22,10 @@ import {
   getWeekRange,
   buildWeekGroups,
   createExtraHoursCARequest,
+  getScheduledHoursForDate,
+  getTimeOffRequestedDatesForVA,
+  createTimeOffCARequest,
+  parseHoursValue,
   type CARequest,
 } from '../services/vaAccount'
 import type { AgreementSettings } from '../services/clientAccount'
@@ -46,6 +53,43 @@ const RATE_PER_HOUR = 10
  *  agreement's own auto-approval period — see `WeekGroup.isOutsidePeriod`. */
 const MAX_LOOKBACK_WEEKS = 16
 
+/** Up to 14 days of time off per Changes & Approvals form (Figma copy). */
+const MAX_TIME_OFF_DAYS = 14
+
+const TIME_OFF_PAID_OPTIONS = [
+  { value: 'paid', label: 'Paid' },
+  { value: 'non-paid', label: 'Non-Paid' },
+  { value: 'paid-replacing-hours', label: 'Paid-Replacing Hours' },
+]
+
+/** Only asked when "Paid-Replacing Hours" is picked above. */
+const MAKE_UP_HOURS_OPTIONS = [
+  'Before I take time off',
+  'After I take time off, upon returning',
+  'Before and After I take time off',
+  "I'm still discussing with the client when I shall make up the missed hours",
+  'Not Applicable / Not Assigned',
+]
+
+const CLIENT_RESPONSE_OPTIONS = [
+  "Client told me they'll approve the request once I complete this form",
+  'Client will let me know once they discuss this with Virtual Latinos',
+  "Client hasn't approved it yet, but will think about it and get back to me",
+  "Client told me they can't approve it (but I need to take time off anyways)",
+  'Other',
+]
+
+/** Mon-Fri 8hrs / Sat-Sun off — used when an agreement has no `week` schedule of its own. */
+const DEFAULT_WORKING_WEEK: WeekDayData[] = [
+  { key: 'mon', dayLetter: 'M', value: '8 hrs' },
+  { key: 'tue', dayLetter: 'T', value: '8 hrs' },
+  { key: 'wed', dayLetter: 'W', value: '8 hrs' },
+  { key: 'thu', dayLetter: 'T', value: '8 hrs' },
+  { key: 'fri', dayLetter: 'F', value: '8 hrs' },
+  { key: 'sat', dayLetter: 'S', value: '0 hrs', disabled: true },
+  { key: 'sun', dayLetter: 'S', value: '0 hrs', disabled: true },
+]
+
 const DEFAULT_AGREEMENT_SETTINGS: AgreementSettings = {
   autoApproveChanges: false,
   notifyOverThreshold: false,
@@ -71,6 +115,12 @@ function parseISODate(iso: string): Date {
 function addDays(date: Date, days: number): Date {
   const result = new Date(date)
   result.setDate(result.getDate() + days)
+  return result
+}
+
+function addMonths(date: Date, months: number): Date {
+  const result = new Date(date)
+  result.setMonth(result.getMonth() + months)
   return result
 }
 
@@ -111,6 +161,46 @@ function InlineWarning({ message }: { message: string }) {
   )
 }
 
+/**
+ * A radio option with a two-line label (bold title + muted description) —
+ * Figma's "How would your VA like to request time off" question. `Radio`
+ * only supports a single-line label, so this is a local, visually-matching
+ * variant rather than a change to that shared component.
+ */
+function RadioOptionWithDescription({
+  name,
+  value,
+  checked,
+  onChange,
+  title,
+  description,
+}: {
+  name: string
+  value: string
+  checked: boolean
+  onChange: () => void
+  title: string
+  description: string
+}) {
+  return (
+    <label className="ca-wizard__radio-option">
+      <input
+        type="radio"
+        name={name}
+        value={value}
+        checked={checked}
+        onChange={onChange}
+        className="ca-wizard__radio-option-input"
+      />
+      <span className="ca-wizard__radio-option-circle" aria-hidden="true" />
+      <span className="ca-wizard__radio-option-text">
+        <span className="ca-wizard__radio-option-title">{title}</span>
+        <span className="ca-wizard__radio-option-description">{description}</span>
+      </span>
+    </label>
+  )
+}
+
 export interface NewCARequestWizardProps {
   /** The VA the request is for — used to look up hours already taken this week against their pre-approved allowance. */
   vaEmail: string
@@ -126,6 +216,8 @@ export interface NewCARequestWizardProps {
    * VA has no active agreement (shouldn't normally happen).
    */
   agreementSettings?: AgreementSettings
+  /** The VA's Monday-first weekly schedule under this agreement (`Agreement.week`) — which days the Time Off calendar allows selecting, and each day's own max-hours cap. Falls back to a Mon-Fri 8hr schedule when omitted. */
+  agreementWeek?: WeekDayData[]
   /** Who's submitting this request when `showOnBehalfOf` isn't shown (VA's own screen vs Client's own screen) — drives the created request's `requestedByRole`. Ignored when `showOnBehalfOf` is set, since the wizard's own Client/VA radio decides it instead. */
   requesterRole?: 'va' | 'client'
   /** Shows the Admin-only "Request on behalf of" Client/VA selector on step 1, above the request type list. */
@@ -136,6 +228,8 @@ export interface NewCARequestWizardProps {
   onFinish: () => void
   /** Called whenever the current step changes, so the parent screen can swap its own header (e.g. to "Success" on step 4). */
   onStepChange?: (step: 1 | 2 | 3 | 4) => void
+  /** Called when the Time Off form's "See C&A" link is clicked — takes the viewer back to their own Changes & Approvals request list. Hidden (plain text) when omitted. */
+  onViewChangesApprovals?: () => void
 }
 
 /** The 4-step "New Request for Changes" wizard (Figma's "Changes & Approvals Form" flow). */
@@ -144,18 +238,33 @@ export const NewCARequestWizard = ({
   agreementId,
   recentRequests,
   agreementSettings = DEFAULT_AGREEMENT_SETTINGS,
+  agreementWeek = DEFAULT_WORKING_WEEK,
   requesterRole = 'va',
   showOnBehalfOf = false,
   finishButtonLabel,
   onFinish,
   onStepChange,
+  onViewChangesApprovals,
 }: NewCARequestWizardProps) => {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [onBehalfOf, setOnBehalfOf] = useState<'client' | 'va'>('va')
-  const [requestType, setRequestType] = useState<RequestType>('extra-hours')
+  // "Request approval for extra hours" isn't offered to the Client (or Admin
+  // acting as Client) — only the VA actually works the hours being
+  // reported, so default away from it when starting from that perspective.
+  const [requestType, setRequestType] = useState<RequestType>(
+    !showOnBehalfOf && requesterRole === 'client' ? 'time-off' : 'extra-hours',
+  )
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [hoursByDate, setHoursByDate] = useState<Record<string, number>>({})
   const [comments, setComments] = useState('')
+
+  const [timeOffMode, setTimeOffMode] = useState<'consecutive' | 'non-consecutive'>('consecutive')
+  const [timeOffPaid, setTimeOffPaid] = useState<'paid' | 'non-paid' | 'paid-replacing-hours'>('paid')
+  const [makeUpHoursTiming, setMakeUpHoursTiming] = useState(MAKE_UP_HOURS_OPTIONS[0])
+  const [clientResponse, setClientResponse] = useState(CLIENT_RESPONSE_OPTIONS[0])
+  const [timeOffDates, setTimeOffDates] = useState<string[]>([])
+  const [timeOffHoursByDate, setTimeOffHoursByDate] = useState<Record<string, number>>({})
+  const [timeOffRangeAnchor, setTimeOffRangeAnchor] = useState<string | null>(null)
 
   useEffect(() => {
     onStepChange?.(step)
@@ -192,7 +301,13 @@ export const NewCARequestWizard = ({
   const totalAmount = totalHours * RATE_PER_HOUR
   const exceededMax = totalHours > TOTAL_MAX_HOURS
   const canGoNext =
-    requestType === 'extra-hours' ? selectedDates.length > 0 && totalHours > 0 && !exceededMax : true
+    requestType === 'extra-hours'
+      ? selectedDates.length > 0 && totalHours > 0 && !exceededMax
+      : requestType === 'time-off'
+        ? timeOffDates.length > 0 &&
+          timeOffDates.reduce((sum, date) => sum + (timeOffHoursByDate[date] ?? 0), 0) > 0 &&
+          timeOffDates.length <= MAX_TIME_OFF_DAYS
+        : true
   const weekGroups = buildWeekGroups(
     selectedDates,
     hoursByDate,
@@ -243,6 +358,105 @@ export const NewCARequestWizard = ({
     setHoursByDate({})
   }
 
+  // Time Off: the calendar allows any date within 6 months forward / 3
+  // months back (Figma's own NOTE copy), further restricted to the VA's
+  // actual working days under this agreement.
+  const timeOffMaxDate = toISODate(addMonths(new Date(), 6))
+  const timeOffMinDate = toISODate(addMonths(new Date(), -3))
+  const isTimeOffDayDisabled = (date: string) => getScheduledHoursForDate(date, agreementWeek) <= 0
+
+  const handleTimeOffDayClick = (date: string) => {
+    if (timeOffMode === 'non-consecutive') {
+      setTimeOffDates((prev) => {
+        if (prev.includes(date)) {
+          setTimeOffHoursByDate((hours) => {
+            const next = { ...hours }
+            delete next[date]
+            return next
+          })
+          return prev.filter((d) => d !== date)
+        }
+        setTimeOffHoursByDate((hours) => ({ ...hours, [date]: 1 }))
+        return [...prev, date].sort()
+      })
+      return
+    }
+
+    // Consecutive mode: the first click sets the range's start, clicking it
+    // again clears the selection, and a second click on any other day
+    // completes the range — only the VA's working days within it are kept,
+    // non-working days in between are simply skipped.
+    if (!timeOffRangeAnchor) {
+      setTimeOffRangeAnchor(date)
+      setTimeOffDates([date])
+      setTimeOffHoursByDate({ [date]: 1 })
+      return
+    }
+    if (timeOffRangeAnchor === date) {
+      setTimeOffRangeAnchor(null)
+      setTimeOffDates([])
+      setTimeOffHoursByDate({})
+      return
+    }
+
+    const start = timeOffRangeAnchor < date ? timeOffRangeAnchor : date
+    const end = timeOffRangeAnchor < date ? date : timeOffRangeAnchor
+    const rangeDates: string[] = []
+    for (let cursor = parseISODate(start); cursor <= parseISODate(end); cursor = addDays(cursor, 1)) {
+      const iso = toISODate(cursor)
+      if (!isTimeOffDayDisabled(iso)) rangeDates.push(iso)
+    }
+    setTimeOffDates(rangeDates)
+    setTimeOffHoursByDate((prev) => {
+      const next: Record<string, number> = {}
+      for (const iso of rangeDates) next[iso] = prev[iso] ?? 1
+      return next
+    })
+    setTimeOffRangeAnchor(null)
+  }
+
+  const handleTimeOffModeChange = (mode: 'consecutive' | 'non-consecutive') => {
+    setTimeOffMode(mode)
+    setTimeOffDates([])
+    setTimeOffHoursByDate({})
+    setTimeOffRangeAnchor(null)
+  }
+
+  const handleTimeOffReset = () => {
+    setTimeOffDates([])
+    setTimeOffHoursByDate({})
+    setTimeOffRangeAnchor(null)
+  }
+
+  const sortedTimeOffDates = [...timeOffDates].sort()
+  const timeOffRangeEndpoints =
+    timeOffMode === 'consecutive' && sortedTimeOffDates.length > 0
+      ? [sortedTimeOffDates[0], sortedTimeOffDates[sortedTimeOffDates.length - 1]]
+      : sortedTimeOffDates
+  const timeOffInRangeDates =
+    timeOffMode === 'consecutive' && sortedTimeOffDates.length > 2 ? sortedTimeOffDates.slice(1, -1) : []
+
+  const totalTimeOffHours = timeOffDates.reduce((sum, date) => sum + (timeOffHoursByDate[date] ?? 0), 0)
+  const totalTimeOffCapacity = timeOffDates.reduce(
+    (sum, date) => sum + getScheduledHoursForDate(date, agreementWeek),
+    0,
+  )
+  const exceededTimeOffDays = timeOffDates.length > MAX_TIME_OFF_DAYS
+  const alreadyRequestedTimeOffDates = getTimeOffRequestedDatesForVA(vaEmail)
+  const hasAlreadyRequestedTimeOffDate = timeOffDates.some((date) => alreadyRequestedTimeOffDates.includes(date))
+
+  const workingDaysPerWeek = agreementWeek.filter((day) => !day.disabled && parseHoursValue(day.value) > 0).length
+  const workingHoursPerWeek = agreementWeek.reduce(
+    (sum, day) => sum + (day.disabled ? 0 : parseHoursValue(day.value)),
+    0,
+  )
+
+  // The Time Off form's copy talks about "your VA" from the client's point of
+  // view (Client's own screen, or Admin filling it out on the client's
+  // behalf) vs. "you"/"your" from the VA's own point of view (VA's own
+  // screen, or Admin filling it out on the VA's behalf).
+  const isClientPerspective = showOnBehalfOf ? onBehalfOf === 'client' : requesterRole === 'client'
+
   const handleSubmit = () => {
     if (requestType === 'extra-hours' && agreementId) {
       createExtraHoursCARequest({
@@ -256,6 +470,20 @@ export const NewCARequestWizard = ({
         anyWeekOutsidePeriod,
       })
     }
+    if (requestType === 'time-off' && agreementId) {
+      createTimeOffCARequest({
+        vaEmail,
+        agreementId,
+        mode: timeOffMode,
+        paidType: timeOffPaid,
+        makeUpHoursTiming: timeOffPaid === 'paid-replacing-hours' ? makeUpHoursTiming : undefined,
+        clientResponse,
+        selectedDates: timeOffDates,
+        hoursByDate: timeOffHoursByDate,
+        comments,
+        requesterRole: showOnBehalfOf ? onBehalfOf : requesterRole,
+      })
+    }
     setStep(4)
   }
 
@@ -264,18 +492,30 @@ export const NewCARequestWizard = ({
     setSelectedDates([])
     setHoursByDate({})
     setComments('')
+    handleTimeOffReset()
+    setTimeOffMode('consecutive')
+    setTimeOffPaid('paid')
+    setMakeUpHoursTiming(MAKE_UP_HOURS_OPTIONS[0])
+    setClientResponse(CLIENT_RESPONSE_OPTIONS[0])
     setStep(1)
   }
 
   return (
     <div className="ca-wizard">
       <StepsNavigation>
-        <Step step={1} title="Choose Request for Changes" position="left" status={step > 1 ? 'completed' : 'selected'} />
+        <Step
+          step={1}
+          title="Choose Request for Changes"
+          position="left"
+          status={step > 1 ? 'completed' : 'selected'}
+          onClick={step > 1 && step <= 3 ? () => setStep(1) : undefined}
+        />
         <Step
           step={2}
           title="Fill request form"
           position="middle"
           status={step === 2 ? 'selected' : step > 2 ? 'completed' : 'default'}
+          onClick={step > 2 && step <= 3 ? () => setStep(2) : undefined}
         />
         <Step
           step={3}
@@ -326,7 +566,11 @@ export const NewCARequestWizard = ({
                       value="client"
                       label="Client"
                       checked={onBehalfOf === 'client'}
-                      onChange={() => setOnBehalfOf('client')}
+                      onChange={() => {
+                        setOnBehalfOf('client')
+                        // Extra hours isn't offered from the client's perspective.
+                        if (requestType === 'extra-hours') setRequestType('time-off')
+                      }}
                     />
                     <Radio
                       name="on-behalf-of"
@@ -343,7 +587,10 @@ export const NewCARequestWizard = ({
                       ? 'Main Changes Requested from the Client'
                       : 'Main Changes Requested from the Virtual Assistant (VA)'}
                   </legend>
-                  {REQUEST_TYPE_OPTIONS.map((option) => (
+                  {(isClientPerspective
+                    ? REQUEST_TYPE_OPTIONS.filter((option) => option.value !== 'extra-hours')
+                    : REQUEST_TYPE_OPTIONS
+                  ).map((option) => (
                     <Radio
                       key={option.value}
                       name="request-type"
@@ -363,11 +610,11 @@ export const NewCARequestWizard = ({
         </div>
       )}
 
-      {step === 2 && requestType !== 'extra-hours' && (
+      {step === 2 && requestType !== 'extra-hours' && requestType !== 'time-off' && (
         <ProfileCard>
           <p className="ca-wizard__description">
             This request type isn&apos;t available in the prototype yet — only &quot;Request approval
-            for extra hours&quot; is fully built out.
+            for extra hours&quot; and &quot;Request approval for time off&quot; are fully built out.
           </p>
           <div className="ca-wizard__actions">
             <Button type="tertiary" buttonText="Back" onClick={() => setStep(1)} />
@@ -639,6 +886,293 @@ export const NewCARequestWizard = ({
                     <Alert
                       type="error"
                       message="This request exceeds the 60-hour limit for requests that require client approval. Reduce the hours or remove some dates, then submit the remaining hours as a separate request."
+                    />
+                  )}
+
+                  <div className="ca-wizard__actions">
+                    <Button buttonText="Next" onClick={() => setStep(3)} disabled={!canGoNext} />
+                  </div>
+                </div>
+              </ProfileCard>
+            </div>
+          </div>
+        </>
+      )}
+
+      {step === 2 && requestType === 'time-off' && (
+        <>
+          <h2 className="ca-wizard__heading">
+            {isClientPerspective ? 'Provide or Approve for Time Off, Vacations, Etc' : 'Request Approval for Time Off, Vacations, Etc'}
+          </h2>
+
+          <div className="ca-wizard__row">
+            <div className="ca-wizard__column ca-wizard__column--narrow">
+              <ProfileCard>
+                <div className="ca-wizard__card-body">
+                  <h3 className="ca-wizard__subheading">
+                    {isClientPerspective
+                      ? 'Provide or Approve for Time Off, Vacations, Etc'
+                      : 'Request Approval for Time Off, Vacations, Etc'}
+                  </h3>
+                  <div className="ca-wizard__info-card ca-wizard__info-card--purple">
+                    <span>Current Invoice period from:</span>
+                    <strong>Aug 17 – 30, 2026</strong>
+                  </div>
+                  <div className="ca-wizard__info-card ca-wizard__info-card--purple">
+                    <span>Requesting for:</span>
+                    <strong>Bloominari dba Virtual Latinos</strong>
+                  </div>
+                  <div className="ca-wizard__info-card ca-wizard__info-card--orange">
+                    <strong>Your deadline is August 25 at 11:59 PM PT.</strong>
+                    <span>Once deadline is over, your changes will take effect on the next invoice period.</span>
+                  </div>
+                </div>
+              </ProfileCard>
+              <p className="ca-wizard__note">
+                <strong>NOTE: </strong>
+                You can request time off up to 6 months in advance; or log time off for past pay periods
+                within the last 3 months.
+              </p>
+            </div>
+
+            <div className="ca-wizard__column">
+              <ProfileCard>
+                <div className="ca-wizard__card-body">
+                  <h3 className="ca-wizard__heading">Request Details</h3>
+
+                  <FormField
+                    label={isClientPerspective ? 'How would you like to request your time off' : 'How would your VA like to request time off'}
+                  >
+                    <div className="ca-wizard__radio-option-list">
+                      <RadioOptionWithDescription
+                        name="time-off-mode"
+                        value="consecutive"
+                        checked={timeOffMode === 'consecutive'}
+                        onChange={() => handleTimeOffModeChange('consecutive')}
+                        title="Consecutive days"
+                        description="Select a continuous range of days with no breaks (e.g. Monday 1st - Friday 5th)"
+                      />
+                      <RadioOptionWithDescription
+                        name="time-off-mode"
+                        value="non-consecutive"
+                        checked={timeOffMode === 'non-consecutive'}
+                        onChange={() => handleTimeOffModeChange('non-consecutive')}
+                        title="Non-consecutive days"
+                        description="Select individual days that don&rsquo;t have to be in sequence (e.g. Monday 1st, Wednesday 3rd, Tuesday 9th)"
+                      />
+                    </div>
+                  </FormField>
+
+                  <FormField
+                    label="Will this be Paid or Non-Paid Time Off?"
+                    info="Paid time off is covered by your agreement. Non-Paid time off is unpaid and won't be billed on your next invoice."
+                  >
+                    <Select
+                      options={TIME_OFF_PAID_OPTIONS}
+                      value={timeOffPaid}
+                      onChange={(value) => setTimeOffPaid(value as 'paid' | 'non-paid' | 'paid-replacing-hours')}
+                    />
+                  </FormField>
+
+                  {timeOffPaid === 'paid-replacing-hours' && (
+                    <FormField label="When will you make up the work hours missed during your time off?">
+                      <fieldset className="ca-wizard__radio-group">
+                        {MAKE_UP_HOURS_OPTIONS.map((option) => (
+                          <Radio
+                            key={option}
+                            name="make-up-hours-timing"
+                            value={option}
+                            label={option}
+                            checked={makeUpHoursTiming === option}
+                            onChange={() => setMakeUpHoursTiming(option)}
+                          />
+                        ))}
+                      </fieldset>
+                    </FormField>
+                  )}
+
+                  <FormField label="Client response to your request">
+                    <fieldset className="ca-wizard__radio-group">
+                      {CLIENT_RESPONSE_OPTIONS.map((option) => (
+                        <Radio
+                          key={option}
+                          name="client-response"
+                          value={option}
+                          label={option}
+                          checked={clientResponse === option}
+                          onChange={() => setClientResponse(option)}
+                        />
+                      ))}
+                    </fieldset>
+                  </FormField>
+
+                  <div className="ca-wizard__details-box">
+                    <div className="ca-wizard__schedule-panel">
+                      <p className="ca-wizard__subheading">Your Schedule (Work Hours per Day)</p>
+                      <Week days={agreementWeek} />
+                      <div className="ca-wizard__schedule-stats">
+                        <div className="ca-wizard__schedule-stat">
+                          <span className="ca-wizard__subheading">Current Working Days/Week</span>
+                          <p className="ca-wizard__metric-value">
+                            {workingDaysPerWeek} <span>Days</span>
+                          </p>
+                        </div>
+                        <div className="ca-wizard__schedule-stat">
+                          <span className="ca-wizard__subheading">Current Working Hours/Week</span>
+                          <p className="ca-wizard__metric-value">
+                            {workingHoursPerWeek} <span>Hours</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="ca-wizard__calendar-row">
+                      <div className="ca-wizard__calendar-column">
+                        <FormField
+                          label="Specific dates that you&apos;d like to request off"
+                          description="Count only business days as applicable in your schedule. You can request up to 14 days of time off per Changes & Approvals form."
+                        >
+                          {null}
+                        </FormField>
+                        <Input
+                          readOnly
+                          placeholder="yyyy-mm-dd"
+                          value={
+                            sortedTimeOffDates.length === 0
+                              ? ''
+                              : timeOffMode === 'consecutive'
+                                ? sortedTimeOffDates.length > 1
+                                  ? `${sortedTimeOffDates[0]} to ${sortedTimeOffDates[sortedTimeOffDates.length - 1]}`
+                                  : sortedTimeOffDates[0]
+                                : sortedTimeOffDates.join(', ')
+                          }
+                        />
+                        <Calendar
+                          selectedDates={timeOffRangeEndpoints}
+                          inRangeDates={timeOffInRangeDates}
+                          onToggleDate={handleTimeOffDayClick}
+                          isDayDisabled={isTimeOffDayDisabled}
+                          minDate={timeOffMinDate}
+                          maxDate={timeOffMaxDate}
+                          initialViewDate={toISODate(new Date())}
+                        />
+                        <Button
+                          type="secondary"
+                          buttonText="Reset"
+                          onClick={handleTimeOffReset}
+                          disabled={timeOffDates.length === 0}
+                        />
+                      </div>
+
+                      <div className="ca-wizard__hours-column">
+                        {timeOffDates.length === 0 ? (
+                          <>
+                            <h3 className="ca-wizard__subheading">Daily Time Off Hours</h3>
+                            <div className="ca-wizard__empty-state">
+                              <Icon name="calendar" size={40} />
+                              <p className="ca-wizard__empty-title">No days selected</p>
+                              <p className="ca-wizard__empty-subtitle">
+                                Select at least one date to enter the hours your VA will take off
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <h3 className="ca-wizard__subheading">Daily Time Off Hours</h3>
+                            <p className="ca-wizard__description">
+                              {isClientPerspective
+                                ? "The maximum amount of hours you can request is based on your VA's scheduled work hours for this day."
+                                : 'The maximum amount of hours you can request is based on your scheduled work hours for this day.'}
+                            </p>
+                            <div className="ca-wizard__date-rows">
+                              {sortedTimeOffDates.map((date) => {
+                                const dayMax = getScheduledHoursForDate(date, agreementWeek)
+                                const dayLabel = isClientPerspective
+                                  ? `Hours your VA will take off on ${formatFullDate(date)}`
+                                  : `Hours you will take off on ${formatFullDate(date)}`
+                                return (
+                                  <FormField key={date} label={dayLabel}>
+                                    <Input
+                                      type="number"
+                                      min={1}
+                                      max={dayMax}
+                                      value={timeOffHoursByDate[date] ?? 1}
+                                      onChange={(event) =>
+                                        setTimeOffHoursByDate((prev) => ({
+                                          ...prev,
+                                          [date]: Math.min(dayMax, Math.max(1, Number(event.target.value))),
+                                        }))
+                                      }
+                                      onIncrement={() =>
+                                        setTimeOffHoursByDate((prev) => ({
+                                          ...prev,
+                                          [date]: Math.min(dayMax, (prev[date] ?? 1) + 1),
+                                        }))
+                                      }
+                                      onDecrement={() =>
+                                        setTimeOffHoursByDate((prev) => ({
+                                          ...prev,
+                                          [date]: Math.max(1, (prev[date] ?? 1) - 1),
+                                        }))
+                                      }
+                                      incrementLabel={`Increase hours for ${formatFullDate(date)}`}
+                                      decrementLabel={`Decrease hours for ${formatFullDate(date)}`}
+                                    />
+                                  </FormField>
+                                )
+                              })}
+                            </div>
+
+                            <div className="ca-wizard__totals">
+                              <div className="ca-wizard__totals-columns">
+                                <div className="ca-wizard__totals-column">
+                                  <span className="ca-wizard__totals-label">Total hours your VA will take off</span>
+                                  <p className="ca-wizard__totals-value">
+                                    {totalTimeOffHours}/{totalTimeOffCapacity} <span>Hours/week</span>
+                                  </p>
+                                  <p className="ca-wizard__totals-caption">
+                                    Calculated from number of dates and hours your VA would like to take off.
+                                  </p>
+                                </div>
+                                <div className="ca-wizard__totals-column">
+                                  <span className="ca-wizard__totals-label">Total days your VA will take off</span>
+                                  <p className="ca-wizard__totals-value">
+                                    {timeOffDates.length} <span>Days</span>
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {hasAlreadyRequestedTimeOffDate && (
+                              <div className="ca-wizard__inline-warning">
+                                <Icon name="triangle-exclamation" size={20} />
+                                <span>
+                                  One or more selected dates have already been requested{' '}
+                                  {onViewChangesApprovals ? (
+                                    <button
+                                      type="button"
+                                      className="ca-wizard__inline-link"
+                                      onClick={onViewChangesApprovals}
+                                    >
+                                      See C&amp;A
+                                    </button>
+                                  ) : (
+                                    <span className="ca-wizard__inline-link">See C&amp;A</span>
+                                  )}
+                                  .
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {exceededTimeOffDays && (
+                    <Alert
+                      type="error"
+                      message={`You can request up to ${MAX_TIME_OFF_DAYS} days of time off per Changes & Approvals form. Reduce the dates, then submit the rest as a separate request.`}
                     />
                   )}
 
