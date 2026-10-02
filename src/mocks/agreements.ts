@@ -114,7 +114,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
   },
   {
     id: 'agr-2',
-    vaEmail: 'va@virtuallatinos.com',
+    vaEmail: 'va3@virtuallatinos.com',
     clientEmail: 'client@virtuallatinos.com',
     clientName: 'The Matian Firm',
     contactName: 'Sarah Matian',
@@ -130,7 +130,7 @@ const INITIAL_AGREEMENTS: Agreement[] = [
     endDate: '1/24/2025',
     nextPaymentDate: '1/24/2025',
     hubspotId: '44787728132',
-    agreementName: 'VL-Agreement-The Matian Firm-Elena R.-2024-07-25 14:02:11',
+    agreementName: 'VL-Agreement-The Matian Firm-Daniela F.-2024-07-25 14:02:11',
     status: 'inactive',
     settings: { ...DEFAULT_SETTINGS, autoApproveExtraHours: false },
     clientRateRanges: [

@@ -24,8 +24,9 @@ export interface AgreementDetailsCardProps {
 /**
  * A client's agreement summary (Figma's "Agreement Details Card") — the
  * wide, two-tier card shown in the client's My Account agreements list:
- * a header row with the agreement title/status and View/Request Changes
- * actions, then a shaded details row with schedule facts plus the VA's
+ * a header row with the agreement title (itself the link to the agreement's
+ * detail screen, underlined on hover) plus status and a "Request Changes"
+ * action, then a shaded details row with schedule facts plus the VA's
  * name/Telegram/country/AKA. The agreement's own status chip (next to the
  * title) is the only chip on the card — unlike `AgreementCard` (the VA's
  * own compact view of their agreement), this is the client's wider,
@@ -52,17 +53,12 @@ export const AgreementDetailsCard = ({
     <div className={classNames}>
       <div className="agreement-details-card__header">
         <div className="agreement-details-card__title-row">
-          <p className="agreement-details-card__title">{title}</p>
+          <button type="button" className="agreement-details-card__title" onClick={onEditAgreement}>
+            {title}
+          </button>
           <Chip label={statusLabel} tone={statusTone} />
         </div>
         <div className="agreement-details-card__header-actions">
-          <Button
-            type="tertiary"
-            size="small"
-            buttonText="View Agreement"
-            onClick={onEditAgreement}
-            style={{ width: '150px' }}
-          />
           <Button
             type="tertiary"
             size="small"
