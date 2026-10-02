@@ -3,6 +3,7 @@ import {
   Alert,
   Button,
   Checkbox,
+  DatePickerField,
   FormField,
   Input,
   PopUp,
@@ -66,6 +67,31 @@ function parseRate(value: string): string {
 function isoToday(): string {
   const now = new Date()
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+}
+
+function formatISO(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+
+/** The Monday of the current week — the earliest "First Effective Day" can land on, even if that Monday has already passed this week. */
+function getCurrentWeekMonday(): string {
+  const today = new Date()
+  const daysSinceMonday = (today.getDay() + 6) % 7
+  const thisMonday = new Date(today)
+  thisMonday.setDate(today.getDate() - daysSinceMonday)
+  return formatISO(thisMonday)
+}
+
+/** How far out "First Effective Day" can be scheduled. */
+function getMaxEffectiveDay(): string {
+  const date = new Date()
+  date.setMonth(date.getMonth() + 6)
+  return formatISO(date)
+}
+
+function isMonday(iso: string): boolean {
+  const [year, month, day] = iso.split('-').map(Number)
+  return new Date(year, month - 1, day).getDay() === 1
 }
 
 /** Bare "4/28/2025" -> "2025-04-28" for pre-filling a native date input. */
@@ -162,10 +188,10 @@ export const AdminAgreementFormScreen = ({ mode, agreementId, onCancel, onSaved 
     const existingDay = existing?.week?.find((candidate) => candidate.key === day.key)
     if (existingDay) {
       initialDayEnabled[day.key] = !existingDay.disabled
-      initialDayHours[day.key] = String(parseFloat(existingDay.value) || 0).replace(/^0$/, '0.0')
+      initialDayHours[day.key] = String(parseFloat(existingDay.value) || 0)
     } else {
       initialDayEnabled[day.key] = WEEKDAY_KEYS.has(day.key)
-      initialDayHours[day.key] = WEEKDAY_KEYS.has(day.key) ? '8.0' : '0.0'
+      initialDayHours[day.key] = WEEKDAY_KEYS.has(day.key) ? '8.0' : '0'
     }
   }
   const [dayEnabled, setDayEnabled] = useState(initialDayEnabled)
@@ -192,10 +218,13 @@ export const AdminAgreementFormScreen = ({ mode, agreementId, onCancel, onSaved 
 
   const handleToggleDay = (key: string, checked: boolean) => {
     setDayEnabled((prev) => ({ ...prev, [key]: checked }))
+    // A day that's turned off doesn't keep whatever hours it had — it reads
+    // as 0 until (if ever) it's turned back on.
+    if (!checked) setDayHours((prev) => ({ ...prev, [key]: '0' }))
   }
 
   const handleDayHoursChange = (key: string, value: string) => {
-    setDayHours((prev) => ({ ...prev, [key]: value }))
+    setDayHours((prev) => ({ ...prev, [key]: value.replace(/-/g, '') }))
   }
 
   const totalWeeklyHours = DAY_ROWS.reduce((sum, day) => (dayEnabled[day.key] ? sum + (parseFloat(dayHours[day.key]) || 0) : sum), 0)
@@ -276,7 +305,7 @@ export const AdminAgreementFormScreen = ({ mode, agreementId, onCancel, onSaved 
     const week: WeekDayData[] = DAY_ROWS.map((day) => ({
       key: day.key,
       dayLetter: day.dayLetter,
-      value: `${dayHours[day.key] || '0.0'} hrs`,
+      value: `${dayHours[day.key] || '0'} hrs`,
       disabled: !dayEnabled[day.key],
     }))
 
@@ -446,7 +475,7 @@ export const AdminAgreementFormScreen = ({ mode, agreementId, onCancel, onSaved 
             <Input value={vaRate} onChange={(event) => setVaRate(event.target.value)} error={!!errors.vaRate} rightText="USD" placeholder="Enter VA rate" type="number" />
           </FormField>
           <FormField label="Weekly Hours" badge="(Optional)" helpText="For agreements of 10-20 weekly hours, Client and VA minimum rates increases by $2/hr." className="admin-agreement-form-screen__field">
-            <Input value={weeklyHours} onChange={(event) => setWeeklyHours(event.target.value)} rightText="Hrs" placeholder="Enter weekly hours" type="number" />
+            <Input value={weeklyHours} onChange={(event) => setWeeklyHours(event.target.value.replace(/-/g, ''))} rightText="Hrs" placeholder="Enter weekly hours" type="number" min={0} />
           </FormField>
         </div>
       </div>
@@ -455,8 +484,18 @@ export const AdminAgreementFormScreen = ({ mode, agreementId, onCancel, onSaved 
         <p className="admin-agreement-form-screen__section-title">VA Work Hours Per Day</p>
 
         {mode === 'edit' && (
-          <FormField label="FIRST Effective Day of new Work Hours Per Day" className="admin-agreement-form-screen__field admin-agreement-form-screen__field--full">
-            <Input type="date" value={firstEffectiveDay} onChange={(event) => setFirstEffectiveDay(event.target.value)} rightIcon="calendar" />
+          <FormField
+            label="FIRST Effective Day of new Work Hours Per Day"
+            description="Only Mondays can be picked as the effective day."
+            className="admin-agreement-form-screen__field admin-agreement-form-screen__field--full"
+          >
+            <DatePickerField
+              value={firstEffectiveDay}
+              onChange={setFirstEffectiveDay}
+              minDate={getCurrentWeekMonday()}
+              maxDate={getMaxEffectiveDay()}
+              isDayDisabled={(date) => !isMonday(date)}
+            />
           </FormField>
         )}
 
@@ -483,6 +522,7 @@ export const AdminAgreementFormScreen = ({ mode, agreementId, onCancel, onSaved 
                 rightText="HRS"
                 className="admin-agreement-form-screen__hours-input"
                 type="number"
+                min={0}
                 step={0.25}
               />
             </div>

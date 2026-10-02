@@ -1,4 +1,5 @@
 import './input.css';
+import { forwardRef } from 'react';
 import type { InputHTMLAttributes } from 'react';
 import { Icon, type IconName, type IconVariant } from '../Icon';
 
@@ -51,24 +52,27 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
  * it's an external validation state — so it's an explicit prop/class instead,
  * same as `disabled`.
  */
-export const Input = ({
-  leftIcon,
-  leftIconVariant = 'bold',
-  onIncrement,
-  onDecrement,
-  incrementLabel,
-  decrementLabel,
-  rightIcon,
-  rightIconVariant = 'bold',
-  onRightIconClick,
-  rightIconLabel,
-  rightText,
-  error = false,
-  disabled,
-  className,
-  style,
-  ...rest
-}: InputProps) => {
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    leftIcon,
+    leftIconVariant = 'bold',
+    onIncrement,
+    onDecrement,
+    incrementLabel,
+    decrementLabel,
+    rightIcon,
+    rightIconVariant = 'bold',
+    onRightIconClick,
+    rightIconLabel,
+    rightText,
+    error = false,
+    disabled,
+    className,
+    style,
+    ...rest
+  },
+  ref,
+) {
   const hasStepper = Boolean(onIncrement && onDecrement);
   const hasLeftContent = hasStepper || Boolean(leftIcon);
   const hasRightIcon = Boolean(rightIcon);
@@ -112,7 +116,7 @@ export const Input = ({
           leftIcon && <Icon name={leftIcon} variant={leftIconVariant} size={16} className="input__icon" />
         )}
         {hasLeftContent && <span className="input__divider" />}
-        <input className="input__field" disabled={disabled} {...rest} />
+        <input ref={ref} className="input__field" disabled={disabled} {...rest} />
       </div>
       {(hasRightIcon || hasRightText) && (
         <div className="input__right">
@@ -136,4 +140,4 @@ export const Input = ({
       )}
     </div>
   );
-};
+});

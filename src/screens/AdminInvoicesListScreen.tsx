@@ -228,7 +228,7 @@ export const AdminInvoicesListScreen = ({ onViewInvoice }: AdminInvoicesListScre
       />
 
       <div className="admin-invoices-list-screen__filters">
-        <Input placeholder="Filter by Date" rightIcon="calendar" readOnly value="" style={{ width: '200px' }} />
+        <Input placeholder="Filter by Date" rightIcon="calendar" className="input--muted-icon" readOnly value="" style={{ width: '200px' }} />
         <Button type="secondary" buttonText="Filters" />
         <Button type="tertiary" buttonText="Reset Filters" disabled />
       </div>

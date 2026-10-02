@@ -10,7 +10,7 @@ import {
 import { MOCK_VA_PROFILES } from '../mocks/vaProfiles';
 import { MOCK_USERS } from '../mocks/users';
 import { MOCK_INVOICES, groupInvoiceItems, type InvoiceGroupView, type InvoiceRecord } from '../mocks/invoices';
-import { sortCARequestsByRecency, shortenVAName } from './vaAccount';
+import { sortCARequestsByRecency, shortenVAName, applyChangeBaseHoursToAgreement } from './vaAccount';
 import {
   MOCK_CA_REQUESTS,
   resetMockCARequests,
@@ -337,6 +337,10 @@ export function resolveCARequest(id: string, decision: 'approved' | 'rejected', 
   request.status = RESOLUTION_STATUS[decision];
   request.resolvedBy = resolvedBy;
   request.resolvedDate = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+  // A pending "change base hours" request only reaches the agreement's own
+  // week/hoursPerWeek once it's actually approved — an auto-approved one
+  // already applied this at creation time, so this is a no-op for those.
+  if (decision === 'approved') applyChangeBaseHoursToAgreement(request);
 }
 
 /** Resolves several requests at once — the client table's checkbox multi-select + "Review Request" action. */

@@ -227,6 +227,7 @@ export const ClientChangesApprovalsScreen = ({ user, scope = 'client' }: ClientC
           leftIcon="calendar"
           leftIconVariant="regular"
           rightIcon="chevron-down"
+          className="input--muted-icon"
           readOnly
           value=""
           style={{ width: '200px' }}

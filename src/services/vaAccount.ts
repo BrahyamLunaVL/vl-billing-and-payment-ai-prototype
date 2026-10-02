@@ -506,6 +506,7 @@ export function createExtraHoursCARequest(input: CreateExtraHoursRequestInput): 
     id: nextCARequestId(),
     vaEmail,
     clientEmail: agreement?.clientEmail ?? '',
+    agreementId,
     title: 'Request approval for extra hours',
     date: todayLong,
     status: needsManualApproval ? 'new' : 'approved',
@@ -591,6 +592,7 @@ export function createTimeOffCARequest(input: CreateTimeOffRequestInput): CARequ
     id: nextCARequestId(),
     vaEmail,
     clientEmail: agreement?.clientEmail ?? '',
+    agreementId,
     title: 'Request approval for time off',
     date: todayLong,
     status: autoApproved ? 'approved' : 'new',
@@ -613,7 +615,9 @@ export interface CreateChangeBaseHoursRequestInput {
   agreementId: string;
   currentHoursPerWeek: number;
   newHoursPerWeek: number;
-  /** Pre-formatted "Monday: 8 hrs" lines for the enabled days of the newly requested schedule, newline-joined. */
+  /** The newly requested per-day schedule — applied to the agreement's own `week` once this request is approved. */
+  week: WeekDayData[];
+  /** Pre-formatted "Monday: 8 hrs" lines for the enabled days of the newly requested schedule, newline-joined — the "New Weekly Schedule" detail's display value. */
   scheduleSummary: string;
   /** ISO date, e.g. "2026-09-14". */
   firstEffectiveDay?: string;
@@ -622,19 +626,45 @@ export interface CreateChangeBaseHoursRequestInput {
 }
 
 /**
+ * Applies a "change base hours/week" request's newly requested schedule to
+ * its agreement — called once, right when the request becomes approved
+ * (immediately for an auto-approved request, or later when the client/admin
+ * manually approves a pending one via `resolveCARequest`). A no-op for any
+ * other request type, since only this one carries `newWeekSchedule`.
+ */
+export function applyChangeBaseHoursToAgreement(request: CARequest): void {
+  if (!request.agreementId || !request.newWeekSchedule || request.newHoursPerWeek === undefined) return;
+  const agreement = MOCK_AGREEMENTS.find((candidate) => candidate.id === request.agreementId);
+  if (!agreement) return;
+  agreement.week = request.newWeekSchedule;
+  agreement.hoursPerWeek = `${request.newHoursPerWeek} Hours per week`;
+}
+
+/**
  * Persists a "Request approval for changing base hours/week worked"
- * submission. Unlike extra hours/time off, there's no auto-approval rule
- * for this request type — changing the agreement's own base schedule always
- * needs the client's manual review. Approving it doesn't yet mutate the
- * agreement's actual `week`/`hoursPerWeek` (out of scope here, same as the
- * other request types' own `appliedBillingPeriod` staying unset until a
- * real invoice cycle exists).
+ * submission. A request made by (or on behalf of) the client is the client
+ * approving their own ask, so it's auto-approved immediately — same rule as
+ * time off; a VA's own request (or Admin on behalf of the VA) always needs
+ * the client's manual review. Either way, the agreement's actual
+ * `week`/`hoursPerWeek` only changes once the request is genuinely approved
+ * — immediately here when auto-approved, or later from `resolveCARequest`.
  */
 export function createChangeBaseHoursCARequest(input: CreateChangeBaseHoursRequestInput): CARequest {
-  const { vaEmail, agreementId, currentHoursPerWeek, newHoursPerWeek, scheduleSummary, firstEffectiveDay, comments, requesterRole } =
-    input;
+  const {
+    vaEmail,
+    agreementId,
+    currentHoursPerWeek,
+    newHoursPerWeek,
+    week,
+    scheduleSummary,
+    firstEffectiveDay,
+    comments,
+    requesterRole,
+  } = input;
   const agreement = MOCK_AGREEMENTS.find((candidate) => candidate.id === agreementId);
   const todayLong = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const todayNumeric = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+  const autoApproved = requesterRole === 'client';
 
   const details: CARequestDetail[] = [
     { label: 'Current Base Hours/Week', value: `${currentHoursPerWeek} Hours/week` },
@@ -649,18 +679,23 @@ export function createChangeBaseHoursCARequest(input: CreateChangeBaseHoursReque
     id: nextCARequestId(),
     vaEmail,
     clientEmail: agreement?.clientEmail ?? '',
+    agreementId,
     title: 'Request approval for changing base hours/week worked',
     date: todayLong,
-    status: 'new',
+    status: autoApproved ? 'approved' : 'new',
     clientName: agreement?.clientName ?? 'LTM Innovation',
     requestedBy: 'you',
     requestedByRole: requesterRole,
     requestedDate: todayLong,
     details,
     comments: comments.trim() || undefined,
+    newWeekSchedule: week,
+    newHoursPerWeek,
+    ...(autoApproved ? { resolvedBy: 'Auto-Approval System', resolvedDate: todayNumeric } : {}),
   };
 
   MOCK_CA_REQUESTS.unshift(request);
+  if (autoApproved) applyChangeBaseHoursToAgreement(request);
   return request;
 }
 

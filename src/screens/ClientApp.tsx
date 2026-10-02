@@ -7,13 +7,34 @@ import { ClientAgreementScreen } from './ClientAgreementScreen'
 import { ClientInvoiceScreen } from './ClientInvoiceScreen'
 import { ClientNewCARequestScreen } from './ClientNewCARequestScreen'
 import { ClientChangesApprovalsScreen } from './ClientChangesApprovalsScreen'
+import { PlaceholderScreen } from './PlaceholderScreen'
 import { getAgreementById } from '../services/clientAccount'
 
 export interface ClientAppProps {
   user: AuthenticatedUser
 }
 
-type ClientPage = 'my-account' | 'agreements' | 'agreement' | 'ca-wizard' | 'changes-approvals-form' | 'client-invoice'
+type ClientPage =
+  | 'my-account'
+  | 'agreements'
+  | 'agreement'
+  | 'ca-wizard'
+  | 'changes-approvals-form'
+  | 'client-invoice'
+  | 'my-va'
+  | 'resources'
+  | 'notifications'
+  | 'settings'
+
+const PLACEHOLDER_TITLES: Record<
+  Exclude<ClientPage, 'my-account' | 'agreements' | 'agreement' | 'ca-wizard' | 'changes-approvals-form' | 'client-invoice'>,
+  string
+> = {
+  'my-va': 'My VA',
+  resources: 'Resources',
+  notifications: 'Notifications',
+  settings: 'Settings',
+}
 
 /**
  * Owns which Client page is showing and drives the shared Sidebar's
@@ -28,10 +49,7 @@ export const ClientApp = ({ user }: ClientAppProps) => {
 
   const handleSelectSidebarItem = (key: string) => {
     setSelectedSidebarItem(key)
-    if (key === 'my-account') setPage('my-account')
-    else if (key === 'agreements') setPage('agreements')
-    else if (key === 'client-invoice') setPage('client-invoice')
-    else if (key === 'changes-approvals-form') setPage('changes-approvals-form')
+    setPage(key as ClientPage)
   }
 
   const handleViewAgreement = (agreementId: string) => {
@@ -86,6 +104,12 @@ export const ClientApp = ({ user }: ClientAppProps) => {
       )}
       {page === 'changes-approvals-form' && <ClientChangesApprovalsScreen user={user} />}
       {page === 'client-invoice' && <ClientInvoiceScreen user={user} />}
+      {page !== 'my-account' &&
+        page !== 'agreements' &&
+        page !== 'agreement' &&
+        page !== 'ca-wizard' &&
+        page !== 'changes-approvals-form' &&
+        page !== 'client-invoice' && <PlaceholderScreen title={PLACEHOLDER_TITLES[page]} />}
     </ClientAppShell>
   )
 }

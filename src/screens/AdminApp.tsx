@@ -10,7 +10,7 @@ import { ClientChangesApprovalsScreen } from './ClientChangesApprovalsScreen'
 import { AdminVAsListScreen } from './AdminVAsListScreen'
 import { AdminVAFormScreen } from './AdminVAFormScreen'
 import { AdminAgreementFormScreen } from './AdminAgreementFormScreen'
-import { AdminPlaceholderScreen } from './AdminPlaceholderScreen'
+import { PlaceholderScreen } from './PlaceholderScreen'
 import { getAgreementById } from '../services/clientAccount'
 
 export interface AdminAppProps {
@@ -36,6 +36,8 @@ type AdminPage =
   | 'codes'
   | 'deposits'
   | 'resources'
+  | 'notifications'
+  | 'settings'
 
 const PLACEHOLDER_TITLES: Record<
   Exclude<
@@ -61,6 +63,8 @@ const PLACEHOLDER_TITLES: Record<
   codes: 'Codes',
   deposits: 'Deposits',
   resources: 'Resources',
+  notifications: 'Notifications',
+  settings: 'Settings',
 }
 
 /** Owns which Admin page is showing and drives the shared Sidebar's selection to match. */
@@ -174,7 +178,7 @@ export const AdminApp = ({ user }: AdminAppProps) => {
         page !== 'va-invoice' &&
         page !== 'va-invoice-detail' &&
         page !== 'vas' &&
-        page !== 'va-form' && <AdminPlaceholderScreen title={PLACEHOLDER_TITLES[page]} />}
+        page !== 'va-form' && <PlaceholderScreen title={PLACEHOLDER_TITLES[page]} />}
     </AdminAppShell>
   )
 }

@@ -1,0 +1,18 @@
+.date-picker-field {
+  position: relative;
+  width: 100%;
+}
+
+.date-picker-field__popover {
+  /* Portaled to document.body and positioned from the trigger's own
+     getBoundingClientRect() (see datePickerField.tsx) — position: fixed
+     here, not absolute, since it's no longer nested inside
+     .date-picker-field. */
+  position: fixed;
+  z-index: 1000;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #ececef;
+  border-radius: 8px;
+  box-shadow: 2px 10px 50px 0px rgba(187, 157, 181, 0.2);
+}

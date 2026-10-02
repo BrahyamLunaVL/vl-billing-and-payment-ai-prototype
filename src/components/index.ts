@@ -97,6 +97,9 @@ export type { CACardProps } from './CACard';
 export { Calendar } from './Calendar';
 export type { CalendarProps } from './Calendar';
 
+export { DatePickerField } from './DatePickerField';
+export type { DatePickerFieldProps } from './DatePickerField';
+
 export { Radio } from './Radio';
 export type { RadioProps } from './Radio';
 

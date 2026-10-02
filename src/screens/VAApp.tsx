@@ -6,12 +6,34 @@ import { ChangesApprovalsScreen } from './ChangesApprovalsScreen'
 import { InvoicePreviewScreen } from './InvoicePreviewScreen'
 import { VAInvoicesScreen } from './VAInvoicesScreen'
 import { ClientAgreementScreen } from './ClientAgreementScreen'
+import { PlaceholderScreen } from './PlaceholderScreen'
 
 export interface VAAppProps {
   user: AuthenticatedUser
 }
 
-type VAPage = 'my-account' | 'changes-approvals' | 'invoices' | 'invoice-preview' | 'agreement'
+type VAPage =
+  | 'my-account'
+  | 'changes-approvals'
+  | 'invoices'
+  | 'invoice-preview'
+  | 'agreement'
+  | 'agreements'
+  | 'invoice-claims'
+  | 'resources'
+  | 'notifications'
+  | 'settings'
+
+const PLACEHOLDER_TITLES: Record<
+  Exclude<VAPage, 'my-account' | 'changes-approvals' | 'invoices' | 'invoice-preview' | 'agreement'>,
+  string
+> = {
+  agreements: 'Agreements',
+  'invoice-claims': 'Invoice Claims',
+  resources: 'Resources',
+  notifications: 'Notifications',
+  settings: 'Settings',
+}
 
 /** Owns which VA page is showing and drives the shared Sidebar's selection to match. */
 export const VAApp = ({ user }: VAAppProps) => {
@@ -26,12 +48,12 @@ export const VAApp = ({ user }: VAAppProps) => {
 
   const handleSelectSidebarItem = (key: string) => {
     setSelectedSidebarItem(key)
-    if (key === 'my-account') setPage('my-account')
-    else if (key === 'invoices') setPage('invoices')
-    else if (key === 'changes-approvals-form') {
+    if (key === 'changes-approvals-form') {
       setOpenWizardDirectly(false)
       setPage('changes-approvals')
+      return
     }
+    setPage(key as VAPage)
   }
 
   const handleViewInvoice = (invoiceId: string) => {
@@ -83,6 +105,11 @@ export const VAApp = ({ user }: VAAppProps) => {
           onRequestChanges={handleRequestChanges}
         />
       )}
+      {page !== 'my-account' &&
+        page !== 'changes-approvals' &&
+        page !== 'invoices' &&
+        page !== 'invoice-preview' &&
+        page !== 'agreement' && <PlaceholderScreen title={PLACEHOLDER_TITLES[page]} />}
     </VAAppShell>
   )
 }

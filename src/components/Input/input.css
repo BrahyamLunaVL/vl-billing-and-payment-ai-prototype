@@ -86,6 +86,24 @@
   flex-shrink: 0;
 }
 
+/* e.g. the decorative calendar icon on a date filter/picker — lighter than
+   the field's own text color so it doesn't read as a dark, high-contrast
+   icon next to the muted placeholder it sits beside. */
+.input--muted-icon .input__icon {
+  color: var(--input-color-gray-400);
+}
+
+/* Only when a custom rightIcon/rightText is present (the `.input__right`
+   sibling) — the browser's own calendar-picker-indicator would otherwise
+   show up alongside (and to the left of) e.g. a `rightIcon="calendar"`. A
+   plain date input with no custom icon keeps the native one as its only
+   indicator. The input stays fully clickable to open the native picker
+   either way. */
+.input__left:has(+ .input__right) .input__field[type='date']::-webkit-calendar-picker-indicator,
+.input__left:has(+ .input__right) .input__field[type='time']::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
 .input__icon-button {
   display: flex;
   align-items: center;

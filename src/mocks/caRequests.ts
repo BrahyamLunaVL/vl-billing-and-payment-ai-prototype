@@ -1,3 +1,5 @@
+import type { WeekDayData } from '../components';
+
 export type CARequestStatus = 'new' | 'approved' | 'rejected' | 'expired';
 
 /** One week's worth of selected days, for the "Days Selected (with hours/day)" detail's collapsible per-week display. */
@@ -39,6 +41,8 @@ export interface CARequest {
   vaEmail: string;
   /** References a MOCK_USERS email — the client the underlying agreement is with. */
   clientEmail: string;
+  /** The agreement this request was submitted under. */
+  agreementId?: string;
   title: string;
   /** e.g. "December 10, 2025" — shown in the C&A list. */
   date: string;
@@ -65,6 +69,9 @@ export interface CARequest {
   extraHoursByDate?: { date: string; hours: number }[];
   /** Structured per-date hours for time-off requests, mirroring `extraHoursByDate` — used to flag dates a VA already requested time off for in an earlier request. */
   timeOffByDate?: { date: string; hours: number }[];
+  /** Present only on "Request approval for changing base hours/week worked" — applied to the agreement's own `week`/`hoursPerWeek` once this request becomes approved (immediately, if auto-approved, or later when manually resolved). */
+  newWeekSchedule?: WeekDayData[];
+  newHoursPerWeek?: number;
 }
 
 /**

@@ -4,6 +4,7 @@ import {
   Step,
   ProfileCard,
   Chip,
+  DatePickerField,
   FormField,
   Input,
   TextArea,
@@ -107,9 +108,14 @@ function buildDayStateFromWeek(week: WeekDayData[]): { enabled: Record<string, b
     const match = week.find((candidate) => candidate.key === day.key)
     enabled[day.key] = match ? !match.disabled : false
     const parsed = match ? parseHoursValue(match.value) : 0
-    hours[day.key] = String(parsed || 0).replace(/^0$/, '0.0')
+    hours[day.key] = String(parsed || 0)
   }
   return { enabled, hours }
+}
+
+/** Total hours across whichever days are currently switched on — the "change base hours" day table's own running total. */
+function sumEnabledDayHours(enabled: Record<string, boolean>, hours: Record<string, string>): number {
+  return DAY_ROWS.reduce((sum, day) => (enabled[day.key] ? sum + (parseFloat(hours[day.key]) || 0) : sum), 0)
 }
 
 /** Mon-Fri 8hrs / Sat-Sun off — used when an agreement has no `week` schedule of its own. */
@@ -155,6 +161,17 @@ function addMonths(date: Date, months: number): Date {
   const result = new Date(date)
   result.setMonth(result.getMonth() + months)
   return result
+}
+
+/** The Monday of the current week — the earliest "First Effective Day" can land on, even if that Monday has already passed this week. */
+function getCurrentWeekMonday(): string {
+  const today = new Date()
+  const daysSinceMonday = (today.getDay() + 6) % 7
+  return toISODate(addDays(today, -daysSinceMonday))
+}
+
+function isMonday(iso: string): boolean {
+  return parseISODate(iso).getDay() === 1
 }
 
 function formatOrdinal(day: number): string {
@@ -305,9 +322,14 @@ export const NewCARequestWizard = ({
   const [timeOffHoursByDate, setTimeOffHoursByDate] = useState<Record<string, number>>({})
   const [timeOffRangeAnchor, setTimeOffRangeAnchor] = useState<string | null>(null)
 
-  const [newBaseHours, setNewBaseHours] = useState('')
-  const [baseHoursFirstEffectiveDay, setBaseHoursFirstEffectiveDay] = useState('')
   const initialBaseHoursDayState = buildDayStateFromWeek(agreementWeek)
+  // Pre-filled with the agreement's current total so it already matches the
+  // day table below — the admin/client only needs to touch it if they
+  // actually want a different weekly total, so it never blocks "Next".
+  const [newBaseHours, setNewBaseHours] = useState(
+    String(sumEnabledDayHours(initialBaseHoursDayState.enabled, initialBaseHoursDayState.hours)),
+  )
+  const [baseHoursFirstEffectiveDay, setBaseHoursFirstEffectiveDay] = useState('')
   const [baseHoursDayEnabled, setBaseHoursDayEnabled] = useState(initialBaseHoursDayState.enabled)
   const [baseHoursDayHours, setBaseHoursDayHours] = useState(initialBaseHoursDayState.hours)
 
@@ -353,9 +375,7 @@ export const NewCARequestWizard = ({
           timeOffDates.reduce((sum, date) => sum + (timeOffHoursByDate[date] ?? 0), 0) > 0 &&
           timeOffDates.length <= MAX_TIME_OFF_DAYS
         : requestType === 'change-base-hours'
-          ? isClientPerspective
-            ? (parseFloat(newBaseHours) || 0) > 0 && baseHoursFirstEffectiveDay !== ''
-            : baseHoursFirstEffectiveDay !== ''
+          ? baseHoursFirstEffectiveDay !== ''
           : true
   const weekGroups = buildWeekGroups(
     selectedDates,
@@ -502,16 +522,16 @@ export const NewCARequestWizard = ({
 
   const handleToggleBaseHoursDay = (key: string, checked: boolean) => {
     setBaseHoursDayEnabled((prev) => ({ ...prev, [key]: checked }))
+    // A day that's turned off doesn't keep whatever hours it had — it reads
+    // as 0 until (if ever) it's turned back on.
+    if (!checked) setBaseHoursDayHours((prev) => ({ ...prev, [key]: '0' }))
   }
 
   const handleBaseHoursDayHoursChange = (key: string, value: string) => {
-    setBaseHoursDayHours((prev) => ({ ...prev, [key]: value }))
+    setBaseHoursDayHours((prev) => ({ ...prev, [key]: value.replace(/-/g, '') }))
   }
 
-  const totalBaseHoursEntered = DAY_ROWS.reduce(
-    (sum, day) => (baseHoursDayEnabled[day.key] ? sum + (parseFloat(baseHoursDayHours[day.key]) || 0) : sum),
-    0,
-  )
+  const totalBaseHoursEntered = sumEnabledDayHours(baseHoursDayEnabled, baseHoursDayHours)
   // The VA's own version of this form has no "New Base Hours/Week" field at
   // all — they're only redistributing hours across days, so the table
   // checks against their current total instead of a separately-requested one.
@@ -566,13 +586,20 @@ export const NewCARequestWizard = ({
     }
     if (requestType === 'change-base-hours' && agreementId) {
       const scheduleSummary = DAY_ROWS.filter((day) => baseHoursDayEnabled[day.key])
-        .map((day) => `${day.label}: ${baseHoursDayHours[day.key] || '0.0'} hrs`)
+        .map((day) => `${day.label}: ${baseHoursDayHours[day.key] || '0'} hrs`)
         .join('\n')
+      const week: WeekDayData[] = DAY_ROWS.map((day) => ({
+        key: day.key,
+        dayLetter: day.dayLetter,
+        value: `${baseHoursDayHours[day.key] || '0'} hrs`,
+        disabled: !baseHoursDayEnabled[day.key],
+      }))
       createChangeBaseHoursCARequest({
         vaEmail,
         agreementId,
         currentHoursPerWeek: workingHoursPerWeek,
         newHoursPerWeek: isClientPerspective ? targetBaseHours : totalBaseHoursEntered,
+        week,
         scheduleSummary,
         firstEffectiveDay: baseHoursFirstEffectiveDay || undefined,
         comments,
@@ -592,11 +619,11 @@ export const NewCARequestWizard = ({
     setTimeOffPaid('paid')
     setMakeUpHoursTiming(MAKE_UP_HOURS_OPTIONS[0])
     setClientResponse(CLIENT_RESPONSE_OPTIONS[0])
-    setNewBaseHours('')
     setBaseHoursFirstEffectiveDay('')
     const resetDayState = buildDayStateFromWeek(agreementWeek)
     setBaseHoursDayEnabled(resetDayState.enabled)
     setBaseHoursDayHours(resetDayState.hours)
+    setNewBaseHours(String(sumEnabledDayHours(resetDayState.enabled, resetDayState.hours)))
     setStep(1)
   }
 
@@ -1331,13 +1358,14 @@ export const NewCARequestWizard = ({
                 {isClientPerspective && (
                   <FormField
                     label="New Base Hours/Week you&apos;d like to request to work for your VA?"
+                    badge="(Optional)"
                     description="This will be the new base minimum hours/week your VA will work."
                   >
                     <Input
                       type="number"
-                      min={1}
+                      min={0}
                       value={newBaseHours}
-                      onChange={(event) => setNewBaseHours(event.target.value)}
+                      onChange={(event) => setNewBaseHours(event.target.value.replace(/-/g, ''))}
                       placeholder="Enter new base hours/week"
                     />
                   </FormField>
@@ -1374,6 +1402,7 @@ export const NewCARequestWizard = ({
                           rightText="Hrs"
                           className="ca-wizard__hours-input"
                           type="number"
+                          min={0}
                           step={0.25}
                         />
                       </div>
@@ -1391,10 +1420,12 @@ export const NewCARequestWizard = ({
                   }
                   helpText="*Please note that you are unable to request changes before current Invoice period."
                 >
-                  <Input
-                    type="date"
+                  <DatePickerField
                     value={baseHoursFirstEffectiveDay}
-                    onChange={(event) => setBaseHoursFirstEffectiveDay(event.target.value)}
+                    onChange={setBaseHoursFirstEffectiveDay}
+                    minDate={getCurrentWeekMonday()}
+                    maxDate={toISODate(addMonths(new Date(), 6))}
+                    isDayDisabled={(date) => !isMonday(date)}
                   />
                 </FormField>
 
