@@ -50,6 +50,13 @@ const REQUEST_TYPE_OPTIONS: { value: RequestType; label: string }[] = [
   { value: 'agreement-hours-per-day', label: 'Request approval for agreement Work Hours Per Day change' },
 ]
 
+// TEMP (offline V2 export): Extra Hours stays listed as a choice on Step 1
+// for every viewer, but Step 2 shows the generic "not built yet" placeholder
+// instead of its real form. Typed as `boolean` (not inferred as the literal
+// `false`) so TypeScript still narrows the real form's own unrelated
+// variables normally in the dead branch below.
+const EXTRA_HOURS_FORM_ENABLED: boolean = false
+
 const DAILY_MAX_HOURS = 12
 const TOTAL_MAX_HOURS = 60
 const RATE_PER_HOUR = 10
@@ -298,9 +305,12 @@ export const NewCARequestWizard = ({
 }: NewCARequestWizardProps) => {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [onBehalfOf, setOnBehalfOf] = useState<'client' | 'va'>('va')
-  // TEMP (offline V2 export): "Request approval for extra hours" is
-  // disabled for every viewer, so default to Time Off instead.
-  const [requestType, setRequestType] = useState<RequestType>('time-off')
+  // "Request approval for extra hours" isn't offered to the Client (or Admin
+  // acting as Client) — only the VA actually works the hours being
+  // reported, so default away from it when starting from that perspective.
+  const [requestType, setRequestType] = useState<RequestType>(
+    !showOnBehalfOf && requesterRole === 'client' ? 'time-off' : 'extra-hours',
+  )
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [hoursByDate, setHoursByDate] = useState<Record<string, number>>({})
   const [comments, setComments] = useState('')
@@ -607,7 +617,7 @@ export const NewCARequestWizard = ({
   }
 
   const handleRequestMore = () => {
-    setRequestType('time-off')
+    setRequestType('extra-hours')
     setSelectedDates([])
     setHoursByDate({})
     setComments('')
@@ -690,11 +700,7 @@ export const NewCARequestWizard = ({
                       value="client"
                       label="Client"
                       checked={onBehalfOf === 'client'}
-                      onChange={() => {
-                        setOnBehalfOf('client')
-                        // Extra hours isn't offered from the client's perspective.
-                        if (requestType === 'extra-hours') setRequestType('time-off')
-                      }}
+                      onChange={() => setOnBehalfOf('client')}
                     />
                     <Radio
                       name="on-behalf-of"
@@ -711,7 +717,8 @@ export const NewCARequestWizard = ({
                       ? 'Main Changes Requested from the Client'
                       : 'Main Changes Requested from the Virtual Assistant (VA)'}
                   </legend>
-                  {REQUEST_TYPE_OPTIONS.filter((option) => option.value !== 'extra-hours').map((option) => (
+                  {/* TEMP (offline V2 export): Extra Hours stays listed for every viewer, Client included. */}
+                  {REQUEST_TYPE_OPTIONS.map((option) => (
                     <Radio
                       key={option.value}
                       name="request-type"
@@ -731,7 +738,12 @@ export const NewCARequestWizard = ({
         </div>
       )}
 
-      {step === 2 && requestType !== 'extra-hours' && requestType !== 'time-off' && requestType !== 'change-base-hours' && (
+      {/* TEMP (offline V2 export): Extra Hours now falls through to this
+          "not built yet" placeholder too, instead of its real form below. */}
+      {step === 2 &&
+        (!EXTRA_HOURS_FORM_ENABLED || requestType !== 'extra-hours') &&
+        requestType !== 'time-off' &&
+        requestType !== 'change-base-hours' && (
         <ProfileCard>
           <p className="ca-wizard__description">
             This request type isn&apos;t available in the prototype yet — only &quot;Request approval
@@ -743,7 +755,7 @@ export const NewCARequestWizard = ({
         </ProfileCard>
       )}
 
-      {step === 2 && requestType === 'extra-hours' && (
+      {EXTRA_HOURS_FORM_ENABLED && step === 2 && requestType === 'extra-hours' && (
         <>
           <h2 className="ca-wizard__heading">Request Approval for Extra Hours</h2>
           <p className="ca-wizard__description">
