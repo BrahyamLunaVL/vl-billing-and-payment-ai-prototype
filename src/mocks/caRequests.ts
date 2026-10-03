@@ -75,16 +75,19 @@ export interface CARequest {
 }
 
 /**
- * Every VA starts with exactly 2 resolved extra-hours requests (one
- * approved, one rejected) — no pending ("new") ones. Pending requests are
- * created live through the wizard (`createExtraHoursCARequest`) as part of
- * whatever's being tested, since only one can be active per VA at a time.
+ * TEMP (offline V2 export): with "Request approval for extra hours" routed
+ * to the generic placeholder on this branch, the seed data no longer
+ * includes any extra-hours requests — every VA instead starts with one
+ * resolved "time off" request and one resolved "change base hours" request
+ * (matching the two request types `NewCARequestWizard` still fully builds
+ * out on this branch).
  */
 const INITIAL_CA_REQUESTS: CARequest[] = [
   {
     id: 'ca-1',
     vaEmail: 'va@virtuallatinos.com',
-    title: 'Request approval for extra hours',
+    agreementId: 'agr-1',
+    title: 'Request approval for time off',
     date: 'April 27, 2026',
     status: 'rejected',
     clientEmail: 'client@virtuallatinos.com',
@@ -96,28 +99,18 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     resolvedDate: 'April 27, 2026',
     appliedBillingPeriod: '4/27/2026 - 5/10/2026',
     details: [
-      { label: 'Pre-approved Hours per week', value: '5 Hours' },
-      { label: 'Total Extra Hours Reported', value: '15 Hours' },
+      { label: 'Request Type', value: 'Non-consecutive days' },
+      { label: 'Paid or Non-Paid', value: 'Non-Paid' },
+      { label: 'Total Hours Requested', value: '15 Hours' },
+      { label: 'Total Days Requested', value: '2 Days' },
       {
-        label: 'Days Selected (with hours/day)',
+        label: 'Dates Requested',
         value: 'Tuesday 04-21-2026 (8 Hours)\nThursday 04-23-2026 (7 Hours)',
-        dayGroups: [
-          {
-            weekLabel: 'Week from Apr 20 to Apr 26, 2026',
-            days: ['Tuesday 04-21-2026 (8 Hours)', 'Thursday 04-23-2026 (7 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 15 },
-          },
-        ],
-      },
-      { label: 'Approval Type', value: 'Manual' },
-      {
-        label: 'Agreement',
-        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Elena R.-2025-04-28',
         fullWidth: true,
       },
     ],
-    comments: 'Covered for a teammate out sick, worked extra to keep the deliverable on track.',
-    extraHoursByDate: [
+    comments: 'Family event, requesting unpaid time off those two days.',
+    timeOffByDate: [
       { date: '2026-04-21', hours: 8 },
       { date: '2026-04-23', hours: 7 },
     ],
@@ -125,53 +118,45 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
   {
     id: 'ca-2',
     vaEmail: 'va@virtuallatinos.com',
-    title: 'Request approval for extra hours',
+    agreementId: 'agr-1',
+    title: 'Request approval for changing base hours/week worked',
     date: 'April 20, 2026',
     status: 'approved',
     clientEmail: 'client@virtuallatinos.com',
-    clientName: 'LTM Innovation',
+    clientName: 'Bloominari dba Virtual Latinos',
     requestedBy: 'you',
-    requestedByRole: 'va',
+    requestedByRole: 'client',
     requestedDate: 'April 20, 2026',
-    resolvedBy: 'Erick Farias VL',
-    resolvedDate: 'April 20, 2026',
+    resolvedBy: 'Auto-Approval System',
+    resolvedDate: '4/20/2026',
     appliedBillingPeriod: '4/20/2026 - 5/3/2026',
     details: [
-      { label: 'Pre-approved Hours per week', value: '5 Hours' },
-      { label: 'Total Extra Hours Reported', value: '7 Hours' },
+      { label: 'Current Base Hours/Week', value: '40 Hours/week' },
+      { label: 'New Base Hours/Week', value: '32 Hours/week' },
       {
-        label: 'Days Selected (with hours/day)',
-        value: 'Wednesday 04-08-2026 (4 Hours)\nThursday 04-16-2026 (3 Hours)',
-        dayGroups: [
-          {
-            weekLabel: 'Week from Apr 6 to Apr 12, 2026',
-            days: ['Wednesday 04-08-2026 (4 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 4 },
-          },
-          {
-            weekLabel: 'Week from Apr 13 to Apr 19, 2026',
-            days: ['Thursday 04-16-2026 (3 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 3 },
-          },
-        ],
-      },
-      { label: 'Approval Type', value: 'Auto Approval' },
-      {
-        label: 'Agreement',
-        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Elena R.-2025-04-28',
+        label: 'New Weekly Schedule',
+        value: 'Monday: 8 hrs\nTuesday: 8 hrs\nWednesday: 8 hrs\nThursday: 8 hrs',
         fullWidth: true,
       },
+      { label: 'First Effective Day', value: 'Monday 04-27-2026', fullWidth: true },
     ],
-    comments: 'Worked ahead on the client deliverable within my pre-approved weekly hours.',
-    extraHoursByDate: [
-      { date: '2026-04-08', hours: 4 },
-      { date: '2026-04-16', hours: 3 },
+    comments: 'Reducing days to 4 per week going forward.',
+    newWeekSchedule: [
+      { key: 'mon', dayLetter: 'M', value: '8 hrs' },
+      { key: 'tue', dayLetter: 'T', value: '8 hrs' },
+      { key: 'wed', dayLetter: 'W', value: '8 hrs' },
+      { key: 'thu', dayLetter: 'T', value: '8 hrs' },
+      { key: 'fri', dayLetter: 'F', value: '0 hrs', disabled: true },
+      { key: 'sat', dayLetter: 'S', value: '0 hrs', disabled: true },
+      { key: 'sun', dayLetter: 'S', value: '0 hrs', disabled: true },
     ],
+    newHoursPerWeek: 32,
   },
   {
     id: 'ca-3',
     vaEmail: 'va2@virtuallatinos.com',
-    title: 'Request approval for extra hours',
+    agreementId: 'agr-5',
+    title: 'Request approval for time off',
     date: 'May 25, 2026',
     status: 'rejected',
     clientEmail: 'client@virtuallatinos.com',
@@ -183,28 +168,18 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     resolvedDate: 'May 25, 2026',
     appliedBillingPeriod: '5/25/2026 - 6/7/2026',
     details: [
-      { label: 'Pre-approved Hours per week', value: '5 Hours' },
-      { label: 'Total Extra Hours Reported', value: '15 Hours' },
+      { label: 'Request Type', value: 'Non-consecutive days' },
+      { label: 'Paid or Non-Paid', value: 'Paid' },
+      { label: 'Total Hours Requested', value: '15 Hours' },
+      { label: 'Total Days Requested', value: '2 Days' },
       {
-        label: 'Days Selected (with hours/day)',
+        label: 'Dates Requested',
         value: 'Monday 05-18-2026 (9 Hours)\nWednesday 05-20-2026 (6 Hours)',
-        dayGroups: [
-          {
-            weekLabel: 'Week from May 18 to May 24, 2026',
-            days: ['Monday 05-18-2026 (9 Hours)', 'Wednesday 05-20-2026 (6 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 15 },
-          },
-        ],
-      },
-      { label: 'Approval Type', value: 'Manual' },
-      {
-        label: 'Agreement',
-        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Laura G.-2024-03-04',
         fullWidth: true,
       },
     ],
-    comments: 'Picked up extra hours to cover a client launch week.',
-    extraHoursByDate: [
+    comments: 'Taking partial days off to handle a personal matter.',
+    timeOffByDate: [
       { date: '2026-05-18', hours: 9 },
       { date: '2026-05-20', hours: 6 },
     ],
@@ -212,95 +187,82 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
   {
     id: 'ca-4',
     vaEmail: 'va2@virtuallatinos.com',
-    title: 'Request approval for extra hours',
+    agreementId: 'agr-5',
+    title: 'Request approval for changing base hours/week worked',
     date: 'May 18, 2026',
     status: 'approved',
     clientEmail: 'client@virtuallatinos.com',
-    clientName: 'LTM Innovation',
+    clientName: 'Bloominari dba Virtual Latinos',
     requestedBy: 'you',
-    requestedByRole: 'va',
+    requestedByRole: 'client',
     requestedDate: 'May 18, 2026',
-    resolvedBy: 'Erick Farias VL',
-    resolvedDate: 'May 18, 2026',
+    resolvedBy: 'Auto-Approval System',
+    resolvedDate: '5/18/2026',
     appliedBillingPeriod: '5/18/2026 - 5/31/2026',
     details: [
-      { label: 'Pre-approved Hours per week', value: '5 Hours' },
-      { label: 'Total Extra Hours Reported', value: '7 Hours' },
+      { label: 'Current Base Hours/Week', value: '40 Hours/week' },
+      { label: 'New Base Hours/Week', value: '24 Hours/week' },
       {
-        label: 'Days Selected (with hours/day)',
-        value: 'Tuesday 05-05-2026 (3 Hours)\nWednesday 05-13-2026 (4 Hours)',
-        dayGroups: [
-          {
-            weekLabel: 'Week from May 4 to May 10, 2026',
-            days: ['Tuesday 05-05-2026 (3 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 3 },
-          },
-          {
-            weekLabel: 'Week from May 11 to May 17, 2026',
-            days: ['Wednesday 05-13-2026 (4 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 5, takenByOtherRequests: 0, reportedInThisRequest: 4 },
-          },
-        ],
-      },
-      { label: 'Approval Type', value: 'Auto Approval' },
-      {
-        label: 'Agreement',
-        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Laura G.-2024-03-04',
+        label: 'New Weekly Schedule',
+        value: 'Monday: 8 hrs\nWednesday: 8 hrs\nFriday: 8 hrs',
         fullWidth: true,
       },
+      { label: 'First Effective Day', value: 'Monday 05-25-2026', fullWidth: true },
     ],
-    comments: 'Stayed a little late two days to finish a report ahead of schedule.',
-    extraHoursByDate: [
-      { date: '2026-05-05', hours: 3 },
-      { date: '2026-05-13', hours: 4 },
+    comments: 'Switching to a 3-day part-time schedule.',
+    newWeekSchedule: [
+      { key: 'mon', dayLetter: 'M', value: '8 hrs' },
+      { key: 'tue', dayLetter: 'T', value: '0 hrs', disabled: true },
+      { key: 'wed', dayLetter: 'W', value: '8 hrs' },
+      { key: 'thu', dayLetter: 'T', value: '0 hrs', disabled: true },
+      { key: 'fri', dayLetter: 'F', value: '8 hrs' },
+      { key: 'sat', dayLetter: 'S', value: '0 hrs', disabled: true },
+      { key: 'sun', dayLetter: 'S', value: '0 hrs', disabled: true },
     ],
+    newHoursPerWeek: 24,
   },
   {
     id: 'ca-5',
     vaEmail: 'va-no-hours@virtuallatinos.com',
-    title: 'Request approval for extra hours',
+    agreementId: 'agr-3',
+    title: 'Request approval for changing base hours/week worked',
     date: 'February 23, 2026',
     status: 'approved',
     clientEmail: 'client@virtuallatinos.com',
-    clientName: 'LTM Innovation',
+    clientName: 'Bloominari dba Virtual Latinos',
     requestedBy: 'you',
-    requestedByRole: 'va',
+    requestedByRole: 'client',
     requestedDate: 'February 23, 2026',
-    resolvedBy: 'Erick Farias VL',
-    resolvedDate: 'February 23, 2026',
+    resolvedBy: 'Auto-Approval System',
+    resolvedDate: '2/23/2026',
     appliedBillingPeriod: '2/23/2026 - 3/8/2026',
     details: [
-      { label: 'Pre-approved Hours per week', value: '0 Hours' },
-      { label: 'Total Extra Hours Reported', value: '15 Hours' },
-      { label: 'Manual Approved Hours', value: '15 Hours' },
+      { label: 'Current Base Hours/Week', value: '40 Hours/week' },
+      { label: 'New Base Hours/Week', value: '20 Hours/week' },
       {
-        label: 'Days Selected (with hours/day)',
-        value: 'Tuesday 02-17-2026 (8 Hours)\nThursday 02-19-2026 (7 Hours)',
-        dayGroups: [
-          {
-            weekLabel: 'Week from Feb 16 to Feb 22, 2026',
-            days: ['Tuesday 02-17-2026 (8 Hours)', 'Thursday 02-19-2026 (7 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 0, takenByOtherRequests: 0, reportedInThisRequest: 15 },
-          },
-        ],
-      },
-      { label: 'Approval Type', value: 'Manual' },
-      {
-        label: 'Agreement',
-        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Camila T.-2026-01-12',
+        label: 'New Weekly Schedule',
+        value: 'Monday: 5 hrs\nTuesday: 5 hrs\nWednesday: 5 hrs\nThursday: 5 hrs',
         fullWidth: true,
       },
+      { label: 'First Effective Day', value: 'Monday 03-02-2026', fullWidth: true },
     ],
-    comments: 'Covered extra shifts while the team was short-staffed that week.',
-    extraHoursByDate: [
-      { date: '2026-02-17', hours: 8 },
-      { date: '2026-02-19', hours: 7 },
+    comments: 'Reducing weekly commitment per new availability.',
+    newWeekSchedule: [
+      { key: 'mon', dayLetter: 'M', value: '5 hrs' },
+      { key: 'tue', dayLetter: 'T', value: '5 hrs' },
+      { key: 'wed', dayLetter: 'W', value: '5 hrs' },
+      { key: 'thu', dayLetter: 'T', value: '5 hrs' },
+      { key: 'fri', dayLetter: 'F', value: '0 hrs', disabled: true },
+      { key: 'sat', dayLetter: 'S', value: '0 hrs', disabled: true },
+      { key: 'sun', dayLetter: 'S', value: '0 hrs', disabled: true },
     ],
+    newHoursPerWeek: 20,
   },
   {
     id: 'ca-6',
     vaEmail: 'va-no-hours@virtuallatinos.com',
-    title: 'Request approval for extra hours',
+    agreementId: 'agr-3',
+    title: 'Request approval for time off',
     date: 'February 16, 2026',
     status: 'rejected',
     clientEmail: 'client@virtuallatinos.com',
@@ -312,33 +274,18 @@ const INITIAL_CA_REQUESTS: CARequest[] = [
     resolvedDate: 'February 16, 2026',
     appliedBillingPeriod: '2/16/2026 - 3/1/2026',
     details: [
-      { label: 'Pre-approved Hours per week', value: '0 Hours' },
-      { label: 'Total Extra Hours Reported', value: '7 Hours' },
+      { label: 'Request Type', value: 'Non-consecutive days' },
+      { label: 'Paid or Non-Paid', value: 'Non-Paid' },
+      { label: 'Total Hours Requested', value: '7 Hours' },
+      { label: 'Total Days Requested', value: '2 Days' },
       {
-        label: 'Days Selected (with hours/day)',
+        label: 'Dates Requested',
         value: 'Wednesday 02-04-2026 (4 Hours)\nThursday 02-12-2026 (3 Hours)',
-        dayGroups: [
-          {
-            weekLabel: 'Week from Feb 2 to Feb 8, 2026',
-            days: ['Wednesday 02-04-2026 (4 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 0, takenByOtherRequests: 0, reportedInThisRequest: 4 },
-          },
-          {
-            weekLabel: 'Week from Feb 9 to Feb 15, 2026',
-            days: ['Thursday 02-12-2026 (3 Hours)'],
-            hoursTooltip: { preApprovedHoursPerWeek: 0, takenByOtherRequests: 0, reportedInThisRequest: 3 },
-          },
-        ],
-      },
-      { label: 'Approval Type', value: 'Manual' },
-      {
-        label: 'Agreement',
-        value: 'VL-Agreement-Bloominari dba Virtual Latinos-Camila T.-2026-01-12',
         fullWidth: true,
       },
     ],
-    comments: "This agreement doesn't have pre-approved hours yet, so every extra hour needs the client's review.",
-    extraHoursByDate: [
+    comments: "This agreement doesn't have pre-approved hours yet, so time off needs the client's review.",
+    timeOffByDate: [
       { date: '2026-02-04', hours: 4 },
       { date: '2026-02-12', hours: 3 },
     ],
